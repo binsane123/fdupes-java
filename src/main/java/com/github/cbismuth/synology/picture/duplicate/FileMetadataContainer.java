@@ -4,6 +4,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import org.slf4j.Logger;
 import org.zeroturnaround.exec.ProcessExecutor;
+import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -83,11 +84,13 @@ class FileMetadataContainer {
 
     private String md5sum(final FileMetadata fileMetadata) {
         try (final Timer.Context ignored = metricRegistry.timer(name("md5sum", "timer")).time()) {
-            return new ProcessExecutor().command(getNativeMd5SumCommand(fileMetadata))
-                                        .readOutput(true)
-                                        .execute()
-                                        .outputUTF8()
-                                        .split("\\s")[0];
+            final String md5sum = new ProcessExecutor().command(getNativeMd5SumCommand(fileMetadata))
+                                                       .readOutput(true)
+                                                       .redirectOutput(Slf4jStream.of("md5sum").asTrace())
+                                                       .execute()
+                                                       .outputUTF8()
+                                                       .split("\\s")[0];
+            return md5sum;
         } catch (final Exception e) {
             LOGGER.error("Can't compute md5sum from file [{}] ({})", fileMetadata.getAbsolutePath(), e.getClass().getSimpleName());
             return randomUUID().toString();
