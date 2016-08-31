@@ -94,7 +94,7 @@ class FileMetadataContainer {
         }
     }
 
-    private Collection<String> getNativeMd5SumCommand(FileMetadata fileMetadata) {
+    private Iterable<String> getNativeMd5SumCommand(final FileMetadata fileMetadata) {
         final Collection<String> command = newArrayList();
 
         if (IS_OS_LINUX) {

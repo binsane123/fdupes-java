@@ -27,7 +27,7 @@ final class Main {
 
         try (final Slf4jReporter slf4jReporter = Slf4jReporter.forRegistry(metricRegistry).outputTo(getLogger("metrics")).build();
              final JmxReporter jmxReporter = JmxReporter.forRegistry(metricRegistry).build()) {
-            slf4jReporter.start(1, MINUTES);
+            slf4jReporter.start(1L, MINUTES);
             jmxReporter.start();
 
             doIt(metricRegistry, args);

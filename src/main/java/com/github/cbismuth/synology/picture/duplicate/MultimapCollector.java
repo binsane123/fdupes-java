@@ -53,13 +53,13 @@ final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K, V>, M
     @Override
     public BiConsumer<Multimap<K, V>, T> accumulator() {
         return (map, element) -> {
-            metricRegistry.counter(name(name, "size")).inc();
+            metricRegistry.counter(name(name, "counter")).inc();
 
             final K key = keyGetter.apply(element);
             final V value = valueGetter.apply(element);
 
             if (map.containsKey(key)) {
-                metricRegistry.counter(name(name, "duplicates")).inc();
+                metricRegistry.counter(name(name, "duplicates", "counter")).inc();
             }
 
             map.put(key, value);
