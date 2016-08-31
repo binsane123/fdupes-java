@@ -1,4 +1,4 @@
-import com.google.common.base.MoreObjects;
+package com.github.cbismuth.synology.picture.duplicate;
 
 import java.util.Objects;
 
@@ -42,14 +42,6 @@ class FileMetadata implements Comparable<FileMetadata> {
 
     long getSize() {
         return size;
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                          .add("absolutePath", absolutePath)
-                          .add("size", size)
-                          .toString();
     }
 
 }

@@ -1,3 +1,5 @@
+package com.github.cbismuth.synology.picture.duplicate;
+
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ArrayListMultimap;

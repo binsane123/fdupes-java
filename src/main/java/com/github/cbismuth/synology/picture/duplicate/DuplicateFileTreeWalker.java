@@ -1,3 +1,5 @@
+package com.github.cbismuth.synology.picture.duplicate;
+
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import org.slf4j.Logger;
@@ -7,19 +9,28 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
+import java.util.Set;
 
 import static java.nio.file.Files.isDirectory;
+import static java.util.Arrays.asList;
 import static org.slf4j.LoggerFactory.getLogger;
 
-class DuplicateFileTreeWalker {
+public class DuplicateFileTreeWalker {
 
     private static final Logger LOGGER = getLogger(DuplicateFileTreeWalker.class);
+
+    public static Set<String> fdups(final String... rootPaths) {
+        return new DuplicateFileTreeWalker().extractDuplicates(asList(rootPaths));
+    }
 
     private final MetricRegistry metricRegistry = new MetricRegistry();
     private final FileMetadataContainer fileMetadataContainer = new FileMetadataContainer(metricRegistry);
 
-    Collection<String> extractDuplicates(final Iterable<String> rootPaths) {
+    MetricRegistry getMetricRegistry() {
+        return metricRegistry;
+    }
+
+    Set<String> extractDuplicates(final Iterable<String> rootPaths) {
         try (final JmxReporter reporter = JmxReporter.forRegistry(metricRegistry).build()) {
             reporter.start();
 
@@ -27,7 +38,7 @@ class DuplicateFileTreeWalker {
         }
     }
 
-    private Collection<String> doIt(final Iterable<String> rootPaths) {
+    private Set<String> doIt(final Iterable<String> rootPaths) {
         fileMetadataContainer.clear();
 
         rootPaths.forEach(rootPath -> {

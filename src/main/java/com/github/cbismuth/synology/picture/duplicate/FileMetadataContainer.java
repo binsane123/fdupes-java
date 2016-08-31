@@ -1,19 +1,25 @@
+package com.github.cbismuth.synology.picture.duplicate;
+
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.base.Throwables;
 import com.google.common.primitives.UnsignedBytes;
 import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.lang.String.format;
+import static java.util.UUID.randomUUID;
 import static org.slf4j.LoggerFactory.getLogger;
 
 class FileMetadataContainer {
@@ -36,12 +42,12 @@ class FileMetadataContainer {
     void addFile(final Path path) {
         try {
             fileMetadataCollection.add(new FileMetadata(path.toString(), Files.size(path)));
-        } catch (final IOException e) {
-            throw Throwables.propagate(e);
+        } catch (final Exception e) {
+            LOGGER.error("Can't read file [{}] ({})", path, e.getClass().getSimpleName());
         }
     }
 
-    Collection<String> extractDuplicates() {
+    Set<String> extractDuplicates() {
         return fileMetadataCollection.stream()
                                      // index file metadata elements by file size
                                      .collect(MultimapCollector.toMultimap(metricRegistry, "duplicatesBySize", FileMetadata::getSize))
@@ -53,7 +59,7 @@ class FileMetadataContainer {
                                      .filter(e -> e.getValue().size() > 1)
                                      // flatten all duplicates by size
                                      .flatMap(e -> e.getValue().stream())
-                                     .peek(e -> LOGGER.info("Duplicate by size detected at [{}]", e.getAbsolutePath()))
+                                     .peek(e -> LOGGER.debug("Duplicate by size detected at [{}]", e.getAbsolutePath()))
                                      // index file metadata elements by md5sum
                                      .collect(MultimapCollector.toMultimap(metricRegistry, "duplicatesByMd5Sum", this::md5sum))
                                      // get a stream of entries
@@ -63,14 +69,14 @@ class FileMetadataContainer {
                                      // keep duplicates by md5sum only
                                      .filter(e -> e.getValue().size() > 1)
                                      // remove first element of each collection (i.e. original file)
-                                     .peek(e -> e.getValue().remove(e.getValue().iterator().next()))
+                                     .peek(e -> sortAndRemoveFirst((List<FileMetadata>) e.getValue()))
                                      // flatten all duplicates by md5sum (i.e. all identified duplicates to remove)
                                      .flatMap(e -> e.getValue().stream())
-                                     .peek(e -> LOGGER.info("Duplicate by md5sum detected at [{}]", e.getAbsolutePath()))
+                                     .peek(e -> LOGGER.debug("Duplicate by md5sum detected at [{}]", e.getAbsolutePath()))
                                      // extract absolute paths only
-                                     .map(FileMetadata::getAbsolutePath)
+                                     .map(e -> format("\"%s\"", e.getAbsolutePath()))
                                      // collect absolute paths
-                                     .collect(Collectors.toList());
+                                     .collect(Collectors.toCollection(TreeSet::new));
 
     }
 
@@ -84,8 +90,14 @@ class FileMetadataContainer {
 
             return UnsignedBytes.join(separator, digest);
         } catch (final Exception e) {
-            throw Throwables.propagate(e);
+            LOGGER.error("Can't compute md5sum from file [{}] ({})", fileMetadata.getAbsolutePath(), e.getClass().getSimpleName());
+            return randomUUID().toString();
         }
+    }
+
+    private void sortAndRemoveFirst(final List<FileMetadata> value) {
+        Collections.sort(value);
+        value.remove(0);
     }
 
 }
