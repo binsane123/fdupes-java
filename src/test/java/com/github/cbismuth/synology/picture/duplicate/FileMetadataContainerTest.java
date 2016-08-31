@@ -1,5 +1,6 @@
 package com.github.cbismuth.synology.picture.duplicate;
 
+import com.codahale.metrics.MetricRegistry;
 import org.junit.Test;
 
 import java.nio.file.Path;
@@ -18,11 +19,12 @@ public class FileMetadataContainerTest {
 
     private static final String WORKING_DIRECTORY = System.getProperty("user.dir");
 
-    private static final long UNIQUE_DIRECTORIES_COUNT = 16L;
+    private static final long UNIQUE_DIRECTORIES_COUNT = 5L;
     private static final long UNIQUE_FILES_COUNT = 3L;
-    private static final long DUPLICATION_FACTOR = 7L;
+    private static final long DUPLICATION_FACTOR = 2L;
 
-    private final DuplicateFileTreeWalker systemUnderTest = new DuplicateFileTreeWalker();
+    private final MetricRegistry metricRegistry = new MetricRegistry();
+    private final DuplicateFileTreeWalker systemUnderTest = new DuplicateFileTreeWalker(metricRegistry);
     private final FileMetadataContainerTestHelper helper = new FileMetadataContainerTestHelper(UNIQUE_DIRECTORIES_COUNT,
                                                                                                UNIQUE_FILES_COUNT,
                                                                                                DUPLICATION_FACTOR);
@@ -235,7 +237,7 @@ public class FileMetadataContainerTest {
     }
 
     private long getCounterValue(final String name) {
-        return systemUnderTest.getMetricRegistry().counter(name).getCount();
+        return metricRegistry.counter(name).getCount();
     }
 
 }
