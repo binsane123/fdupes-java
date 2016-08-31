@@ -6,11 +6,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
 
-import static com.github.cbismuth.synology.picture.duplicate.DuplicateFileTreeWalker.fdups;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
+import static java.util.Arrays.asList;
 import static org.slf4j.LoggerFactory.getLogger;
 
 final class Main {
@@ -26,6 +27,10 @@ final class Main {
         Files.write(output, fdups(args), CREATE_NEW);
 
         LOGGER.info("Output log file located at [{}]", output);
+    }
+
+    private static Set<String> fdups(final String... rootPaths) {
+        return new DuplicateFileTreeWalker().extractDuplicates(asList(rootPaths));
     }
 
 }
