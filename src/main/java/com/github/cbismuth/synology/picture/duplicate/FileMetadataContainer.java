@@ -2,13 +2,11 @@ package com.github.cbismuth.synology.picture.duplicate;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.primitives.UnsignedBytes;
 import org.slf4j.Logger;
+import org.zeroturnaround.exec.ProcessExecutor;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.MessageDigest;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -17,9 +15,12 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
+import static org.apache.commons.lang3.SystemUtils.IS_OS_LINUX;
+import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC_OSX;
 import static org.slf4j.LoggerFactory.getLogger;
 
 class FileMetadataContainer {
@@ -82,17 +83,32 @@ class FileMetadataContainer {
 
     private String md5sum(final FileMetadata fileMetadata) {
         try (final Timer.Context ignored = metricRegistry.timer(name("md5sum", "timer")).time()) {
-            final String separator = ":";
-            final MessageDigest md = MessageDigest.getInstance("MD5");
-            final Path path = Paths.get(fileMetadata.getAbsolutePath());
-            final byte[] bytes = Files.readAllBytes(path);
-            final byte[] digest = md.digest(bytes);
-
-            return UnsignedBytes.join(separator, digest);
+            return new ProcessExecutor().command(getNativeMd5SumCommand(fileMetadata))
+                                        .readOutput(true)
+                                        .execute()
+                                        .outputUTF8()
+                                        .split("\\s")[0];
         } catch (final Exception e) {
             LOGGER.error("Can't compute md5sum from file [{}] ({})", fileMetadata.getAbsolutePath(), e.getClass().getSimpleName());
             return randomUUID().toString();
         }
+    }
+
+    private Collection<String> getNativeMd5SumCommand(FileMetadata fileMetadata) {
+        final Collection<String> command = newArrayList();
+
+        if (IS_OS_LINUX) {
+            command.add("md5sum");
+        } else if (IS_OS_MAC_OSX) {
+            command.add("md5");
+            command.add("-q");
+        } else {
+            throw new UnsupportedOperationException("Only Linux and OS X operating systems are supported");
+        }
+
+        command.add(fileMetadata.getAbsolutePath());
+
+        return command;
     }
 
     private void sortAndRemoveFirst(final List<FileMetadata> value) {
