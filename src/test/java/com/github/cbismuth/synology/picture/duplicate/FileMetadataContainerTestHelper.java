@@ -13,6 +13,7 @@ import java.util.Collection;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static java.lang.String.format;
+import static java.nio.file.Files.createTempDirectory;
 import static java.nio.file.Files.isDirectory;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
@@ -25,26 +26,18 @@ class FileMetadataContainerTestHelper {
 
     private static final Logger LOGGER = getLogger(FileMetadataContainerTestHelper.class);
 
-    String uniqueString() {
-        return randomUUID().toString();
-    }
+    private final long uniqueDirectoriesCount;
+    private final long uniqueFilesCount;
+    private final long duplicationFactor;
 
-    Path uniqueTempPath(final Path parentTempPath) {
-        return Paths.get(parentTempPath.toString(), uniqueString());
-    }
+    FileMetadataContainerTestHelper(final long uniqueDirectoriesCount,
+                                    final long uniqueFilesCount,
+                                    final long duplicationFactor) {
+        super();
 
-    Path createEmptyFile(final Path tempDirectory) throws IOException {
-        return Files.createFile(uniqueTempPath(tempDirectory));
-    }
-
-    Path createUniqueFile(final Path tempDirectory) throws IOException {
-        return Files.write(uniqueTempPath(tempDirectory), uniqueString().getBytes(UTF_8), CREATE);
-    }
-
-    void createUniqueFiles(final Path tempDirectory, final long count) throws IOException {
-        for (long i = 0L; i < count; i++) {
-            createUniqueFile(tempDirectory);
-        }
+        this.uniqueDirectoriesCount = uniqueDirectoriesCount;
+        this.uniqueFilesCount = uniqueFilesCount;
+        this.duplicationFactor = duplicationFactor;
     }
 
     Collection<Path> listClassFiles(final Path path) {
@@ -65,12 +58,82 @@ class FileMetadataContainerTestHelper {
         }
     }
 
-    void duplicateClassFiles(final Iterable<Path> paths, final Path tempDirectory, final long duplicatesCount) {
+    void addEmptyPath(final Collection<Path> rootPaths) throws IOException {
+        rootPaths.add(makePathDeeper(createTempDirectory(uniqueString())));
+    }
+
+    void addUniqueEmptyFile(final Collection<Path> rootPaths) throws IOException {
+        final Path path = makePathDeeper(createTempDirectory(uniqueString()));
+
+        createEmptyFile(path);
+
+        rootPaths.add(path);
+    }
+
+    void addDuplicatesBySize(final Collection<Path> rootPaths) throws IOException {
+        for (long i = 0L; i < uniqueDirectoriesCount; i++) {
+            final Path path = makePathDeeper(createTempDirectory(uniqueString()));
+
+            createUniqueFiles(path);
+
+            rootPaths.add(path);
+        }
+    }
+
+    void addDuplicatesByMd5Sum(final Iterable<Path> originals, final Collection<Path> rootPaths) throws IOException {
+        for (long i = 0L; i < uniqueDirectoriesCount; i++) {
+            final Path path = makePathDeeper(createTempDirectory(uniqueString()));
+
+            duplicateClassFiles(originals, path);
+
+            rootPaths.add(path);
+        }
+    }
+
+    private Path createEmptyFile(final Path rootPath) throws IOException {
+        return createFile(rootPath, "".getBytes(UTF_8));
+
+    }
+
+    private void createUniqueFiles(final Path rootPath) throws IOException {
+        for (long i = 0L; i < uniqueFilesCount; i++) {
+            createUniqueFile(rootPath);
+        }
+    }
+
+    private Path createUniqueFile(final Path rootPath) throws IOException {
+        return createFile(rootPath, uniqueString().getBytes(UTF_8));
+    }
+
+    private Path createFile(final Path rootPath, final byte[] content) throws IOException {
+        final Path parentPath = makePathDeeper(rootPath);
+        final Path filePath = Paths.get(parentPath.toString(), uniqueString());
+
+        createDirectories(parentPath);
+
+        return Files.write(filePath, content, CREATE);
+    }
+
+    private void createDirectories(final Path path) {
+        try {
+            Files.createDirectories(path);
+        } catch (final IOException e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    private Path makePathDeeper(final Path rootPath) {
+        final Path path = Paths.get(rootPath.toString(), uniqueString(), uniqueString());
+
+        createDirectories(path);
+
+        return path;
+    }
+
+    private void duplicateClassFiles(final Iterable<Path> paths, final Path tempDirectory) {
         paths.forEach(source -> {
             try {
-                final long totalCount = duplicatesCount + 1L;
-
-                for (long i = 0L; i < totalCount; i++) {
+                for (long i = 0L; i < duplicationFactor; i++) {
                     duplicateFile(tempDirectory, source, String.valueOf(i));
                 }
             } catch (final Exception e) {
@@ -79,13 +142,17 @@ class FileMetadataContainerTestHelper {
         });
     }
 
-    void duplicateFile(final Path tempDirectory, final Path source, final String suffix) throws IOException {
+    private void duplicateFile(final Path tempDirectory, final Path source, final String suffix) throws IOException {
         final Path target = Paths.get(tempDirectory.toString(), format("%s %s", source.getFileName(), suffix));
 
         final Path copy = Files.copy(source, target, COPY_ATTRIBUTES);
         assertTrue(Files.isRegularFile(copy, NOFOLLOW_LINKS));
 
         LOGGER.debug("File duplicated at [{}]", copy);
+    }
+
+    private String uniqueString() {
+        return randomUUID().toString();
     }
 
 }

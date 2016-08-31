@@ -96,7 +96,7 @@ class FileMetadataContainer {
     }
 
     private void sortAndRemoveFirst(final List<FileMetadata> value) {
-        Collections.sort(value);
+        Collections.sort(value, (o1, o2) -> o1.getAbsolutePath().compareTo(o2.getAbsolutePath()));
         value.remove(0);
     }
 

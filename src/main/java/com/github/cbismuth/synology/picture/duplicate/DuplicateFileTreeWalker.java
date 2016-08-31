@@ -12,16 +12,11 @@ import java.nio.file.Paths;
 import java.util.Set;
 
 import static java.nio.file.Files.isDirectory;
-import static java.util.Arrays.asList;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class DuplicateFileTreeWalker {
 
     private static final Logger LOGGER = getLogger(DuplicateFileTreeWalker.class);
-
-    public static Set<String> fdups(final String... rootPaths) {
-        return new DuplicateFileTreeWalker().extractDuplicates(asList(rootPaths));
-    }
 
     private final MetricRegistry metricRegistry = new MetricRegistry();
     private final FileMetadataContainer fileMetadataContainer = new FileMetadataContainer(metricRegistry);

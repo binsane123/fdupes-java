@@ -1,8 +1,6 @@
 package com.github.cbismuth.synology.picture.duplicate;
 
-import java.util.Objects;
-
-class FileMetadata implements Comparable<FileMetadata> {
+class FileMetadata {
 
     private final String absolutePath;
     private final long size;
@@ -12,28 +10,6 @@ class FileMetadata implements Comparable<FileMetadata> {
 
         this.absolutePath = absolutePath;
         this.size = size;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if ((o == null) || (getClass() != o.getClass())) {
-            return false;
-        }
-        final FileMetadata that = (FileMetadata) o;
-        return Objects.equals(absolutePath, that.absolutePath);
-    }
-
-    @Override
-    public int compareTo(final FileMetadata o) {
-        return absolutePath.compareTo(o.absolutePath);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(absolutePath);
     }
 
     String getAbsolutePath() {
