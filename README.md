@@ -11,7 +11,7 @@ A simple file duplicate files finder implemented in Java 8 the functional way.
 * Dropwizard-based metrics are logged along the way
 
 ```
-java -jar fdups-<version>-all.jar <dir1> <dir2>
+java -jar fdups-<version>-all.jar <dir1> [<dir2>]...
 ```
 
 Written by Christophe Bismuth, licensed under the [The MIT License (MIT)](LICENSE.md).
