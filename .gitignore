@@ -7,3 +7,6 @@
 
 # Apache Maven
 target/
+
+# Logging
+*.log
