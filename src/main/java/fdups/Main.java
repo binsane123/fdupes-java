@@ -11,8 +11,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
 
-import static java.lang.String.format;
-import static java.lang.System.currentTimeMillis;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -36,7 +34,7 @@ final class Main {
 
     private static void doIt(final MetricRegistry metricRegistry, final String[] args) throws IOException {
         final String workingDirectory = System.getProperty("user.dir");
-        final String filename = format("duplicates-%d.log", currentTimeMillis());
+        final String filename = "duplicates.log";
 
         final Path output = Paths.get(workingDirectory, filename);
 
