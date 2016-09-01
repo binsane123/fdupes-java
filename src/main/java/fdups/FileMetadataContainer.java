@@ -78,7 +78,6 @@ class FileMetadataContainer {
                                      .map(e -> format("\"%s\"", e.getAbsolutePath()))
                                      // collect absolute paths
                                      .collect(Collectors.toCollection(TreeSet::new));
-
     }
 
     private String md5sum(final FileMetadata fileMetadata) {
