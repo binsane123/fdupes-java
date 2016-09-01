@@ -21,6 +21,14 @@ final class Main {
     private static final Logger LOGGER = getLogger(Main.class);
 
     public static void main(final String... args) throws IOException {
+        if (args.length == 0) {
+            System.err.println("Usage: java -jar fdups-<version>-all.jar <dir1> [<dir2>]...");
+        } else {
+            launch(args);
+        }
+    }
+
+    private static void launch(final String[] args) throws IOException {
         final MetricRegistry metricRegistry = new MetricRegistry();
 
         try (final Slf4jReporter slf4jReporter = Slf4jReporter.forRegistry(metricRegistry).outputTo(getLogger("metrics")).build();
