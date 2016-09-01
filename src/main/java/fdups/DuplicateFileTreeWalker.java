@@ -14,14 +14,14 @@ import static com.codahale.metrics.MetricRegistry.name;
 import static java.nio.file.Files.isDirectory;
 import static org.slf4j.LoggerFactory.getLogger;
 
-class DuplicateFileTreeWalker {
+public class DuplicateFileTreeWalker {
 
     private static final Logger LOGGER = getLogger(DuplicateFileTreeWalker.class);
 
     private final MetricRegistry metricRegistry;
     private final FileMetadataContainer fileMetadataContainer;
 
-    DuplicateFileTreeWalker(final MetricRegistry metricRegistry) {
+    public DuplicateFileTreeWalker(final MetricRegistry metricRegistry) {
         this(metricRegistry, new FileMetadataContainer(metricRegistry));
     }
 
@@ -30,7 +30,7 @@ class DuplicateFileTreeWalker {
         this.fileMetadataContainer = fileMetadataContainer;
     }
 
-    Set<String> extractDuplicates(final Iterable<String> rootPaths) {
+    public Set<String> extractDuplicates(final Iterable<String> rootPaths) {
         fileMetadataContainer.clear();
 
         rootPaths.forEach(rootPath -> {

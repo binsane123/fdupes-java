@@ -1,8 +1,7 @@
-package fdups;
-
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
+import fdups.DuplicateFileTreeWalker;
 import org.slf4j.Logger;
 
 import java.io.IOException;
