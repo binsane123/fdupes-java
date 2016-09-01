@@ -30,7 +30,6 @@ public class FileMetadataContainerTest {
     @Test
     public void testExtractDuplicates_fakePath() throws Exception {
         // GIVEN
-        final Collection<Path> originals = helper.listClassFiles(Paths.get(WORKING_DIRECTORY));
         final Collection<Path> rootPaths = newArrayList();
 
         rootPaths.add(Paths.get(randomUUID().toString()));
@@ -51,7 +50,6 @@ public class FileMetadataContainerTest {
     @Test
     public void testExtractDuplicates_emptyPath() throws Exception {
         // GIVEN
-        final Collection<Path> originals = helper.listClassFiles(Paths.get(WORKING_DIRECTORY));
         final Collection<Path> rootPaths = newArrayList();
 
         helper.addEmptyPath(rootPaths);
@@ -72,7 +70,6 @@ public class FileMetadataContainerTest {
     @Test
     public void testExtractDuplicates_uniqueEmptyFile() throws Exception {
         // GIVEN
-        final Collection<Path> originals = helper.listClassFiles(Paths.get(WORKING_DIRECTORY));
         final Collection<Path> rootPaths = newArrayList();
 
         helper.addUniqueEmptyFile(rootPaths);
@@ -93,7 +90,6 @@ public class FileMetadataContainerTest {
     @Test
     public void testExtractDuplicates_duplicatesBySizeOnly() throws Exception {
         // GIVEN
-        final Collection<Path> originals = helper.listClassFiles(Paths.get(WORKING_DIRECTORY));
         final Collection<Path> rootPaths = newArrayList();
 
         helper.addDuplicatesBySize(rootPaths);
