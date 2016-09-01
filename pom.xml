@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.cbismuth</groupId>
-    <artifactId>synology-picture-sorter</artifactId>
+    <artifactId>fdups</artifactId>
     <version>1.0.3-SNAPSHOT</version>
 
     <prerequisites>

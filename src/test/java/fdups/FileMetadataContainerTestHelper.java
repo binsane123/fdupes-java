@@ -1,4 +1,4 @@
-package com.github.cbismuth.synology.picture.duplicate;
+package fdups;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;

@@ -1,4 +1,4 @@
-package com.github.cbismuth.synology.picture.duplicate;
+package fdups;
 
 import com.codahale.metrics.MetricRegistry;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.github.cbismuth.synology.picture.duplicate;
+package fdups;
 
 class FileMetadata {
 
