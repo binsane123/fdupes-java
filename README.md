@@ -1,5 +1,7 @@
 # fdups
 
+[![Build Status](https://travis-ci.org/cbismuth/fdups.svg?branch=master)](https://travis-ci.org/cbismuth/fdups)
+
 A simple duplicated files finder implemented in Java 8, the functional way.
  
 * Find all non-hidden files from input paths and their subdirectories
