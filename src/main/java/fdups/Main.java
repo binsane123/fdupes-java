@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
 
-import static java.nio.file.StandardOpenOption.CREATE_NEW;
+import static java.nio.file.StandardOpenOption.CREATE;
 import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -46,7 +46,7 @@ final class Main {
 
         final Path output = Paths.get(workingDirectory, filename);
 
-        Files.write(output, fdups(metricRegistry, args), CREATE_NEW);
+        Files.write(output, fdups(metricRegistry, args), CREATE);
 
         LOGGER.info("Output log file located at [{}]", output);
     }
