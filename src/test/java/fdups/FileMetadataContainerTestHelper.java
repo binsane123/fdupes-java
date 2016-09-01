@@ -11,8 +11,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 
-import static com.google.common.base.Charsets.UTF_8;
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createTempDirectory;
 import static java.nio.file.Files.isDirectory;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
@@ -33,8 +33,6 @@ class FileMetadataContainerTestHelper {
     FileMetadataContainerTestHelper(final long uniqueDirectoriesCount,
                                     final long uniqueFilesCount,
                                     final long duplicationFactor) {
-        super();
-
         this.uniqueDirectoriesCount = uniqueDirectoriesCount;
         this.uniqueFilesCount = uniqueFilesCount;
         this.duplicationFactor = duplicationFactor;

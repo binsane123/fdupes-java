@@ -3,8 +3,6 @@ package fdups;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import org.slf4j.Logger;
-import org.zeroturnaround.exec.ProcessExecutor;
-import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,12 +14,9 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_LINUX;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC_OSX;
 import static org.slf4j.LoggerFactory.getLogger;
 
 class FileMetadataContainer {
@@ -30,11 +25,15 @@ class FileMetadataContainer {
 
     private final MetricRegistry metricRegistry;
     private final Collection<FileMetadata> fileMetadataCollection = newHashSet();
+    private final Md5SumHelper md5SumHelper;
 
     FileMetadataContainer(final MetricRegistry metricRegistry) {
-        super();
+        this(metricRegistry, new Md5SumHelper());
+    }
 
+    FileMetadataContainer(final MetricRegistry metricRegistry, final Md5SumHelper md5SumHelper) {
         this.metricRegistry = metricRegistry;
+        this.md5SumHelper = md5SumHelper;
     }
 
     void clear() {
@@ -84,34 +83,11 @@ class FileMetadataContainer {
 
     private String md5sum(final FileMetadata fileMetadata) {
         try (final Timer.Context ignored = metricRegistry.timer(name("md5sum", "timer")).time()) {
-            final String md5sum = new ProcessExecutor().command(getNativeMd5SumCommand(fileMetadata))
-                                                       .readOutput(true)
-                                                       .redirectOutput(Slf4jStream.of("md5sum").asTrace())
-                                                       .execute()
-                                                       .outputUTF8()
-                                                       .split("\\s")[0];
-            return md5sum;
+            return md5SumHelper.md5sum(fileMetadata);
         } catch (final Exception e) {
             LOGGER.error("Can't compute md5sum from file [{}] ({})", fileMetadata.getAbsolutePath(), e.getClass().getSimpleName());
             return randomUUID().toString();
         }
-    }
-
-    private Iterable<String> getNativeMd5SumCommand(final FileMetadata fileMetadata) {
-        final Collection<String> command = newArrayList();
-
-        if (IS_OS_LINUX) {
-            command.add("md5sum");
-        } else if (IS_OS_MAC_OSX) {
-            command.add("md5");
-            command.add("-q");
-        } else {
-            throw new UnsupportedOperationException("Only Linux and OS X operating systems are supported");
-        }
-
-        command.add(fileMetadata.getAbsolutePath());
-
-        return command;
     }
 
     private void sortAndRemoveFirst(final List<FileMetadata> value) {

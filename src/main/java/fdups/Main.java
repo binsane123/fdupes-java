@@ -16,13 +16,13 @@ import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.slf4j.LoggerFactory.getLogger;
 
-final class Main {
+class Main {
 
     private static final Logger LOGGER = getLogger(Main.class);
 
     public static void main(final String... args) throws IOException {
         if (args.length == 0) {
-            System.err.println("Usage: java -jar fdups-<version>-all.jar <dir1> [<dir2>]...");
+            LOGGER.error("Usage: java -jar fdups-<version>-all.jar <dir1> [<dir2>]...");
         } else {
             launch(args);
         }

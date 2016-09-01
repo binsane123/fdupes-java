@@ -2,17 +2,22 @@ package fdups;
 
 import com.codahale.metrics.MetricRegistry;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 
+@RunWith(Parameterized.class)
 public class FileMetadataContainerTest {
 
     private static final String WORKING_DIRECTORY = System.getProperty("user.dir");
@@ -21,11 +26,30 @@ public class FileMetadataContainerTest {
     private static final long UNIQUE_FILES_COUNT = 3L;
     private static final long DUPLICATION_FACTOR = 2L;
 
-    private final MetricRegistry metricRegistry = new MetricRegistry();
-    private final DuplicateFileTreeWalker systemUnderTest = new DuplicateFileTreeWalker(metricRegistry);
+    private final DuplicateFileTreeWalker systemUnderTest;
+
     private final FileMetadataContainerTestHelper helper = new FileMetadataContainerTestHelper(UNIQUE_DIRECTORIES_COUNT,
                                                                                                UNIQUE_FILES_COUNT,
                                                                                                DUPLICATION_FACTOR);
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        return asList(
+            new Object[][] {
+                // test with native support if present
+                { new Md5SumHelper() },
+                // test with jvm md5 implementation
+                { new Md5SumHelper(Optional.empty()) }
+            }
+        );
+    }
+
+    public FileMetadataContainerTest(final Md5SumHelper md5SumHelper) {
+        final MetricRegistry metricRegistry = new MetricRegistry();
+        final FileMetadataContainer fileMetadataContainer = new FileMetadataContainer(metricRegistry, md5SumHelper);
+
+        systemUnderTest = new DuplicateFileTreeWalker(metricRegistry, fileMetadataContainer);
+    }
 
     @Test
     public void testExtractDuplicates_fakePath() throws Exception {

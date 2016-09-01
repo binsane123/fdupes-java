@@ -16,7 +16,7 @@ import java.util.stream.Collector;
 import static com.codahale.metrics.MetricRegistry.name;
 import static java.util.stream.Collector.Characteristics.UNORDERED;
 
-final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K, V>, Multimap<K, V>> {
+class MultimapCollector<T, K, V> implements Collector<T, Multimap<K, V>, Multimap<K, V>> {
 
     private final MetricRegistry metricRegistry;
     private final String name;
@@ -28,8 +28,6 @@ final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K, V>, M
                               final String name,
                               final Function<T, K> keyGetter,
                               final Function<T, V> valueGetter) {
-        super();
-
         this.metricRegistry = metricRegistry;
         this.name = name;
 

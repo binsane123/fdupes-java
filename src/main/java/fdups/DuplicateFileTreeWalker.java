@@ -22,11 +22,12 @@ class DuplicateFileTreeWalker {
     private final FileMetadataContainer fileMetadataContainer;
 
     DuplicateFileTreeWalker(final MetricRegistry metricRegistry) {
-        super();
+        this(metricRegistry, new FileMetadataContainer(metricRegistry));
+    }
 
+    DuplicateFileTreeWalker(final MetricRegistry metricRegistry, final FileMetadataContainer fileMetadataContainer) {
         this.metricRegistry = metricRegistry;
-
-        fileMetadataContainer = new FileMetadataContainer(this.metricRegistry);
+        this.fileMetadataContainer = fileMetadataContainer;
     }
 
     Set<String> extractDuplicates(final Iterable<String> rootPaths) {

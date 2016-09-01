@@ -6,8 +6,6 @@ class FileMetadata {
     private final long size;
 
     FileMetadata(final String absolutePath, final long size) {
-        super();
-
         this.absolutePath = absolutePath;
         this.size = size;
     }
