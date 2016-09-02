@@ -171,7 +171,7 @@ public class FileMetadataContainerTest {
         final Collection<String> duplicates = systemUnderTest.extractDuplicates(rootAbsolutePaths);
 
         // THEN
-        final long expectedDuplicatesByMd5SumCount = ((long) originals.size() * DUPLICATION_FACTOR * UNIQUE_DIRECTORIES_COUNT) - (long) originals.size();
+        final long expectedDuplicatesByMd5SumCount = (long) originals.size() * DUPLICATION_FACTOR * UNIQUE_DIRECTORIES_COUNT - (long) originals.size();
         final long actualDuplicatesByMd5SumCount = (long) duplicates.size();
         assertEquals(expectedDuplicatesByMd5SumCount, actualDuplicatesByMd5SumCount);
     }
@@ -195,7 +195,7 @@ public class FileMetadataContainerTest {
         final Collection<String> duplicates = systemUnderTest.extractDuplicates(rootAbsolutePaths);
 
         // THEN
-        final long expectedDuplicatesByMd5SumCount = ((long) originals.size() * DUPLICATION_FACTOR * UNIQUE_DIRECTORIES_COUNT) - (long) originals.size();
+        final long expectedDuplicatesByMd5SumCount = (long) originals.size() * DUPLICATION_FACTOR * UNIQUE_DIRECTORIES_COUNT - (long) originals.size();
         final long actualDuplicatesByMd5SumCount = (long) duplicates.size();
         assertEquals(expectedDuplicatesByMd5SumCount, actualDuplicatesByMd5SumCount);
     }

@@ -40,7 +40,7 @@ import java.util.stream.Collector;
 import static com.codahale.metrics.MetricRegistry.name;
 import static java.util.stream.Collector.Characteristics.UNORDERED;
 
-class MultimapCollector<T, K, V> implements Collector<T, Multimap<K, V>, Multimap<K, V>> {
+final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K, V>, Multimap<K, V>> {
 
     private final MetricRegistry metricRegistry;
     private final String name;

@@ -45,8 +45,6 @@ class Md5SumHelper {
     private final Optional<String> binaryName;
 
     Md5SumHelper() {
-        super();
-
         binaryName = new Md5SumCommandChecker().getBinaryName();
     }
 
