@@ -3,7 +3,6 @@
 
 # JetBrains IntelliJ IDEA
 *.iml
-.idea/
 
 # Apache Maven
 target/
