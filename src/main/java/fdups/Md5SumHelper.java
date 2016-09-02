@@ -104,4 +104,9 @@ class Md5SumHelper {
         return command;
     }
 
+    @Override
+    public String toString() {
+        return binaryName.isPresent()? binaryName.get() : "";
+    }
+
 }

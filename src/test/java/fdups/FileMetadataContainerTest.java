@@ -44,7 +44,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class FileMetadataContainerTest {
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         return asList(
             new Object[][] {
