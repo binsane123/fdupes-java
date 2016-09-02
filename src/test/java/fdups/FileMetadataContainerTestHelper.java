@@ -41,7 +41,6 @@ import static java.nio.file.Files.createTempDirectory;
 import static java.nio.file.Files.isDirectory;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
-import static java.nio.file.StandardOpenOption.CREATE;
 import static java.util.UUID.randomUUID;
 import static org.junit.Assert.assertTrue;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -133,7 +132,7 @@ class FileMetadataContainerTestHelper {
 
         createDirectories(parentPath);
 
-        return Files.write(filePath, content, CREATE);
+        return Files.write(filePath, content);
     }
 
     private void createDirectories(final Path path) {
