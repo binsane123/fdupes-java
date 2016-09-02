@@ -1,8 +1,8 @@
 # fdups
 
 [![Build Status](https://travis-ci.org/cbismuth/fdups.svg?branch=master)](https://travis-ci.org/cbismuth/fdups)
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=plastic)](https://raw.githubusercontent.com/cbismuth/fdups/master/LICENSE.md)
-[![GitHub issues](https://img.shields.io/github/issues/cbismuth/fdups.svg?style=plastic)](https://github.com/cbismuth/fdups/issues)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/cbismuth/fdups/master/LICENSE.md)
+[![GitHub issues](https://img.shields.io/github/issues/cbismuth/fdups.svg)](https://github.com/cbismuth/fdups/issues)
 
 A simple duplicated files finder implemented in Java 8, the functional way.
 
