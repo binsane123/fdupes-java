@@ -44,18 +44,6 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class FileMetadataContainerTest {
 
-    private static final String WORKING_DIRECTORY = System.getProperty("user.dir");
-
-    private static final long UNIQUE_DIRECTORIES_COUNT = 5L;
-    private static final long UNIQUE_FILES_COUNT = 3L;
-    private static final long DUPLICATION_FACTOR = 2L;
-
-    private final DuplicateFileTreeWalker systemUnderTest;
-
-    private final FileMetadataContainerTestHelper helper = new FileMetadataContainerTestHelper(UNIQUE_DIRECTORIES_COUNT,
-                                                                                               UNIQUE_FILES_COUNT,
-                                                                                               DUPLICATION_FACTOR);
-
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return asList(
@@ -67,6 +55,18 @@ public class FileMetadataContainerTest {
             }
         );
     }
+
+    private static final String WORKING_DIRECTORY = System.getProperty("user.dir");
+
+    private static final long UNIQUE_DIRECTORIES_COUNT = 5L;
+    private static final long UNIQUE_FILES_COUNT = 3L;
+    private static final long DUPLICATION_FACTOR = 2L;
+
+    private final DuplicateFileTreeWalker systemUnderTest;
+
+    private final FileMetadataContainerTestHelper helper = new FileMetadataContainerTestHelper(UNIQUE_DIRECTORIES_COUNT,
+                                                                                               UNIQUE_FILES_COUNT,
+                                                                                               DUPLICATION_FACTOR);
 
     public FileMetadataContainerTest(final Md5SumHelper md5SumHelper) {
         final MetricRegistry metricRegistry = new MetricRegistry();
