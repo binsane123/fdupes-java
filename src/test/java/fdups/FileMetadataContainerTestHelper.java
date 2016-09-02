@@ -25,7 +25,6 @@
 package fdups;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -35,6 +34,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createTempDirectory;
@@ -62,7 +62,7 @@ class FileMetadataContainerTestHelper {
     }
 
     Collection<Path> listClassFiles(final Path path) {
-        final Collection<Path> classFiles = Lists.newArrayList();
+        final Collection<Path> classFiles = newArrayList();
 
         try (final DirectoryStream<Path> stream = Files.newDirectoryStream(path, e -> isDirectory(e) || e.toString().endsWith(".class"))) {
             stream.forEach(e -> {
