@@ -27,13 +27,13 @@ package fdupes;
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
+import fdupes.container.FileMetadataDuplicateWriter;
 import fdupes.io.DuplicateFileTreeWalker;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.List;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
@@ -67,20 +67,14 @@ public final class Main {
     }
 
     private static void doIt(final MetricRegistry metricRegistry, final String[] args) throws IOException {
-        final String workingDirectory = System.getProperty("user.dir");
-        final String filename = "duplicates.log";
-
-        final Path output = Paths.get(workingDirectory, filename);
-
-        Files.write(output, fdupes(metricRegistry, args));
-
-        LOGGER.info("Output log file located at [{}]", output);
-    }
-
-    private static Set<String> fdupes(final MetricRegistry metricRegistry, final String... rootPaths) {
         final DuplicateFileTreeWalker walker = new DuplicateFileTreeWalker(metricRegistry);
+        final FileMetadataDuplicateWriter writer = new FileMetadataDuplicateWriter();
 
-        return walker.extractDuplicates(asList(rootPaths));
+        final List<String> inputPaths = asList(args);
+        final Set<String> absolutePathsOfDuplicates = walker.extractDuplicates(inputPaths);
+        final Path outputPath = writer.write(absolutePathsOfDuplicates);
+
+        LOGGER.info("Output file written at [{}]", outputPath);
     }
 
     private Main() {

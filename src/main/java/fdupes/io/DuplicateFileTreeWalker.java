@@ -55,10 +55,10 @@ public class DuplicateFileTreeWalker {
         this.fileMetadataContainer = fileMetadataContainer;
     }
 
-    public Set<String> extractDuplicates(final Iterable<String> rootPaths) {
+    public Set<String> extractDuplicates(final Iterable<String> inputPaths) {
         fileMetadataContainer.clear();
 
-        rootPaths.forEach(rootPath -> {
+        inputPaths.forEach(rootPath -> {
             final Path path = Paths.get(rootPath);
 
             if (isDirectory(path)) {
