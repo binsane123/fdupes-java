@@ -22,10 +22,11 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdupes;
+package fdupes.md5;
 
 import com.google.common.base.Throwables;
 import com.google.common.primitives.UnsignedBytes;
+import fdupes.container.FileMetadata;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 
@@ -40,19 +41,19 @@ import java.util.Optional;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
 
-class Md5SumHelper {
+public class Md5SumHelper {
 
     private final Optional<String> binaryName;
 
-    Md5SumHelper() {
+    public Md5SumHelper() {
         binaryName = new Md5SumCommandChecker().getBinaryName();
     }
 
-    Md5SumHelper(final Optional<String> binaryName) {
+    public Md5SumHelper(final Optional<String> binaryName) {
         this.binaryName = binaryName;
     }
 
-    String md5sum(final FileMetadata fileMetadata) {
+    public String md5sum(final FileMetadata fileMetadata) {
         if (binaryName.isPresent()) {
             return nativeMd5Sum(fileMetadata);
         } else {

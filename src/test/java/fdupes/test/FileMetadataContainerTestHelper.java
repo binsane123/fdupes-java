@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdupes;
+package fdupes.test;
 
 import com.google.common.base.Throwables;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ import static java.util.UUID.randomUUID;
 import static org.junit.Assert.assertTrue;
 import static org.slf4j.LoggerFactory.getLogger;
 
-class FileMetadataContainerTestHelper {
+public class FileMetadataContainerTestHelper {
 
     private static final Logger LOGGER = getLogger(FileMetadataContainerTestHelper.class);
 
@@ -53,15 +53,15 @@ class FileMetadataContainerTestHelper {
     private final long uniqueFilesCount;
     private final long duplicationFactor;
 
-    FileMetadataContainerTestHelper(final long uniqueDirectoriesCount,
-                                    final long uniqueFilesCount,
-                                    final long duplicationFactor) {
+    public FileMetadataContainerTestHelper(final long uniqueDirectoriesCount,
+                                           final long uniqueFilesCount,
+                                           final long duplicationFactor) {
         this.uniqueDirectoriesCount = uniqueDirectoriesCount;
         this.uniqueFilesCount = uniqueFilesCount;
         this.duplicationFactor = duplicationFactor;
     }
 
-    Collection<Path> listClassFiles(final Path path) {
+    public Collection<Path> listClassFiles(final Path path) {
         final Collection<Path> classFiles = newArrayList();
 
         try (final DirectoryStream<Path> stream = Files.newDirectoryStream(path, e -> isDirectory(e) || e.toString().endsWith(".class"))) {
@@ -79,11 +79,11 @@ class FileMetadataContainerTestHelper {
         }
     }
 
-    void addEmptyPath(final Collection<Path> rootPaths) throws IOException {
+    public void addEmptyPath(final Collection<Path> rootPaths) throws IOException {
         rootPaths.add(makePathDeeper(createTempDirectory(uniqueString())));
     }
 
-    void addUniqueEmptyFile(final Collection<Path> rootPaths) throws IOException {
+    public void addUniqueEmptyFile(final Collection<Path> rootPaths) throws IOException {
         final Path path = makePathDeeper(createTempDirectory(uniqueString()));
 
         createEmptyFile(path);
@@ -91,7 +91,7 @@ class FileMetadataContainerTestHelper {
         rootPaths.add(path);
     }
 
-    void addDuplicatesBySize(final Collection<Path> rootPaths) throws IOException {
+    public void addDuplicatesBySize(final Collection<Path> rootPaths) throws IOException {
         for (long i = 0L; i < uniqueDirectoriesCount; i++) {
             final Path path = makePathDeeper(createTempDirectory(uniqueString()));
 
@@ -101,7 +101,7 @@ class FileMetadataContainerTestHelper {
         }
     }
 
-    void addDuplicatesByMd5Sum(final Iterable<Path> originals, final Collection<Path> rootPaths) throws IOException {
+    public void addDuplicatesByMd5Sum(final Iterable<Path> originals, final Collection<Path> rootPaths) throws IOException {
         for (long i = 0L; i < uniqueDirectoriesCount; i++) {
             final Path path = makePathDeeper(createTempDirectory(uniqueString()));
 

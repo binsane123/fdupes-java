@@ -22,10 +22,12 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdupes;
+package fdupes.container;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import fdupes.collect.MultimapCollector;
+import fdupes.md5.Md5SumHelper;
 import org.slf4j.Logger;
 
 import java.nio.file.Files;
@@ -43,7 +45,7 @@ import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 import static org.slf4j.LoggerFactory.getLogger;
 
-class FileMetadataContainer {
+public class FileMetadataContainer {
 
     private static final Logger LOGGER = getLogger(FileMetadataContainer.class);
 
@@ -51,20 +53,20 @@ class FileMetadataContainer {
     private final Collection<FileMetadata> fileMetadataCollection = newHashSet();
     private final Md5SumHelper md5SumHelper;
 
-    FileMetadataContainer(final MetricRegistry metricRegistry) {
+    public FileMetadataContainer(final MetricRegistry metricRegistry) {
         this(metricRegistry, new Md5SumHelper());
     }
 
-    FileMetadataContainer(final MetricRegistry metricRegistry, final Md5SumHelper md5SumHelper) {
+    public FileMetadataContainer(final MetricRegistry metricRegistry, final Md5SumHelper md5SumHelper) {
         this.metricRegistry = metricRegistry;
         this.md5SumHelper = md5SumHelper;
     }
 
-    void clear() {
+    public void clear() {
         fileMetadataCollection.clear();
     }
 
-    void addFile(final Path path) {
+    public void addFile(final Path path) {
         try {
             fileMetadataCollection.add(new FileMetadata(path.toString(), Files.size(path)));
         } catch (final Exception e) {
@@ -72,7 +74,7 @@ class FileMetadataContainer {
         }
     }
 
-    Set<String> extractDuplicates() {
+    public Set<String> extractDuplicates() {
         return fileMetadataCollection.stream()
                                      // index file metadata elements by file size
                                      .collect(MultimapCollector.toMultimap(metricRegistry, "duplicatesBySize", FileMetadata::getSize))

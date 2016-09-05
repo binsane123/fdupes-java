@@ -22,23 +22,23 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdupes;
+package fdupes.container;
 
-class FileMetadata {
+public class FileMetadata {
 
     private final String absolutePath;
     private final long size;
 
-    FileMetadata(final String absolutePath, final long size) {
+    public FileMetadata(final String absolutePath, final long size) {
         this.absolutePath = absolutePath;
         this.size = size;
     }
 
-    String getAbsolutePath() {
+    public String getAbsolutePath() {
         return absolutePath;
     }
 
-    long getSize() {
+    public long getSize() {
         return size;
     }
 

@@ -22,9 +22,10 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdupes;
+package fdupes.io;
 
 import com.codahale.metrics.MetricRegistry;
+import fdupes.container.FileMetadataContainer;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -49,7 +50,7 @@ public class DuplicateFileTreeWalker {
         this(metricRegistry, new FileMetadataContainer(metricRegistry));
     }
 
-    DuplicateFileTreeWalker(final MetricRegistry metricRegistry, final FileMetadataContainer fileMetadataContainer) {
+    public DuplicateFileTreeWalker(final MetricRegistry metricRegistry, final FileMetadataContainer fileMetadataContainer) {
         this.metricRegistry = metricRegistry;
         this.fileMetadataContainer = fileMetadataContainer;
     }

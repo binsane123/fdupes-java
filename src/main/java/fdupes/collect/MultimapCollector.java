@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdupes;
+package fdupes.collect;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
@@ -40,7 +40,7 @@ import java.util.stream.Collector;
 import static com.codahale.metrics.MetricRegistry.name;
 import static java.util.stream.Collector.Characteristics.UNORDERED;
 
-final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K, V>, Multimap<K, V>> {
+public final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K, V>, Multimap<K, V>> {
 
     private final MetricRegistry metricRegistry;
     private final String name;
@@ -59,11 +59,11 @@ final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K, V>, M
         this.valueGetter = valueGetter;
     }
 
-    static <T, K, V> MultimapCollector<T, K, T> toMultimap(final MetricRegistry metricRegistry, final String name, final Function<T, K> keyGetter) {
+    public static <T, K, V> MultimapCollector<T, K, T> toMultimap(final MetricRegistry metricRegistry, final String name, final Function<T, K> keyGetter) {
         return toMultimap(metricRegistry, name, keyGetter, v -> v);
     }
 
-    static <T, K, V> MultimapCollector<T, K, V> toMultimap(final MetricRegistry metricRegistry, final String name, final Function<T, K> keyGetter, final Function<T, V> valueGetter) {
+    public static <T, K, V> MultimapCollector<T, K, V> toMultimap(final MetricRegistry metricRegistry, final String name, final Function<T, K> keyGetter, final Function<T, V> valueGetter) {
         return new MultimapCollector<>(metricRegistry, name, keyGetter, valueGetter);
     }
 

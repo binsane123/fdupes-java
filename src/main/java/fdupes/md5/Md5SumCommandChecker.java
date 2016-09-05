@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdupes;
+package fdupes.md5;
 
 import org.slf4j.Logger;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -36,11 +36,11 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.UUID.randomUUID;
 import static org.slf4j.LoggerFactory.getLogger;
 
-class Md5SumCommandChecker {
+public class Md5SumCommandChecker {
 
     private static final Logger LOGGER = getLogger(Md5SumCommandChecker.class);
 
-    Optional<String> getBinaryName() {
+    public Optional<String> getBinaryName() {
         Optional<String> binaryName;
 
         try {

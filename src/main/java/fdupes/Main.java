@@ -22,10 +22,12 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+package fdupes;
+
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
-import fdupes.DuplicateFileTreeWalker;
+import fdupes.io.DuplicateFileTreeWalker;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -38,7 +40,7 @@ import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.slf4j.LoggerFactory.getLogger;
 
-final class Main {
+public final class Main {
 
     private static final Logger LOGGER = getLogger(Main.class);
 
@@ -77,4 +79,7 @@ final class Main {
         return new DuplicateFileTreeWalker(metricRegistry).extractDuplicates(asList(rootPaths));
     }
 
+    private Main() {
+        // NOT ALLOWED
+    }
 }

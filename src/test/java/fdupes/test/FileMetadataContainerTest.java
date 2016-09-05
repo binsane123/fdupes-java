@@ -22,9 +22,12 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdupes;
+package fdupes.test;
 
 import com.codahale.metrics.MetricRegistry;
+import fdupes.container.FileMetadataContainer;
+import fdupes.io.DuplicateFileTreeWalker;
+import fdupes.md5.Md5SumHelper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
