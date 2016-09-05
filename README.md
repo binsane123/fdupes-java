@@ -46,6 +46,7 @@ Core implementation is located [here](https://github.com/cbismuth/fdupes-java/bl
 
 Here is how issues are triaged:
 
+* **Bug**: identifies an unexpected result or application behaviour
 * **Feature**: adds an new end-user feature
 * **Enhancement**: changes the way the application behaves but produces the same result
 * **Spike**: improves implementation design but doesn't change application behaviour and produces the same result
