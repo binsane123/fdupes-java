@@ -61,6 +61,8 @@ public final class Main {
             jmxReporter.start();
 
             doIt(metricRegistry, args);
+
+            slf4jReporter.report();
         }
     }
 
