@@ -42,6 +42,14 @@ Metrics are logged every minute, so you always know what happens.
 
 Core implementation is located [here](https://github.com/cbismuth/fdupes-java/blob/1.1.0/src/main/java/fdupes-java/FileMetadataContainer.java#L51).
 
+## Report issues
+
+Here is how issues are triaged:
+
+* **Feature**: adds an new end-user feature
+* **Enhancement**: changes the way the application behaves but produces the same result
+* **Spike**: improves implementation design but doesn't change application behaviour and produces the same result
+
 ## Credits
 
 Written by Christophe Bismuth, licensed under the [The MIT License (MIT)](LICENSE.md).
