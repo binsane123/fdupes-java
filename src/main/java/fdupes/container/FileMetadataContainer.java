@@ -77,7 +77,7 @@ public class FileMetadataContainer {
     public Set<String> extractDuplicates() {
         return fileMetadataCollection.stream()
                                      // index file metadata elements by file size
-                                     .collect(MultimapCollector.toMultimap(metricRegistry, "duplicatesBySize", FileMetadata::getSize))
+                                     .collect(MultimapCollector.toMultimap(metricRegistry, name("multimap", "by-size"), FileMetadata::getSize))
                                      // get a stream of entries
                                      .asMap()
                                      .entrySet()
@@ -88,7 +88,7 @@ public class FileMetadataContainer {
                                      .flatMap(e -> e.getValue().stream())
                                      .peek(e -> LOGGER.debug("Duplicate by size detected at [{}]", e.getAbsolutePath()))
                                      // index file metadata elements by md5sum
-                                     .collect(MultimapCollector.toMultimap(metricRegistry, "duplicatesByMd5Sum", this::md5sum))
+                                     .collect(MultimapCollector.toMultimap(metricRegistry, name("multimap", "by-md5sum"), this::md5sum))
                                      // get a stream of entries
                                      .asMap()
                                      .entrySet()

@@ -75,6 +75,8 @@ public class DuplicateFileTreeWalker {
         try (final DirectoryStream<Path> stream = Files.newDirectoryStream(path, e -> isDirectory(e) || !e.toString().startsWith("."))) {
             stream.forEach(p -> {
                 if (isDirectory(p)) {
+                    metricRegistry.counter(name("walker", "directories", "counter")).inc();
+
                     handleDirectory(p);
                 } else {
                     handleFile(p);
@@ -86,9 +88,9 @@ public class DuplicateFileTreeWalker {
     }
 
     private void handleFile(final Path path) {
-        fileMetadataContainer.addFile(path);
+        metricRegistry.counter(name("walker", "files", "counter")).inc();
 
-        metricRegistry.counter(name("filesToHandle", "counter")).inc();
+        fileMetadataContainer.addFile(path);
     }
 
 }
