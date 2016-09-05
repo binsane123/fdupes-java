@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdups;
+package fdupes;
 
 import com.google.common.base.Throwables;
 import org.junit.Test;
@@ -36,7 +36,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 
-import static fdups.FilenamePredicate.FILENAME_STOP_WORDS;
+import static fdupes.FilenamePredicate.FILENAME_STOP_WORDS;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;

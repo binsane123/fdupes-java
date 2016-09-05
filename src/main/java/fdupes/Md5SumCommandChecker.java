@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdups;
+package fdupes;
 
 import org.slf4j.Logger;
 import org.zeroturnaround.exec.ProcessExecutor;

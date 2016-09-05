@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdups;
+package fdupes;
 
 import com.codahale.metrics.MetricRegistry;
 import org.junit.Test;

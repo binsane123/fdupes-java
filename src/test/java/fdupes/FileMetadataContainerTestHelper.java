@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdups;
+package fdupes;
 
 import com.google.common.base.Throwables;
 import org.slf4j.Logger;

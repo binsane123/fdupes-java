@@ -25,7 +25,7 @@
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
-import fdups.DuplicateFileTreeWalker;
+import fdupes.DuplicateFileTreeWalker;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -38,13 +38,13 @@ import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.slf4j.LoggerFactory.getLogger;
 
-class Main {
+final class Main {
 
     private static final Logger LOGGER = getLogger(Main.class);
 
     public static void main(final String... args) throws IOException {
         if (args.length == 0) {
-            LOGGER.error("Usage: java -jar fdups-<version>-all.jar <dir1> [<dir2>]...");
+            LOGGER.error("Usage: java -jar fdupes-<version>-all.jar <dir1> [<dir2>]...");
         } else {
             launch(args);
         }
@@ -68,12 +68,12 @@ class Main {
 
         final Path output = Paths.get(workingDirectory, filename);
 
-        Files.write(output, fdups(metricRegistry, args));
+        Files.write(output, fdupes(metricRegistry, args));
 
         LOGGER.info("Output log file located at [{}]", output);
     }
 
-    private static Set<String> fdups(final MetricRegistry metricRegistry, final String... rootPaths) {
+    private static Set<String> fdupes(final MetricRegistry metricRegistry, final String... rootPaths) {
         return new DuplicateFileTreeWalker(metricRegistry).extractDuplicates(asList(rootPaths));
     }
 

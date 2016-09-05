@@ -1,8 +1,8 @@
-# fdups
+# fdupes-java
 
-[![Build Status](https://travis-ci.org/cbismuth/fdups.svg?branch=master)](https://travis-ci.org/cbismuth/fdups)
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/cbismuth/fdups/master/LICENSE.md)
-[![GitHub issues](https://img.shields.io/github/issues/cbismuth/fdups.svg)](https://github.com/cbismuth/fdups/issues)
+[![Build Status](https://travis-ci.org/cbismuth/fdupes-java.svg?branch=master)](https://travis-ci.org/cbismuth/fdupes-java)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/cbismuth/fdupes-java/master/LICENSE.md)
+[![GitHub issues](https://img.shields.io/github/issues/cbismuth/fdupes-java.svg)](https://github.com/cbismuth/fdupes-java/issues)
 
 A simple duplicated files finder implemented in Java 8, the functional way.
 
@@ -15,9 +15,9 @@ A simple duplicated files finder implemented in Java 8, the functional way.
 * Dropwizard-based metrics are logged every minute
 
 ```
-java -jar fdups-<version>-all.jar <dir1> [<dir2>]...
+java -jar fdupes-<version>-all.jar <dir1> [<dir2>]...
 ```
 
-Core implementation is located [here](https://github.com/cbismuth/fdups/blob/1.1.0/src/main/java/fdups/FileMetadataContainer.java#L51).
+Core implementation is located [here](https://github.com/cbismuth/fdupes-java/blob/1.1.0/src/main/java/fdupes-java/FileMetadataContainer.java#L51).
 
 Written by Christophe Bismuth, licensed under the [The MIT License (MIT)](LICENSE.md).

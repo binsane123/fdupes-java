@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdups;
+package fdupes;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -33,7 +33,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 final class FilenamePredicate implements Predicate<Path> {
 
-    static Collection<String> FILENAME_STOP_WORDS = newArrayList(
+    static final Collection<String> FILENAME_STOP_WORDS = newArrayList(
         // OS X
         ".ds_store",
 

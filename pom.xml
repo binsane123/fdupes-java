@@ -30,7 +30,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.cbismuth</groupId>
-    <artifactId>fdups</artifactId>
+    <artifactId>fdupes-java</artifactId>
     <version>1.2.0-SNAPSHOT</version>
 
     <prerequisites>
