@@ -78,11 +78,13 @@ public final class Main {
     }
 
     private static Set<String> fdupes(final MetricRegistry metricRegistry, final String... rootPaths) {
-        return new DuplicateFileTreeWalker(metricRegistry).extractDuplicates(asList(rootPaths));
+        final DuplicateFileTreeWalker walker = new DuplicateFileTreeWalker(metricRegistry);
+
+        return walker.extractDuplicates(asList(rootPaths));
     }
 
     private Main() {
-        // NOT ALLOWED
+        // PRIVATE
     }
 
 }

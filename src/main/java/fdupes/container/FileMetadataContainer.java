@@ -42,7 +42,6 @@ import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.collect.Sets.newHashSet;
-import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -85,30 +84,37 @@ public class FileMetadataContainer {
         return fileMetadataCollection.stream()
                                      // index file metadata elements by file size
                                      .collect(MultimapCollector.toMultimap(metricRegistry, name("multimap", "by-size"), FileMetadata::getSize))
+
                                      // get a stream of entries
-                                     .asMap()
-                                     .entrySet()
-                                     .stream()
+                                     .asMap().entrySet().stream()
+
                                      // keep duplicates by size only
                                      .filter(e -> e.getValue().size() > 1)
+
                                      // flatten all duplicates by size
                                      .flatMap(e -> e.getValue().stream())
-                                     .peek(e -> LOGGER.debug("Duplicate by size detected at [{}]", e.getAbsolutePath()))
+
                                      // index file metadata elements by md5sum
                                      .collect(MultimapCollector.toMultimap(metricRegistry, name("multimap", "by-md5sum"), this::md5sum))
+
                                      // get a stream of entries
-                                     .asMap()
-                                     .entrySet()
-                                     .stream()
+                                     .asMap().entrySet().stream()
+
                                      // keep duplicates by md5sum only
                                      .filter(e -> e.getValue().size() > 1)
+
                                      // remove first element of each collection (i.e. original file)
                                      .peek(e -> sortAndRemoveFirst((List<FileMetadata>) e.getValue()))
+
                                      // flatten all duplicates by md5sum (i.e. all identified duplicates to remove)
                                      .flatMap(e -> e.getValue().stream())
-                                     .peek(e -> LOGGER.debug("Duplicate by md5sum detected at [{}]", e.getAbsolutePath()))
+
                                      // extract absolute paths only
-                                     .map(e -> format("\"%s\"", e.getAbsolutePath()))
+                                     .map(FileMetadata::getAbsolutePath)
+
+                                     // normalize absolute paths
+                                     .map(AbsolutePathNormalizer.INSTANCE)
+
                                      // collect absolute paths
                                      .collect(Collectors.toCollection(TreeSet::new));
     }
