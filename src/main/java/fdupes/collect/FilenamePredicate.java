@@ -64,7 +64,9 @@ public final class FilenamePredicate implements DirectoryStream.Filter<Path> {
     public boolean accept(final Path path) {
         final boolean isDirectory = Files.isDirectory(path);
 
-        final boolean isAllowedFile = !isHiddenFile(path.toString())
+        final boolean isAllowedFile = !Files.isSymbolicLink(path)
+                                      && Files.isReadable(path)
+                                      && !isHiddenFile(path.toString())
                                       && !containsForbiddenSubstring(path, FILENAME_STOP_WORDS);
 
         return isDirectory || isAllowedFile;
