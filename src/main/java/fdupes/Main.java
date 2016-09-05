@@ -27,8 +27,8 @@ package fdupes;
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
-import fdupes.container.FileMetadataDuplicateWriter;
 import fdupes.io.DuplicateFileTreeWalker;
+import fdupes.io.FileMetadataDuplicateWriter;
 import org.slf4j.Logger;
 
 import java.io.IOException;

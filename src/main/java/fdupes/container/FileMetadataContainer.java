@@ -27,6 +27,7 @@ package fdupes.container;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import fdupes.collect.MultimapCollector;
+import fdupes.io.AbsolutePathNormalizer;
 import fdupes.md5.Md5SumHelper;
 import org.slf4j.Logger;
 

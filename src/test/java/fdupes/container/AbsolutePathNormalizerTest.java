@@ -24,6 +24,7 @@
 
 package fdupes.container;
 
+import fdupes.io.AbsolutePathNormalizer;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

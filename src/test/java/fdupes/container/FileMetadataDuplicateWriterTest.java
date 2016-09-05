@@ -24,6 +24,7 @@
 
 package fdupes.container;
 
+import fdupes.io.FileMetadataDuplicateWriter;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -32,7 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 
-import static fdupes.container.FileMetadataDuplicateWriter.NEW_LINE;
+import static fdupes.io.FileMetadataDuplicateWriter.NEW_LINE;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
