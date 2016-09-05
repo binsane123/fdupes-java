@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -68,7 +69,13 @@ public class FileMetadataContainer {
 
     public void addFile(final Path path) {
         try {
-            fileMetadataCollection.add(new FileMetadata(path.toString(), Files.size(path)));
+            final BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
+
+            fileMetadataCollection.add(new FileMetadata(path.toString(),
+                                                        attributes.creationTime(),
+                                                        attributes.lastAccessTime(),
+                                                        attributes.lastModifiedTime(),
+                                                        Files.size(path)));
         } catch (final Exception e) {
             LOGGER.error("Can't read file [{}] ({})", path, e.getClass().getSimpleName());
         }
@@ -116,7 +123,7 @@ public class FileMetadataContainer {
     }
 
     private void sortAndRemoveFirst(final List<FileMetadata> value) {
-        Collections.sort(value, (o1, o2) -> o1.getAbsolutePath().compareTo(o2.getAbsolutePath()));
+        Collections.sort(value, FileMetadataComparator.INSTANCE);
         value.remove(0);
     }
 

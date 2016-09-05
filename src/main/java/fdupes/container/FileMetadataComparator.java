@@ -24,46 +24,26 @@
 
 package fdupes.container;
 
-import java.nio.file.attribute.FileTime;
+import com.google.common.collect.ComparisonChain;
 
-public class FileMetadata {
+import java.util.Comparator;
 
-    private final String absolutePath;
-    private final FileTime creationTime;
-    private final FileTime lastAccessTime;
-    private final FileTime lastModifiedTime;
-    private final long size;
+public class FileMetadataComparator implements Comparator<FileMetadata> {
 
-    public FileMetadata(final String absolutePath,
-                        final FileTime creationTime,
-                        final FileTime lastAccessTime,
-                        final FileTime lastModifiedTime,
-                        final long size) {
-        this.absolutePath = absolutePath;
-        this.creationTime = creationTime;
-        this.lastAccessTime = lastAccessTime;
-        this.lastModifiedTime = lastModifiedTime;
-        this.size = size;
+    public static final FileMetadataComparator INSTANCE = new FileMetadataComparator();
+
+    private FileMetadataComparator() {
+        // NOT ALLOWED
     }
 
-    public String getAbsolutePath() {
-        return absolutePath;
-    }
-
-    public FileTime getCreationTime() {
-        return creationTime;
-    }
-
-    public FileTime getLastAccessTime() {
-        return lastAccessTime;
-    }
-
-    public FileTime getLastModifiedTime() {
-        return lastModifiedTime;
-    }
-
-    public long getSize() {
-        return size;
+    @Override
+    public int compare(final FileMetadata o1, final FileMetadata o2) {
+        return ComparisonChain.start()
+                              .compare(o1.getCreationTime(), o2.getCreationTime())
+                              .compare(o1.getLastAccessTime(), o2.getLastAccessTime())
+                              .compare(o1.getLastModifiedTime(), o2.getLastModifiedTime())
+                              .compare(o1.getAbsolutePath(), o2.getAbsolutePath())
+                              .result();
     }
 
 }
