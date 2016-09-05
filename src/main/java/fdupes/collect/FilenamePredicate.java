@@ -24,14 +24,17 @@
 
 package fdupes.collect;
 
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Locale;
-import java.util.function.Predicate;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-public final class FilenamePredicate implements Predicate<Path> {
+public final class FilenamePredicate implements DirectoryStream.Filter<Path> {
+
+    public static final FilenamePredicate INSTANCE = new FilenamePredicate();
 
     public static final Collection<String> FILENAME_STOP_WORDS = newArrayList(
         // OS X
@@ -53,9 +56,18 @@ public final class FilenamePredicate implements Predicate<Path> {
         "#recycle"
     );
 
+    private FilenamePredicate() {
+        // PRIVATE
+    }
+
     @Override
-    public boolean test(final Path path) {
-        return !isHiddenFile(path.toString()) && !containsForbiddenSubstring(path, FILENAME_STOP_WORDS);
+    public boolean accept(final Path path) {
+        final boolean isDirectory = Files.isDirectory(path);
+
+        final boolean isAllowedFile = !isHiddenFile(path.toString())
+                                      && !containsForbiddenSubstring(path, FILENAME_STOP_WORDS);
+
+        return isDirectory || isAllowedFile;
     }
 
     private boolean isHiddenFile(final String name) {

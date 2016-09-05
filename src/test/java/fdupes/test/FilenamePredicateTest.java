@@ -56,7 +56,7 @@ public class FilenamePredicateTest {
     private static final Logger LOGGER = getLogger(FilenamePredicateTest.class);
 
     private final String forbiddenSubstring;
-    private final FilenamePredicate systemUnderTest = new FilenamePredicate();
+    private final FilenamePredicate systemUnderTest = FilenamePredicate.INSTANCE;
 
     public FilenamePredicateTest(final String forbiddenSubstring) {
         this.forbiddenSubstring = forbiddenSubstring;
@@ -71,7 +71,7 @@ public class FilenamePredicateTest {
 
         final int expectedFilesCount = 1;
         final int actualFilesCount = Files.list(path)
-                                          .filter(systemUnderTest)
+                                          .filter(systemUnderTest::accept)
                                           .collect(toList())
                                           .size();
 

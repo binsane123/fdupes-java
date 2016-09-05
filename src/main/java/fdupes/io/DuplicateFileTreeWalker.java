@@ -25,6 +25,7 @@
 package fdupes.io;
 
 import com.codahale.metrics.MetricRegistry;
+import fdupes.collect.FilenamePredicate;
 import fdupes.container.FileMetadataContainer;
 import org.slf4j.Logger;
 
@@ -72,7 +73,7 @@ public class DuplicateFileTreeWalker {
     }
 
     private void handleDirectory(final Path path) {
-        try (final DirectoryStream<Path> stream = Files.newDirectoryStream(path, e -> isDirectory(e) || !e.toString().startsWith("."))) {
+        try (final DirectoryStream<Path> stream = Files.newDirectoryStream(path, FilenamePredicate.INSTANCE)) {
             stream.forEach(p -> {
                 if (isDirectory(p)) {
                     metricRegistry.counter(name("walker", "directories", "counter")).inc();
