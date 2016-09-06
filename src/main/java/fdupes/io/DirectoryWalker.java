@@ -26,7 +26,9 @@ package fdupes.io;
 
 import com.codahale.metrics.MetricRegistry;
 import fdupes.collect.FilenamePredicate;
+import fdupes.container.DuplicatesFinder;
 import fdupes.container.FileMetadataContainer;
+import fdupes.md5.Md5SumHelper;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -45,15 +47,13 @@ public class DirectoryWalker {
     private static final Logger LOGGER = getLogger(DirectoryWalker.class);
 
     private final MetricRegistry metricRegistry;
-    private final FileMetadataContainer fileMetadataContainer;
+    private final DuplicatesFinder duplicatesFinder;
 
-    public DirectoryWalker(final MetricRegistry metricRegistry) {
-        this(metricRegistry, new FileMetadataContainer(metricRegistry));
-    }
+    private final FileMetadataContainer fileMetadataContainer = new FileMetadataContainer();
 
-    public DirectoryWalker(final MetricRegistry metricRegistry, final FileMetadataContainer fileMetadataContainer) {
+    public DirectoryWalker(final MetricRegistry metricRegistry, final Md5SumHelper md5SumHelper) {
         this.metricRegistry = metricRegistry;
-        this.fileMetadataContainer = fileMetadataContainer;
+        duplicatesFinder = new DuplicatesFinder(metricRegistry, md5SumHelper);
     }
 
     public Set<String> extractDuplicates(final Iterable<String> inputPaths) {
@@ -69,7 +69,7 @@ public class DirectoryWalker {
             }
         });
 
-        return fileMetadataContainer.extractDuplicates();
+        return duplicatesFinder.extractDuplicates(fileMetadataContainer.getElements());
     }
 
     private void handleDirectory(final Path path) {

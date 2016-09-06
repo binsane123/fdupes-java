@@ -25,7 +25,6 @@
 package fdupes.test;
 
 import com.codahale.metrics.MetricRegistry;
-import fdupes.container.FileMetadataContainer;
 import fdupes.io.DirectoryWalker;
 import fdupes.md5.Md5SumHelper;
 import org.junit.Test;
@@ -36,7 +35,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
@@ -52,9 +50,9 @@ public class FileMetadataContainerTest {
         return asList(
             new Object[][] {
                 // test with native support if present
-                { new Md5SumHelper() },
+                { new Md5SumHelper(new MetricRegistry()) },
                 // test with jvm md5 implementation
-                { new Md5SumHelper(Optional.empty()) }
+                { new Md5SumHelper(new MetricRegistry(), null) }
             }
         );
     }
@@ -66,16 +64,12 @@ public class FileMetadataContainerTest {
     private static final long DUPLICATION_FACTOR = 2L;
 
     private final DirectoryWalker systemUnderTest;
-
     private final FileMetadataContainerTestHelper helper = new FileMetadataContainerTestHelper(UNIQUE_DIRECTORIES_COUNT,
                                                                                                UNIQUE_FILES_COUNT,
                                                                                                DUPLICATION_FACTOR);
 
     public FileMetadataContainerTest(final Md5SumHelper md5SumHelper) {
-        final MetricRegistry metricRegistry = new MetricRegistry();
-        final FileMetadataContainer fileMetadataContainer = new FileMetadataContainer(metricRegistry, md5SumHelper);
-
-        systemUnderTest = new DirectoryWalker(metricRegistry, fileMetadataContainer);
+        systemUnderTest = new DirectoryWalker(new MetricRegistry(), md5SumHelper);
     }
 
     @Test

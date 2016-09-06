@@ -29,6 +29,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
 import fdupes.io.DirectoryWalker;
 import fdupes.io.DuplicatesWriter;
+import fdupes.md5.Md5SumHelper;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -67,7 +68,7 @@ public final class Main {
     }
 
     private static void doIt(final MetricRegistry metricRegistry, final String[] args) throws IOException {
-        final DirectoryWalker walker = new DirectoryWalker(metricRegistry);
+        final DirectoryWalker walker = new DirectoryWalker(metricRegistry, new Md5SumHelper(metricRegistry));
         final DuplicatesWriter writer = new DuplicatesWriter();
 
         final List<String> inputPaths = asList(args);

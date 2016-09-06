@@ -24,9 +24,12 @@
 
 package fdupes.md5;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.base.Throwables;
 import com.google.common.primitives.UnsignedBytes;
 import fdupes.container.FileMetadata;
+import org.slf4j.Logger;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 
@@ -38,22 +41,38 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
+import static java.util.UUID.randomUUID;
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class Md5SumHelper {
 
+    private static final Logger LOGGER = getLogger(Md5SumHelper.class);
+
+    private final MetricRegistry metricRegistry;
     private final Optional<String> binaryName;
 
-    public Md5SumHelper() {
-        binaryName = new Md5SumCommandChecker().getBinaryName();
+    public Md5SumHelper(final MetricRegistry metricRegistry) {
+        this(metricRegistry, new Md5SumCommandChecker().getBinaryName());
     }
 
-    public Md5SumHelper(final Optional<String> binaryName) {
-        this.binaryName = binaryName;
+    public Md5SumHelper(final MetricRegistry metricRegistry, final String binaryName) {
+        this.metricRegistry = metricRegistry;
+        this.binaryName = Optional.ofNullable(binaryName);
     }
 
     public String md5sum(final FileMetadata fileMetadata) {
+        try (final Timer.Context ignored = metricRegistry.timer(name("md5sum", "timer")).time()) {
+            return doIt(fileMetadata);
+        } catch (final Exception e) {
+            LOGGER.error("Can't compute md5sum from file [{}] ({})", fileMetadata.getAbsolutePath(), e.getClass().getSimpleName());
+            return randomUUID().toString();
+        }
+    }
+
+    private String doIt(final FileMetadata fileMetadata) {
         if (binaryName.isPresent()) {
             return nativeMd5Sum(fileMetadata);
         } else {

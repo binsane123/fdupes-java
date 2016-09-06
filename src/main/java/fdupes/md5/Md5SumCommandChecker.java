@@ -30,7 +30,6 @@ import org.zeroturnaround.exec.ProcessExecutor;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.UUID.randomUUID;
@@ -40,25 +39,25 @@ public class Md5SumCommandChecker {
 
     private static final Logger LOGGER = getLogger(Md5SumCommandChecker.class);
 
-    public Optional<String> getBinaryName() {
-        Optional<String> binaryName;
+    public String getBinaryName() {
+        String binaryName;
 
         try {
             final Path path = newTempFile();
 
             if (checkCommand(path, "md5sum")) {
-                binaryName = Optional.of("md5sum");
+                binaryName = "md5sum";
             } else if (checkCommand(path, "md5")) {
-                binaryName = Optional.of("md5");
+                binaryName = "md5";
             } else {
-                binaryName = Optional.empty();
+                binaryName = null;
             }
         } catch (final Throwable ignored1) {
-            binaryName = Optional.empty();
+            binaryName = null;
         }
 
-        if (binaryName.isPresent()) {
-            LOGGER.info("Native MD5 command found at [{}]", binaryName.get());
+        if (binaryName == null) {
+            LOGGER.info("Native MD5 command found at [{}]", binaryName);
         } else {
             LOGGER.warn("No native MD5 command found (slower JVM implementation will be used)");
         }
