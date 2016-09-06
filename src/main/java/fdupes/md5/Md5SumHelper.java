@@ -124,7 +124,7 @@ public class Md5SumHelper {
 
     @Override
     public String toString() {
-        return binaryName.isPresent()? binaryName.get() : "";
+        return binaryName.isPresent() ? binaryName.get() : "jvm";
     }
 
 }

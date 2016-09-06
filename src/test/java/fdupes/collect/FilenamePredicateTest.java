@@ -22,10 +22,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdupes.test;
+package fdupes.collect;
 
 import com.google.common.base.Throwables;
-import fdupes.collect.FilenamePredicate;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
