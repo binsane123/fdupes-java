@@ -26,7 +26,7 @@ package fdupes.test;
 
 import com.codahale.metrics.MetricRegistry;
 import fdupes.container.FileMetadataContainer;
-import fdupes.io.DuplicateFileTreeWalker;
+import fdupes.io.DirectoryWalker;
 import fdupes.md5.Md5SumHelper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,7 +65,7 @@ public class FileMetadataContainerTest {
     private static final long UNIQUE_FILES_COUNT = 3L;
     private static final long DUPLICATION_FACTOR = 2L;
 
-    private final DuplicateFileTreeWalker systemUnderTest;
+    private final DirectoryWalker systemUnderTest;
 
     private final FileMetadataContainerTestHelper helper = new FileMetadataContainerTestHelper(UNIQUE_DIRECTORIES_COUNT,
                                                                                                UNIQUE_FILES_COUNT,
@@ -75,7 +75,7 @@ public class FileMetadataContainerTest {
         final MetricRegistry metricRegistry = new MetricRegistry();
         final FileMetadataContainer fileMetadataContainer = new FileMetadataContainer(metricRegistry, md5SumHelper);
 
-        systemUnderTest = new DuplicateFileTreeWalker(metricRegistry, fileMetadataContainer);
+        systemUnderTest = new DirectoryWalker(metricRegistry, fileMetadataContainer);
     }
 
     @Test

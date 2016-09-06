@@ -28,11 +28,11 @@ import java.util.function.Function;
 
 import static java.lang.String.format;
 
-public class AbsolutePathNormalizer implements Function<String, String> {
+public class PathEscapeFunction implements Function<String, String> {
 
-    public static final AbsolutePathNormalizer INSTANCE = new AbsolutePathNormalizer();
+    public static final PathEscapeFunction INSTANCE = new PathEscapeFunction();
 
-    private AbsolutePathNormalizer() {
+    private PathEscapeFunction() {
         // PRIVATE
     }
 

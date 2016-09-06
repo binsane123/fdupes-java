@@ -24,7 +24,7 @@
 
 package fdupes.container;
 
-import fdupes.io.FileMetadataDuplicateWriter;
+import fdupes.io.DuplicatesWriter;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -33,13 +33,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 
-import static fdupes.io.FileMetadataDuplicateWriter.NEW_LINE;
+import static fdupes.io.DuplicatesWriter.NEW_LINE;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
-public class FileMetadataDuplicateWriterTest {
+public class DuplicatesWriterTest {
 
-    private final FileMetadataDuplicateWriter systemUnderTest = new FileMetadataDuplicateWriter();
+    private final DuplicatesWriter systemUnderTest = new DuplicatesWriter();
 
     @Test
     public void testWrite() throws IOException {

@@ -24,17 +24,17 @@
 
 package fdupes.container;
 
-import fdupes.io.AbsolutePathNormalizer;
+import fdupes.io.PathEscapeFunction;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class AbsolutePathNormalizerTest {
+public class PathEscapeFunctionTest {
 
-    private final AbsolutePathNormalizer systemUnderTest = AbsolutePathNormalizer.INSTANCE;
+    private final PathEscapeFunction systemUnderTest = PathEscapeFunction.INSTANCE;
 
     @Test
-    public void testNormalizeAbsolutePath() {
+    public void testApply() {
         // GIVEN
         final String s = " a b c ";
 

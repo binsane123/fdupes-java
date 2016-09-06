@@ -27,7 +27,7 @@ package fdupes.container;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import fdupes.collect.MultimapCollector;
-import fdupes.io.AbsolutePathNormalizer;
+import fdupes.io.PathEscapeFunction;
 import fdupes.md5.Md5SumHelper;
 import org.slf4j.Logger;
 
@@ -114,7 +114,7 @@ public class FileMetadataContainer {
                                      .map(FileMetadata::getAbsolutePath)
 
                                      // normalize absolute paths
-                                     .map(AbsolutePathNormalizer.INSTANCE)
+                                     .map(PathEscapeFunction.INSTANCE)
 
                                      // collect absolute paths
                                      .collect(Collectors.toCollection(TreeSet::new));

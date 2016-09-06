@@ -40,18 +40,18 @@ import static com.codahale.metrics.MetricRegistry.name;
 import static java.nio.file.Files.isDirectory;
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class DuplicateFileTreeWalker {
+public class DirectoryWalker {
 
-    private static final Logger LOGGER = getLogger(DuplicateFileTreeWalker.class);
+    private static final Logger LOGGER = getLogger(DirectoryWalker.class);
 
     private final MetricRegistry metricRegistry;
     private final FileMetadataContainer fileMetadataContainer;
 
-    public DuplicateFileTreeWalker(final MetricRegistry metricRegistry) {
+    public DirectoryWalker(final MetricRegistry metricRegistry) {
         this(metricRegistry, new FileMetadataContainer(metricRegistry));
     }
 
-    public DuplicateFileTreeWalker(final MetricRegistry metricRegistry, final FileMetadataContainer fileMetadataContainer) {
+    public DirectoryWalker(final MetricRegistry metricRegistry, final FileMetadataContainer fileMetadataContainer) {
         this.metricRegistry = metricRegistry;
         this.fileMetadataContainer = fileMetadataContainer;
     }
