@@ -47,10 +47,17 @@ public final class Main {
 
     public static void main(final String... args) throws IOException {
         if (args.length == 0) {
-            LOGGER.error("Usage: java -jar fdupes-<version>-all.jar <dir1> [<dir2>]...");
+            System.out.println(version());
+            System.err.println("Usage: java -jar fdupes-<version>-all.jar <dir1> [<dir2>]...");
+        } else if (args.length == 1 && ("-v".equals(args[0]) || "--version".equals(args[0]))) {
+            System.out.println(version());
         } else {
             launch(args);
         }
+    }
+
+    private static String version() {
+        return String.format("fdupes-java version %s", Main.class.getPackage().getImplementationVersion());
     }
 
     private static void launch(final String[] args) throws IOException {
