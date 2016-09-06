@@ -24,7 +24,6 @@
 
 package fdupes.md5;
 
-import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.base.Throwables;
 import com.google.common.primitives.UnsignedBytes;
@@ -43,6 +42,7 @@ import java.util.Optional;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.collect.Lists.newArrayList;
+import static fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -51,20 +51,18 @@ public class Md5SumHelper {
 
     private static final Logger LOGGER = getLogger(Md5SumHelper.class);
 
-    private final MetricRegistry metricRegistry;
     private final Optional<String> binaryName;
 
-    public Md5SumHelper(final MetricRegistry metricRegistry) {
-        this(metricRegistry, new Md5SumCommandChecker().getBinaryName());
+    public Md5SumHelper() {
+        this(new Md5SumCommandChecker().getBinaryName());
     }
 
-    public Md5SumHelper(final MetricRegistry metricRegistry, final String binaryName) {
-        this.metricRegistry = metricRegistry;
+    public Md5SumHelper(final String binaryName) {
         this.binaryName = Optional.ofNullable(binaryName);
     }
 
     public String md5sum(final FileMetadata fileMetadata) {
-        try (final Timer.Context ignored = metricRegistry.timer(name("md5sum", "timer")).time()) {
+        try (final Timer.Context ignored = getMetricRegistry().timer(name("md5sum", "timer")).time()) {
             return doIt(fileMetadata);
         } catch (final Exception e) {
             LOGGER.error("Can't compute md5sum from file [{}] ({})", fileMetadata.getAbsolutePath(), e.getClass().getSimpleName());

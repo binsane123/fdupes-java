@@ -25,7 +25,6 @@
 package fdupes.collect;
 
 import com.codahale.metrics.Gauge;
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
@@ -38,33 +37,31 @@ import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static java.util.stream.Collector.Characteristics.UNORDERED;
 
 public final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K, V>, Multimap<K, V>> {
 
-    private final MetricRegistry metricRegistry;
     private final String name;
 
     private final Function<T, K> keyGetter;
     private final Function<T, V> valueGetter;
 
-    private MultimapCollector(final MetricRegistry metricRegistry,
-                              final String name,
+    private MultimapCollector(final String name,
                               final Function<T, K> keyGetter,
                               final Function<T, V> valueGetter) {
-        this.metricRegistry = metricRegistry;
         this.name = name;
 
         this.keyGetter = keyGetter;
         this.valueGetter = valueGetter;
     }
 
-    public static <T, K, V> MultimapCollector<T, K, T> toMultimap(final MetricRegistry metricRegistry, final String name, final Function<T, K> keyGetter) {
-        return toMultimap(metricRegistry, name, keyGetter, v -> v);
+    public static <T, K, V> MultimapCollector<T, K, T> toMultimap(final String name, final Function<T, K> keyGetter) {
+        return toMultimap(name, keyGetter, v -> v);
     }
 
-    public static <T, K, V> MultimapCollector<T, K, V> toMultimap(final MetricRegistry metricRegistry, final String name, final Function<T, K> keyGetter, final Function<T, V> valueGetter) {
-        return new MultimapCollector<>(metricRegistry, name, keyGetter, valueGetter);
+    public static <T, K, V> MultimapCollector<T, K, V> toMultimap(final String name, final Function<T, K> keyGetter, final Function<T, V> valueGetter) {
+        return new MultimapCollector<>(name, keyGetter, valueGetter);
     }
 
     @Override
@@ -75,13 +72,13 @@ public final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K
     @Override
     public BiConsumer<Multimap<K, V>, T> accumulator() {
         return (map, element) -> {
-            metricRegistry.counter(name(name, "total", "counter")).inc();
+            getMetricRegistry().counter(name(name, "total", "counter")).inc();
 
             final K key = keyGetter.apply(element);
             final V value = valueGetter.apply(element);
 
             if (map.containsKey(key)) {
-                metricRegistry.counter(name(name, "duplicates", "counter")).inc();
+                getMetricRegistry().counter(name(name, "duplicates", "counter")).inc();
             }
 
             map.put(key, value);
@@ -98,7 +95,7 @@ public final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K
 
     @Override
     public Function<Multimap<K, V>, Multimap<K, V>> finisher() {
-        metricRegistry.register(name(name, "finished"), (Gauge<Boolean>) () -> true);
+        getMetricRegistry().register(name(name, "finished"), (Gauge<Boolean>) () -> true);
 
         return map -> map;
     }

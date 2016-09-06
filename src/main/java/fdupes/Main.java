@@ -25,7 +25,6 @@
 package fdupes;
 
 import com.codahale.metrics.JmxReporter;
-import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
 import fdupes.io.DirectoryWalker;
 import fdupes.io.DuplicatesWriter;
@@ -37,6 +36,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
+import static fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -54,21 +54,19 @@ public final class Main {
     }
 
     private static void launch(final String[] args) throws IOException {
-        final MetricRegistry metricRegistry = new MetricRegistry();
-
-        try (final Slf4jReporter slf4jReporter = Slf4jReporter.forRegistry(metricRegistry).outputTo(getLogger("metrics")).build();
-             final JmxReporter jmxReporter = JmxReporter.forRegistry(metricRegistry).build()) {
+        try (final Slf4jReporter slf4jReporter = Slf4jReporter.forRegistry(getMetricRegistry()).outputTo(getLogger("metrics")).build();
+             final JmxReporter jmxReporter = JmxReporter.forRegistry(getMetricRegistry()).build()) {
             slf4jReporter.start(1L, MINUTES);
             jmxReporter.start();
 
-            doIt(metricRegistry, args);
+            doIt(args);
 
             slf4jReporter.report();
         }
     }
 
-    private static void doIt(final MetricRegistry metricRegistry, final String[] args) throws IOException {
-        final DirectoryWalker walker = new DirectoryWalker(metricRegistry, new Md5SumHelper(metricRegistry));
+    private static void doIt(final String[] args) throws IOException {
+        final DirectoryWalker walker = new DirectoryWalker(new Md5SumHelper());
         final DuplicatesWriter writer = new DuplicatesWriter();
 
         final List<String> inputPaths = asList(args);

@@ -24,7 +24,6 @@
 
 package fdupes.io;
 
-import com.codahale.metrics.MetricRegistry;
 import fdupes.collect.FilenamePredicate;
 import fdupes.container.DuplicatesFinder;
 import fdupes.container.FileMetadataContainer;
@@ -39,6 +38,7 @@ import java.nio.file.Paths;
 import java.util.Set;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static java.nio.file.Files.isDirectory;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -46,14 +46,12 @@ public class DirectoryWalker {
 
     private static final Logger LOGGER = getLogger(DirectoryWalker.class);
 
-    private final MetricRegistry metricRegistry;
     private final DuplicatesFinder duplicatesFinder;
 
     private final FileMetadataContainer fileMetadataContainer = new FileMetadataContainer();
 
-    public DirectoryWalker(final MetricRegistry metricRegistry, final Md5SumHelper md5SumHelper) {
-        this.metricRegistry = metricRegistry;
-        duplicatesFinder = new DuplicatesFinder(metricRegistry, md5SumHelper);
+    public DirectoryWalker(final Md5SumHelper md5SumHelper) {
+        duplicatesFinder = new DuplicatesFinder(md5SumHelper);
     }
 
     public Set<String> extractDuplicates(final Iterable<String> inputPaths) {
@@ -76,7 +74,7 @@ public class DirectoryWalker {
         try (final DirectoryStream<Path> stream = Files.newDirectoryStream(path, FilenamePredicate.INSTANCE)) {
             stream.forEach(p -> {
                 if (isDirectory(p)) {
-                    metricRegistry.counter(name("walker", "directories", "counter")).inc();
+                    getMetricRegistry().counter(name("walker", "directories", "counter")).inc();
 
                     handleDirectory(p);
                 } else {
@@ -89,7 +87,7 @@ public class DirectoryWalker {
     }
 
     private void handleFile(final Path path) {
-        metricRegistry.counter(name("walker", "files", "counter")).inc();
+        getMetricRegistry().counter(name("walker", "files", "counter")).inc();
 
         fileMetadataContainer.addFile(path);
     }

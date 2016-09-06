@@ -24,7 +24,6 @@
 
 package fdupes.container;
 
-import com.codahale.metrics.MetricRegistry;
 import fdupes.collect.MultimapCollector;
 import fdupes.io.PathEscapeFunction;
 import fdupes.md5.Md5SumHelper;
@@ -40,19 +39,16 @@ import static com.codahale.metrics.MetricRegistry.name;
 
 public class DuplicatesFinder {
 
-    private final MetricRegistry metricRegistry;
     private final Md5SumHelper md5SumHelper;
 
-    public DuplicatesFinder(final MetricRegistry metricRegistry,
-                            final Md5SumHelper md5SumHelper) {
-        this.metricRegistry = metricRegistry;
+    public DuplicatesFinder(final Md5SumHelper md5SumHelper) {
         this.md5SumHelper = md5SumHelper;
     }
 
     public Set<String> extractDuplicates(final Collection<FileMetadata> elements) {
         return elements.stream()
                        // index file metadata elements by file size
-                       .collect(MultimapCollector.toMultimap(metricRegistry, name("multimap", "by-size"), FileMetadata::getSize))
+                       .collect(MultimapCollector.toMultimap(name("multimap", "by-size"), FileMetadata::getSize))
 
                        // get a stream of entries
                        .asMap().entrySet().stream()
@@ -64,7 +60,7 @@ public class DuplicatesFinder {
                        .flatMap(e -> e.getValue().stream())
 
                        // index file metadata elements by md5sum
-                       .collect(MultimapCollector.toMultimap(metricRegistry, name("multimap", "by-md5sum"), md5SumHelper::md5sum))
+                       .collect(MultimapCollector.toMultimap(name("multimap", "by-md5sum"), md5SumHelper::md5sum))
 
                        // get a stream of entries
                        .asMap().entrySet().stream()
