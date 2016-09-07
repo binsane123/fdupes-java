@@ -26,7 +26,7 @@ package fdupes.stream;
 
 import fdupes.immutable.FileMetadata;
 import fdupes.io.ToByteStringFunction;
-import fdupes.md5.Md5SumHelper;
+import fdupes.md5.Md5Computer;
 
 import java.util.Collection;
 import java.util.Set;
@@ -34,21 +34,21 @@ import java.util.stream.Stream;
 
 public class DuplicatesFinder {
 
-    private final Md5SumHelper md5SumHelper;
-    private final StreamHandler streamHandler = new StreamHandler();
+    private final Md5Computer md5;
+    private final StreamHandler handler = new StreamHandler();
 
-    public DuplicatesFinder(final Md5SumHelper md5SumHelper) {
-        this.md5SumHelper = md5SumHelper;
+    public DuplicatesFinder(final Md5Computer md5) {
+        this.md5 = md5;
     }
 
     public Set<String> extractDuplicates(final Collection<FileMetadata> elements) {
         Stream<FileMetadata> stream = elements.stream();
 
-        stream = streamHandler.removeUniqueFilesByKey(stream, "size", FileMetadata::getSize);
-        stream = streamHandler.removeUniqueFilesByKey(stream, "md5", md5SumHelper::md5sum);
-        stream = streamHandler.removeUniqueFilesByKeyAndOriginals(stream, "bytes", ToByteStringFunction.INSTANCE);
+        stream = handler.removeUniqueFilesByKey(stream, "size", FileMetadata::getSize);
+        stream = handler.removeUniqueFilesByKey(stream, "md5", md5::compute);
+        stream = handler.removeUniqueFilesByKeyAndOriginals(stream, "bytes", ToByteStringFunction.INSTANCE);
 
-        return streamHandler.extractAbsolutePaths(stream);
+        return handler.extractAbsolutePaths(stream);
     }
 
 }

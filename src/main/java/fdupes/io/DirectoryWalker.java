@@ -26,7 +26,7 @@ package fdupes.io;
 
 import fdupes.collect.FileMetadataContainer;
 import fdupes.collect.FilenamePredicate;
-import fdupes.md5.Md5SumHelper;
+import fdupes.md5.Md5Computer;
 import fdupes.stream.DuplicatesFinder;
 import org.slf4j.Logger;
 
@@ -50,8 +50,8 @@ public class DirectoryWalker {
 
     private final FileMetadataContainer fileMetadataContainer = new FileMetadataContainer();
 
-    public DirectoryWalker(final Md5SumHelper md5SumHelper) {
-        duplicatesFinder = new DuplicatesFinder(md5SumHelper);
+    public DirectoryWalker(final Md5Computer md5Computer) {
+        duplicatesFinder = new DuplicatesFinder(md5Computer);
     }
 
     public Set<String> extractDuplicates(final String inputPath) {

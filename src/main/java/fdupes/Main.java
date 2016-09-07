@@ -28,7 +28,7 @@ import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.Slf4jReporter;
 import fdupes.io.DirectoryWalker;
 import fdupes.io.DuplicatesWriter;
-import fdupes.md5.Md5SumHelper;
+import fdupes.md5.Md5Computer;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -73,7 +73,7 @@ public final class Main {
     }
 
     private static void doIt(final String[] args) throws IOException {
-        final DirectoryWalker walker = new DirectoryWalker(new Md5SumHelper());
+        final DirectoryWalker walker = new DirectoryWalker(new Md5Computer());
         final DuplicatesWriter writer = new DuplicatesWriter();
 
         final List<String> inputPaths = asList(args);

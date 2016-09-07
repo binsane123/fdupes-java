@@ -47,21 +47,21 @@ import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class Md5SumHelper {
+public class Md5Computer {
 
-    private static final Logger LOGGER = getLogger(Md5SumHelper.class);
+    private static final Logger LOGGER = getLogger(Md5Computer.class);
 
     private final Optional<String> binaryName;
 
-    public Md5SumHelper() {
+    public Md5Computer() {
         this(new Md5SumCommandChecker().getBinaryName());
     }
 
-    public Md5SumHelper(final String binaryName) {
+    public Md5Computer(final String binaryName) {
         this.binaryName = Optional.ofNullable(binaryName);
     }
 
-    public String md5sum(final FileMetadata fileMetadata) {
+    public String compute(final FileMetadata fileMetadata) {
         try (final Timer.Context ignored = getMetricRegistry().timer(name("md5sum", "timer")).time()) {
             return doIt(fileMetadata);
         } catch (final Exception e) {

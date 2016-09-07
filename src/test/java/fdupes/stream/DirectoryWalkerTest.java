@@ -26,7 +26,7 @@ package fdupes.stream;
 
 import fdupes.immutable.FileMetadata;
 import fdupes.io.DirectoryWalker;
-import fdupes.md5.Md5SumHelper;
+import fdupes.md5.Md5Computer;
 import fdupes.util.PathUtils;
 import org.junit.After;
 import org.junit.Test;
@@ -50,16 +50,16 @@ public class DirectoryWalkerTest {
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
-        final Md5SumHelper mock = Mockito.mock(Md5SumHelper.class);
-        Mockito.when(mock.md5sum(Mockito.any(FileMetadata.class))).thenReturn(randomUUID().toString());
+        final Md5Computer mock = Mockito.mock(Md5Computer.class);
+        Mockito.when(mock.compute(Mockito.any(FileMetadata.class))).thenReturn(randomUUID().toString());
         Mockito.when(mock.toString()).thenReturn("byte-by-byte");
 
         return asList(
             new Object[][] {
                 // test with native support if present
-                { new Md5SumHelper() },
+                { new Md5Computer() },
                 // test with jvm md5 implementation
-                { new Md5SumHelper(null) },
+                { new Md5Computer(null) },
                 // force bytes comparison
                 { mock }
             }
@@ -81,8 +81,8 @@ public class DirectoryWalkerTest {
 
     private final DirectoryWalker systemUnderTest;
 
-    public DirectoryWalkerTest(final Md5SumHelper md5SumHelper) {
-        systemUnderTest = new DirectoryWalker(md5SumHelper);
+    public DirectoryWalkerTest(final Md5Computer md5Computer) {
+        systemUnderTest = new DirectoryWalker(md5Computer);
     }
 
     @Test
