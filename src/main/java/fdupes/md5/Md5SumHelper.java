@@ -87,8 +87,10 @@ public class Md5SumHelper {
             final byte[] digest = md.digest(bytes);
 
             return UnsignedBytes.join(separator, digest);
-        } catch (final Exception e) {
-            throw Throwables.propagate(e);
+        } catch (final Throwable e) {
+            LOGGER.error(e.getMessage());
+
+            return randomUUID().toString();
         }
     }
 
