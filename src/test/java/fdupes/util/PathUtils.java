@@ -25,6 +25,7 @@
 package fdupes.util;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 
 import java.io.IOException;
@@ -126,7 +127,7 @@ public class PathUtils {
         return destination;
     }
 
-    private static final AtomicLong LINES_COUNT = new AtomicLong(10);
+    private static final AtomicLong LINES_COUNT = new AtomicLong(10_000);
 
     private Path createUniqueFileWithRandomContent(final Path parentDirectory) throws IOException {
         checkIsDirectory(parentDirectory);
@@ -135,7 +136,7 @@ public class PathUtils {
 
         final StringBuilder sb = new StringBuilder();
         for (long i = 0; i < max; i++) {
-            sb.append(i).append(NEW_LINE);
+            sb.append(Strings.padStart(String.valueOf(i), 5, '0')).append(NEW_LINE);
         }
 
         return createFileWithContent(parentDirectory, uniqueString(), uniqueString(), sb.toString().getBytes(UTF_8));
