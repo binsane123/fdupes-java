@@ -24,10 +24,10 @@
 
 package fdupes.io;
 
+import fdupes.collect.FileMetadataContainer;
 import fdupes.collect.FilenamePredicate;
-import fdupes.container.DuplicatesFinder;
-import fdupes.container.FileMetadataContainer;
 import fdupes.md5.Md5SumHelper;
+import fdupes.stream.DuplicatesFinder;
 import org.slf4j.Logger;
 
 import java.io.IOException;

@@ -27,7 +27,7 @@ package fdupes.md5;
 import com.codahale.metrics.Timer;
 import com.google.common.base.Throwables;
 import com.google.common.primitives.UnsignedBytes;
-import fdupes.container.FileMetadata;
+import fdupes.immutable.FileMetadata;
 import org.slf4j.Logger;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;

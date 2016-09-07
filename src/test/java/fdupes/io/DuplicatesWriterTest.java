@@ -22,32 +22,35 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdupes.container;
+package fdupes.io;
 
+import org.junit.Test;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 
-import static java.util.stream.Collectors.toList;
+import static fdupes.io.DuplicatesWriter.NEW_LINE;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
 
-public class KeepDuplicatesOnlyFunction implements Function<Map.Entry<String, Collection<FileMetadata>>, Map.Entry<String, Collection<FileMetadata>>> {
+public class DuplicatesWriterTest {
 
-    public static final KeepDuplicatesOnlyFunction INSTANCE = new KeepDuplicatesOnlyFunction();
+    private final DuplicatesWriter systemUnderTest = new DuplicatesWriter();
 
-    @Override
-    public Map.Entry<String, Collection<FileMetadata>> apply(final Map.Entry<String, Collection<FileMetadata>> entry) {
-        final List<FileMetadata> sorted = entry.getValue()
-                                               .stream()
-                                               .sorted(FileMetadataComparator.INSTANCE)
-                                               .collect(toList());
+    @Test
+    public void testWrite() throws IOException {
+        // GIVEN
+        final Collection<String> strings = asList("abcd", "xyz");
 
-        sorted.remove(0);
+        // WHEN
+        final Path path = systemUnderTest.write(strings);
 
-        entry.getValue().clear();
-        entry.getValue().addAll(sorted);
-
-        return entry;
+        // THEN
+        final String actual = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+        assertEquals("abcd" + NEW_LINE + "xyz", actual);
     }
 
 }

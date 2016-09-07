@@ -22,8 +22,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdupes.container;
+package fdupes.collect;
 
+import fdupes.immutable.FileMetadata;
 import org.slf4j.Logger;
 
 import java.nio.file.Files;

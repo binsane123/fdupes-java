@@ -22,36 +22,27 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdupes.container;
+package fdupes.io;
 
-import fdupes.io.DuplicatesWriter;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collection;
-
-import static fdupes.io.DuplicatesWriter.NEW_LINE;
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
-public class DuplicatesWriterTest {
+public class PathEscapeFunctionTest {
 
-    private final DuplicatesWriter systemUnderTest = new DuplicatesWriter();
+    private final PathEscapeFunction systemUnderTest = PathEscapeFunction.INSTANCE;
 
     @Test
-    public void testWrite() throws IOException {
+    public void testApply() {
         // GIVEN
-        final Collection<String> strings = asList("abcd", "xyz");
+        final String s = " a b c ";
 
         // WHEN
-        final Path path = systemUnderTest.write(strings);
+        final String actual = systemUnderTest.apply(s);
 
         // THEN
-        final String actual = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-        assertEquals("abcd" + NEW_LINE + "xyz", actual);
+        final String expected = "\"\\ a\\ b\\ c\\ \"";
+        assertEquals(expected, actual);
     }
 
 }

@@ -22,28 +22,38 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdupes.container;
+package fdupes.io;
 
-import fdupes.io.PathEscapeFunction;
-import org.junit.Test;
+import com.google.common.primitives.UnsignedBytes;
+import fdupes.immutable.FileMetadata;
+import org.slf4j.Logger;
 
-import static org.junit.Assert.assertEquals;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.function.Function;
 
-public class PathEscapeFunctionTest {
+import static java.util.UUID.randomUUID;
+import static org.slf4j.LoggerFactory.getLogger;
 
-    private final PathEscapeFunction systemUnderTest = PathEscapeFunction.INSTANCE;
+public class ToByteStringFunction implements Function<FileMetadata, String> {
 
-    @Test
-    public void testApply() {
-        // GIVEN
-        final String s = " a b c ";
+    private static final Logger LOGGER = getLogger(ToByteStringFunction.class);
 
-        // WHEN
-        final String actual = systemUnderTest.apply(s);
+    public static final ToByteStringFunction INSTANCE = new ToByteStringFunction();
 
-        // THEN
-        final String expected = "\"\\ a\\ b\\ c\\ \"";
-        assertEquals(expected, actual);
+    @Override
+    public String apply(final FileMetadata fileMetadata) {
+        try {
+            final Path path = Paths.get(fileMetadata.getAbsolutePath());
+            final byte[] bytes = Files.readAllBytes(path);
+
+            return UnsignedBytes.join(":", bytes);
+        } catch (final Throwable t) {
+            LOGGER.error(t.getMessage());
+
+            return randomUUID().toString();
+        }
     }
 
 }

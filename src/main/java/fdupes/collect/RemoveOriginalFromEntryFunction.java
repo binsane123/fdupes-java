@@ -22,28 +22,32 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdupes.container;
+package fdupes.collect;
 
-import com.google.common.collect.ComparisonChain;
+import fdupes.immutable.FileMetadata;
 
-import java.util.Comparator;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-public class FileMetadataComparator implements Comparator<FileMetadata> {
+import static java.util.stream.Collectors.toList;
 
-    public static final FileMetadataComparator INSTANCE = new FileMetadataComparator();
+public class RemoveOriginalFromEntryFunction<K> implements Function<Map.Entry<K, Collection<FileMetadata>>, Stream<? extends FileMetadata>> {
 
-    private FileMetadataComparator() {
-        // NOT ALLOWED
-    }
+    private final FileMetadataComparator comparator = FileMetadataComparator.INSTANCE;
 
     @Override
-    public int compare(final FileMetadata o1, final FileMetadata o2) {
-        return ComparisonChain.start()
-                              .compare(o1.getCreationTime(), o2.getCreationTime())
-                              .compare(o1.getLastAccessTime(), o2.getLastAccessTime())
-                              .compare(o1.getLastModifiedTime(), o2.getLastModifiedTime())
-                              .compare(o1.getAbsolutePath(), o2.getAbsolutePath())
-                              .result();
+    public Stream<? extends FileMetadata> apply(final Map.Entry<K, Collection<FileMetadata>> entry) {
+        final List<FileMetadata> sorted = entry.getValue()
+                                               .stream()
+                                               .sorted(comparator)
+                                               .collect(toList());
+
+        sorted.remove(0);
+
+        return sorted.stream();
     }
 
 }

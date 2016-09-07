@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdupes.io;
+package fdupes.util;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
@@ -40,7 +40,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.util.UUID.randomUUID;
 
-public class PathHelper {
+public class PathUtils {
 
     private static final String NEW_LINE = System.getProperty("line.separator");
 
@@ -58,9 +58,12 @@ public class PathHelper {
         final Collection<Path> destination = newArrayList();
 
         for (long i = 0L; i < directoryDuplicationFactor; i++) {
-            final Collection<Path> uniqueFiles = createUniqueFilesWithSingleUUIDContent(parentDirectory, fileDuplicationFactor);
+            final String subDirectoryName = uniqueString();
+            final Path parentSubDirectory = createSubDirectory(parentDirectory, subDirectoryName);
 
-            destination.addAll(uniqueFiles);
+            createUniqueFilesWithSingleUUIDContent(parentSubDirectory, fileDuplicationFactor);
+
+            destination.add(parentSubDirectory);
         }
 
         return destination;
@@ -83,13 +86,13 @@ public class PathHelper {
         return destination;
     }
 
-    public Path createEmptyFile(final Path parentDirectory, final String subDirectoryName, final String filename) throws IOException {
+    private Path createEmptyFile(final Path parentDirectory, final String subDirectoryName, final String filename) throws IOException {
         checkIsDirectory(parentDirectory);
 
         return createFileWithContent(parentDirectory, subDirectoryName, filename, "".getBytes(UTF_8));
     }
 
-    public Collection<Path> createUniqueFilesWithSingleUUIDContent(final Path parentDirectory, final long fileDuplicationFactor) throws IOException {
+    private Collection<Path> createUniqueFilesWithSingleUUIDContent(final Path parentDirectory, final long fileDuplicationFactor) throws IOException {
         checkIsDirectory(parentDirectory);
 
         final Collection<Path> destination = newArrayList();
@@ -103,13 +106,13 @@ public class PathHelper {
         return destination;
     }
 
-    public Path createUniqueFileWithSingleUUIDContent(final Path parentDirectory) throws IOException {
+    private Path createUniqueFileWithSingleUUIDContent(final Path parentDirectory) throws IOException {
         checkIsDirectory(parentDirectory);
 
         return createFileWithContent(parentDirectory, uniqueString(), uniqueString(), uniqueString().getBytes(UTF_8));
     }
 
-    public Collection<Path> createUniqueFilesWithRandomContent(final Path parentDirectory, final long fileDuplicationFactor) throws IOException {
+    private Collection<Path> createUniqueFilesWithRandomContent(final Path parentDirectory, final long fileDuplicationFactor) throws IOException {
         checkIsDirectory(parentDirectory);
 
         final Collection<Path> destination = newArrayList();
@@ -125,7 +128,7 @@ public class PathHelper {
 
     private static final AtomicLong LINES_COUNT = new AtomicLong(10);
 
-    public Path createUniqueFileWithRandomContent(final Path parentDirectory) throws IOException {
+    private Path createUniqueFileWithRandomContent(final Path parentDirectory) throws IOException {
         checkIsDirectory(parentDirectory);
 
         final long max = LINES_COUNT.getAndAdd(1);

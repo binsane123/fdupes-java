@@ -22,9 +22,11 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package fdupes.io;
+package fdupes.stream;
 
+import fdupes.io.DirectoryWalker;
 import fdupes.md5.Md5SumHelper;
+import fdupes.util.PathUtils;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,11 +64,11 @@ public class DirectoryWalkerTest {
                            .forEach(getMetricRegistry()::remove);
     }
 
-    private static final long UNIQUE_FILES_COUNT = 3L;
+    private static final long UNIQUE_FILES_COUNT = 2L;
     private static final long DIRECTORY_DUPLICATION_FACTOR = 10L;
     private static final long FILE_DUPLICATION_FACTOR = 20L;
 
-    private final PathHelper helper = new PathHelper();
+    private final PathUtils helper = new PathUtils();
 
     private final DirectoryWalker systemUnderTest;
 
