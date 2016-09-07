@@ -126,7 +126,7 @@ public class Md5SumHelper {
 
     @Override
     public String toString() {
-        return binaryName.isPresent() ? binaryName.get() : "jvm";
+        return binaryName.isPresent() ? "md5-native" : "md5-jvm";
     }
 
 }

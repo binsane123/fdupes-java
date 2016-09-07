@@ -24,6 +24,7 @@
 
 package fdupes.stream;
 
+import fdupes.immutable.FileMetadata;
 import fdupes.io.DirectoryWalker;
 import fdupes.md5.Md5SumHelper;
 import fdupes.util.PathUtils;
@@ -31,6 +32,7 @@ import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mockito.Mockito;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,6 +42,7 @@ import java.util.Collection;
 import static com.google.common.collect.Lists.newArrayList;
 import static fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static java.util.Arrays.asList;
+import static java.util.UUID.randomUUID;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
@@ -47,12 +50,18 @@ public class DirectoryWalkerTest {
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
+        final Md5SumHelper mock = Mockito.mock(Md5SumHelper.class);
+        Mockito.when(mock.md5sum(Mockito.any(FileMetadata.class))).thenReturn(randomUUID().toString());
+        Mockito.when(mock.toString()).thenReturn("byte-by-byte");
+
         return asList(
             new Object[][] {
                 // test with native support if present
                 { new Md5SumHelper() },
                 // test with jvm md5 implementation
-                { new Md5SumHelper(null) }
+                { new Md5SumHelper(null) },
+                // force bytes comparison
+                { mock }
             }
         );
     }

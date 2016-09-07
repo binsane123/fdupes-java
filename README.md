@@ -38,11 +38,7 @@ java -jar fdupes-<version>-all.jar <dir1> [<dir2>]...
 
 Metrics are logged every minute, so you always know what happens.
 
-## Developer corner
-
-Core implementation is located [here](https://github.com/cbismuth/fdupes-java/blob/1.1.0/src/main/java/fdupes-java/FileMetadataContainer.java#L51).
-
-## Report issues
+## Issues
 
 Here is how issues are triaged:
 

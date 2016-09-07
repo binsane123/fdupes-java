@@ -25,6 +25,7 @@
 package fdupes.stream;
 
 import fdupes.immutable.FileMetadata;
+import fdupes.io.ToByteStringFunction;
 import fdupes.md5.Md5SumHelper;
 
 import java.util.Collection;
@@ -44,7 +45,8 @@ public class DuplicatesFinder {
         Stream<FileMetadata> stream = elements.stream();
 
         stream = streamHandler.removeUniqueFilesByKey(stream, "size", FileMetadata::getSize);
-        stream = streamHandler.removeUniqueFilesByKeyAndOriginals(stream, "md5", md5SumHelper::md5sum);
+        stream = streamHandler.removeUniqueFilesByKey(stream, "md5", md5SumHelper::md5sum);
+        stream = streamHandler.removeUniqueFilesByKeyAndOriginals(stream, "bytes", ToByteStringFunction.INSTANCE);
 
         return streamHandler.extractAbsolutePaths(stream);
     }
