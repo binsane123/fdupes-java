@@ -127,7 +127,7 @@ public class PathUtils {
         return destination;
     }
 
-    private static final AtomicLong LINES_COUNT = new AtomicLong(10_000);
+    private static final AtomicLong LINES_COUNT = new AtomicLong(1000);
 
     private Path createUniqueFileWithRandomContent(final Path parentDirectory) throws IOException {
         checkIsDirectory(parentDirectory);

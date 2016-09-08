@@ -65,7 +65,9 @@ public class Md5Computer {
         try (final Timer.Context ignored = getMetricRegistry().timer(name("md5sum", "timer")).time()) {
             return doIt(fileMetadata);
         } catch (final Exception e) {
-            LOGGER.error("Can't compute md5sum from file [{}] ({})", fileMetadata.getAbsolutePath(), e.getClass().getSimpleName());
+            LOGGER.error("Can't compute md5sum from file [{}] ([{}]: [{}])",
+                         fileMetadata.getAbsolutePath(), e.getClass().getSimpleName(), e.getMessage());
+
             return randomUUID().toString();
         }
     }
@@ -78,7 +80,7 @@ public class Md5Computer {
         }
     }
 
-    private String jvmMd5Sum(final FileMetadata fileMetadata) {
+    public String jvmMd5Sum(final FileMetadata fileMetadata) {
         try {
             final String separator = ":";
             final MessageDigest md = MessageDigest.getInstance("MD5");
@@ -88,13 +90,11 @@ public class Md5Computer {
 
             return UnsignedBytes.join(separator, digest);
         } catch (final Throwable e) {
-            LOGGER.error(e.getMessage());
-
-            return randomUUID().toString();
+            throw Throwables.propagate(e);
         }
     }
 
-    private String nativeMd5Sum(final FileMetadata fileMetadata) {
+    public String nativeMd5Sum(final FileMetadata fileMetadata) {
         try {
             return new ProcessExecutor().command(getNativeMd5SumCommand(fileMetadata))
                                         .readOutput(true)
@@ -102,7 +102,7 @@ public class Md5Computer {
                                         .execute()
                                         .outputUTF8()
                                         .split("\\s")[0];
-        } catch (final Exception e) {
+        } catch (final Throwable e) {
             throw Throwables.propagate(e);
         }
     }

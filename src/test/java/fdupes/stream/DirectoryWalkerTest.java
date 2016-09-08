@@ -50,20 +50,36 @@ public class DirectoryWalkerTest {
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
+        return asList(
+            new Object[][] {
+                { new Md5Computer() },
+                { new Md5Computer(null) },
+                { newForceByteComparisonMock() },
+                { newNativeMd5SumWithExceptionMock() },
+                { newJvmMd5SumWithExceptionMock() }
+            }
+        );
+    }
+
+    private static Md5Computer newForceByteComparisonMock() {
         final Md5Computer mock = Mockito.mock(Md5Computer.class);
         Mockito.when(mock.compute(Mockito.any(FileMetadata.class))).thenReturn(randomUUID().toString());
         Mockito.when(mock.toString()).thenReturn("byte-by-byte");
+        return mock;
+    }
 
-        return asList(
-            new Object[][] {
-                // test with native support if present
-                { new Md5Computer() },
-                // test with jvm md5 implementation
-                { new Md5Computer(null) },
-                // force bytes comparison
-                { mock }
-            }
-        );
+    private static Md5Computer newNativeMd5SumWithExceptionMock() {
+        final Md5Computer mock = Mockito.mock(Md5Computer.class);
+        Mockito.when(mock.nativeMd5Sum(Mockito.any(FileMetadata.class))).thenThrow(new RuntimeException());
+        Mockito.when(mock.toString()).thenReturn("mock-exception-md5-native");
+        return mock;
+    }
+
+    private static Md5Computer newJvmMd5SumWithExceptionMock() {
+        final Md5Computer mock = Mockito.mock(Md5Computer.class);
+        Mockito.when(mock.jvmMd5Sum(Mockito.any(FileMetadata.class))).thenThrow(new RuntimeException());
+        Mockito.when(mock.toString()).thenReturn("mock-exception-md5-jvm");
+        return mock;
     }
 
     @After
