@@ -8,26 +8,28 @@
 
 A command line duplicated files finder written in Java 8 which finds all duplicated files from input paths and their subdirectories.
 
-### Requirements
+## Usage
 
-Java 8 Runtime environment is the only requirement to run [fdupes-java](https://github.com/cbismuth/fdupes-java).
+Executable files are available on the [release page](https://github.com/cbismuth/fdupes-java/releases), download the
+latest one and run the command line below. 
 
-This can be downloaded from the Oracle website [here](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
+```bash
+java -jar fdupes-<version>-all.jar <PATH1> [<PATH2>]...
+```
 
-**Hint**: on Debian-based Linux OSes just run `sudo apt-get install openjdk-8-jre-headless`.
-
-### Algorithms
-
-* Files are compared by **file sizes**, followed by **MD5 signatures** comparison then followed by a buffered **byte-by-byte comparison**.
-* Original file is detected by comparing creation, last access and last modification time.
-
-### Output
+## Output
 
 Paths of duplicated files are reported in a `duplicates.log` file dumped in the current working directory.
 
-Reported paths are double quoted and escaped to be *nix-compliant.
-On *nix systems these duplicates can be deleted by running this one-liner `cat duplicates.log | xargs echo rm | sh`
+**Notes**:
 
+* Reported paths are "double quoted" and "escaped" to be *nix-compliant.
+
+`<PATH1> [<PATH2>]...` can be either regular files, directories or both.
+
+## Requirements
+
+Java 8 Runtime environment is the only requirement, it can be downloaded [here](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
 
 ## Motivation
 
@@ -45,16 +47,10 @@ Symlinks are ignored in [fdupes-java](https://github.com/cbismuth/fdupes-java).
 
 Duplicated input directories and files are filtered in [fdupes-java](https://github.com/cbismuth/fdupes-java).
 
-## Usage
+## Algorithms
 
-Executable files are available on the [release page](https://github.com/cbismuth/fdupes-java/releases), download the
-latest one and run the command line below. 
-
-```bash
-java -jar fdupes-<version>-all.jar <PATH1> [<PATH2>]...
-```
-
-`<PATH1> [<PATH2>]...` can be either regular files, directories or both.
+* Files are compared by **file sizes**, followed by **MD5 signatures** comparison, then by a **byte-by-byte** buffered comparison.
+* Original file is detected by comparing creation, last access and last modification time.
 
 ## Issues
 
