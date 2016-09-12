@@ -79,9 +79,7 @@ public class PathUtils {
             final String subDirectoryName = uniqueString();
             final Path parentSubDirectory = createSubDirectory(parentDirectory, subDirectoryName);
 
-            duplicateFiles(originals, parentSubDirectory, fileDuplicationFactor);
-
-            destination.add(parentSubDirectory);
+            destination.addAll(duplicateFiles(originals, parentSubDirectory, fileDuplicationFactor));
         }
 
         return destination;

@@ -32,12 +32,11 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
 
 import static com.codahale.metrics.Slf4jReporter.LoggingLevel.TRACE;
+import static com.google.common.collect.Lists.newArrayList;
 import static fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
-import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -47,44 +46,63 @@ public final class Main {
 
     public static void main(final String... args) throws IOException {
         if (args.length == 0) {
-            System.out.println(version());
-            System.err.println("Usage: java -jar fdupes-<version>-all.jar <dir1> [<dir2>]...");
+            help();
         } else if (args.length == 1 && ("-v".equals(args[0]) || "--version".equals(args[0]))) {
             System.out.println(version());
         } else {
-            launch(args);
+            execute(args);
         }
+    }
+
+    private static void help() {
+        System.out.println(version());
+        System.err.println("Usage: java -jar fdupes-<version>-all.jar <dir1> [<dir2>]...");
     }
 
     private static String version() {
         return String.format("fdupes-java version %s", Main.class.getPackage().getImplementationVersion());
     }
 
-    private static void launch(final String[] args) throws IOException {
-        try (final Slf4jReporter slf4jReporter = Slf4jReporter.forRegistry(getMetricRegistry())
-                                                              .outputTo(getLogger("fdupes"))
-                                                              .withLoggingLevel(TRACE).build()) {
-            slf4jReporter.start(1L, MINUTES);
-
-            doIt(args);
-
-            slf4jReporter.report();
-        }
-    }
-
-    private static void doIt(final String[] args) throws IOException {
-        final DirectoryWalker walker = new DirectoryWalker(new Md5Computer());
+    private static void execute(final String[] args) throws IOException {
+        final Md5Computer md5 = new Md5Computer();
+        final DirectoryWalker walker = new DirectoryWalker(md5);
         final DuplicatesWriter writer = new DuplicatesWriter();
 
-        final List<String> inputPaths = asList(args);
-        final Set<String> absolutePathsOfDuplicates = walker.extractDuplicates(inputPaths);
-        final Path outputPath = writer.write(absolutePathsOfDuplicates);
+        final Path outputPath = new Main(md5, walker, writer).launchAndReport(args);
 
         LOGGER.info("Output file written at [{}]", outputPath);
     }
 
-    private Main() {
-        // PRIVATE
+    private final Md5Computer md5;
+    private final DirectoryWalker walker;
+    private final DuplicatesWriter writer;
+
+    public Main(final Md5Computer md5,
+                final DirectoryWalker walker,
+                final DuplicatesWriter writer) {
+        this.md5 = md5;
+        this.walker = walker;
+        this.writer = writer;
+    }
+
+    public Path launchAndReport(final String... args) throws IOException {
+        return launchAndReport(newArrayList(args));
+    }
+
+    public Path launchAndReport(final Collection<String> args) throws IOException {
+        try (final Slf4jReporter slf4jReporter = Slf4jReporter.forRegistry(getMetricRegistry())
+                                                              .outputTo(getLogger("fdupes"))
+                                                              .withLoggingLevel(TRACE).build()) {
+            slf4jReporter.start(1L, MINUTES);
+            final Path outputPath = launch(args);
+            slf4jReporter.report();
+
+            return outputPath;
+        }
+    }
+
+    private Path launch(final Collection<String> args) throws IOException {
+        return writer.write(walker.extractDuplicates(args));
     }
 
 }

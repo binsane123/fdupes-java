@@ -24,8 +24,10 @@
 
 package fdupes.stream;
 
+import fdupes.Main;
 import fdupes.immutable.FileMetadata;
 import fdupes.io.DirectoryWalker;
+import fdupes.io.DuplicatesWriter;
 import fdupes.md5.Md5Computer;
 import fdupes.util.PathUtils;
 import org.junit.After;
@@ -95,10 +97,13 @@ public class DirectoryWalkerTest {
 
     private final PathUtils helper = new PathUtils();
 
-    private final DirectoryWalker systemUnderTest;
+    private final Main systemUnderTest;
 
-    public DirectoryWalkerTest(final Md5Computer md5Computer) {
-        systemUnderTest = new DirectoryWalker(md5Computer);
+    public DirectoryWalkerTest(final Md5Computer md5) {
+        final DirectoryWalker walker = new DirectoryWalker(md5);
+        final DuplicatesWriter writer = new DuplicatesWriter();
+
+        systemUnderTest = new Main(md5, walker, writer);
     }
 
     @Test
@@ -107,7 +112,9 @@ public class DirectoryWalkerTest {
         final Path inputPath = Paths.get(helper.uniqueString());
 
         // WHEN
-        final Collection<String> duplicates = systemUnderTest.extractDuplicates(inputPath.toString());
+        final Collection<String> duplicates = Files.readAllLines(
+            systemUnderTest.launchAndReport(inputPath.toString())
+        );
 
         // THEN
         final long expectedDuplicatesByMd5SumCount = 0L;
@@ -126,7 +133,9 @@ public class DirectoryWalkerTest {
         sources.add(helper.createEmptyTempDirectory(parentDirectory));
 
         // WHEN
-        final Collection<String> duplicates = systemUnderTest.extractDuplicates(parentDirectory.toString());
+        final Collection<String> duplicates = Files.readAllLines(
+            systemUnderTest.launchAndReport(parentDirectory.toString())
+        );
 
         // THEN
         final long expectedDuplicatesByMd5SumCount = 0L;
@@ -143,7 +152,9 @@ public class DirectoryWalkerTest {
         sources.add(helper.createSingleEmptyFile(parentDirectory));
 
         // WHEN
-        final Collection<String> duplicates = systemUnderTest.extractDuplicates(parentDirectory.toString());
+        final Collection<String> duplicates = Files.readAllLines(
+            systemUnderTest.launchAndReport(parentDirectory.toString())
+        );
 
         // THEN
         final long expectedDuplicatesByMd5SumCount = 0L;
@@ -160,7 +171,9 @@ public class DirectoryWalkerTest {
         sources.addAll(helper.createNewSetWithDuplicatesBySize(parentDirectory, DIRECTORY_DUPLICATION_FACTOR, UNIQUE_FILES_COUNT));
 
         // WHEN
-        final Collection<String> duplicates = systemUnderTest.extractDuplicates(parentDirectory.toString());
+        final Collection<String> duplicates = Files.readAllLines(
+            systemUnderTest.launchAndReport(parentDirectory.toString())
+        );
 
         // THEN
         final long expectedDuplicatesByMd5SumCount = 0L;
@@ -177,7 +190,9 @@ public class DirectoryWalkerTest {
         sources.addAll(helper.createNewSetWithDuplicatesByMd5Sum(parentDirectory, UNIQUE_FILES_COUNT, DIRECTORY_DUPLICATION_FACTOR, FILE_DUPLICATION_FACTOR));
 
         // WHEN
-        final Collection<String> duplicates = systemUnderTest.extractDuplicates(parentDirectory.toString());
+        final Collection<String> duplicates = Files.readAllLines(
+            systemUnderTest.launchAndReport(parentDirectory.toString())
+        );
 
         // THEN
         final long expectedDuplicatesByMd5SumCount = UNIQUE_FILES_COUNT * FILE_DUPLICATION_FACTOR * DIRECTORY_DUPLICATION_FACTOR - UNIQUE_FILES_COUNT;
@@ -197,7 +212,9 @@ public class DirectoryWalkerTest {
         sources.addAll(helper.createNewSetWithDuplicatesByMd5Sum(parentDirectory, UNIQUE_FILES_COUNT, DIRECTORY_DUPLICATION_FACTOR, FILE_DUPLICATION_FACTOR));
 
         // WHEN
-        final Collection<String> duplicates = systemUnderTest.extractDuplicates(parentDirectory.toString());
+        final Collection<String> duplicates = Files.readAllLines(
+            systemUnderTest.launchAndReport(parentDirectory.toString())
+        );
 
         // THEN
         final long expectedDuplicatesByMd5SumCount = UNIQUE_FILES_COUNT * FILE_DUPLICATION_FACTOR * DIRECTORY_DUPLICATION_FACTOR - UNIQUE_FILES_COUNT;
