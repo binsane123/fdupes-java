@@ -1,8 +1,10 @@
 # fdupes-java
 
 [![Build status](https://travis-ci.org/cbismuth/fdupes-java.svg?branch=master)](https://travis-ci.org/cbismuth/fdupes-java)
+[![Coverage status](https://coveralls.io/repos/github/cbismuth/fdupes-java/badge.svg?branch=master)](https://coveralls.io/github/cbismuth/fdupes-java?branch=master)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/cbismuth/fdupes-java/master/LICENSE.md)
 [![GitHub issues](https://img.shields.io/github/issues/cbismuth/fdupes-java.svg)](https://github.com/cbismuth/fdupes-java/issues)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.cbismuth/fdupes-java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.cbismuth/fdupes-java/)
 
 ## Description
 
