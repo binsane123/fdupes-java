@@ -24,6 +24,7 @@
 
 package fdupes.collect;
 
+import com.google.common.base.Preconditions;
 import fdupes.immutable.FileMetadata;
 
 import java.util.Collection;
@@ -40,6 +41,8 @@ public class RemoveOriginalFromEntryFunction<K> implements Function<Map.Entry<K,
 
     @Override
     public Stream<? extends FileMetadata> apply(final Map.Entry<K, Collection<FileMetadata>> entry) {
+        Preconditions.checkNotNull(entry, "null file metadata entry");
+
         final List<FileMetadata> sorted = entry.getValue()
                                                .stream()
                                                .sorted(comparator)

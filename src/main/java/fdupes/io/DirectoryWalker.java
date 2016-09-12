@@ -24,6 +24,7 @@
 
 package fdupes.io;
 
+import com.google.common.base.Preconditions;
 import fdupes.collect.FileMetadataContainer;
 import fdupes.collect.FilenamePredicate;
 import fdupes.md5.Md5Computer;
@@ -51,14 +52,20 @@ public class DirectoryWalker {
     private final FileMetadataContainer fileMetadataContainer = new FileMetadataContainer();
 
     public DirectoryWalker(final Md5Computer md5Computer) {
+        Preconditions.checkNotNull(md5Computer, "null MD5 computer");
+
         duplicatesFinder = new DuplicatesFinder(md5Computer);
     }
 
     public Set<String> extractDuplicates(final String inputPath) {
+        Preconditions.checkNotNull(inputPath, "null input path");
+
         return extractDuplicates(singletonList(inputPath));
     }
 
     public Set<String> extractDuplicates(final Iterable<String> inputPaths) {
+        Preconditions.checkNotNull(inputPaths, "null input path collection");
+
         fileMetadataContainer.clear();
 
         inputPaths.forEach(rootPath -> {

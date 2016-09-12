@@ -24,6 +24,7 @@
 
 package fdupes.collect;
 
+import com.google.common.base.Preconditions;
 import fdupes.immutable.FileMetadata;
 import org.slf4j.Logger;
 
@@ -47,6 +48,8 @@ public class FileMetadataContainer {
     }
 
     public void addFile(final Path path) {
+        Preconditions.checkNotNull(path, "null path");
+
         try {
             final BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
 

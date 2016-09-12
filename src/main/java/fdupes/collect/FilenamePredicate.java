@@ -24,6 +24,8 @@
 
 package fdupes.collect;
 
+import com.google.common.base.Preconditions;
+
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -62,6 +64,8 @@ public final class FilenamePredicate implements DirectoryStream.Filter<Path> {
 
     @Override
     public boolean accept(final Path path) {
+        Preconditions.checkNotNull(path, "null path");
+
         final boolean isDirectory = Files.isDirectory(path);
 
         final boolean isAllowedFile = !Files.isSymbolicLink(path)

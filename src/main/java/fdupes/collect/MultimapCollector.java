@@ -25,6 +25,7 @@
 package fdupes.collect;
 
 import com.codahale.metrics.Gauge;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
@@ -57,10 +58,17 @@ public final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K
     }
 
     public static <T, K, V> MultimapCollector<T, K, T> toMultimap(final String name, final Function<T, K> keyGetter) {
+        Preconditions.checkNotNull(name, "null multimap name");
+        Preconditions.checkNotNull(keyGetter, "null multimap key getter");
+
         return toMultimap(name, keyGetter, v -> v);
     }
 
     public static <T, K, V> MultimapCollector<T, K, V> toMultimap(final String name, final Function<T, K> keyGetter, final Function<T, V> valueGetter) {
+        Preconditions.checkNotNull(name, "null multimap name");
+        Preconditions.checkNotNull(keyGetter, "null multimap key getter");
+        Preconditions.checkNotNull(valueGetter, "null multimap value getter");
+
         return new MultimapCollector<>(name, keyGetter, valueGetter);
     }
 

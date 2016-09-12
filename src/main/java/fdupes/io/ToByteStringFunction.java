@@ -24,6 +24,7 @@
 
 package fdupes.io;
 
+import com.google.common.base.Preconditions;
 import com.google.common.primitives.UnsignedBytes;
 import fdupes.immutable.FileMetadata;
 import org.slf4j.Logger;
@@ -44,6 +45,8 @@ public class ToByteStringFunction implements Function<FileMetadata, String> {
 
     @Override
     public String apply(final FileMetadata fileMetadata) {
+        Preconditions.checkNotNull(fileMetadata, "null file metadata");
+
         try {
             final Path path = Paths.get(fileMetadata.getAbsolutePath());
             final byte[] bytes = Files.readAllBytes(path);

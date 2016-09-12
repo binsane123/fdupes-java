@@ -24,6 +24,7 @@
 
 package fdupes.collect;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ComparisonChain;
 import fdupes.immutable.FileMetadata;
 
@@ -39,6 +40,9 @@ public class FileMetadataComparator implements Comparator<FileMetadata> {
 
     @Override
     public int compare(final FileMetadata o1, final FileMetadata o2) {
+        Preconditions.checkNotNull(o1, "null file metadata 1");
+        Preconditions.checkNotNull(o2, "null file metadata 2");
+
         return ComparisonChain.start()
                               .compare(o1.getCreationTime(), o2.getCreationTime())
                               .compare(o1.getLastAccessTime(), o2.getLastAccessTime())

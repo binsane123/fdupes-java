@@ -24,6 +24,7 @@
 
 package fdupes.stream;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
 import fdupes.collect.RemoveOriginalFromEntryFunction;
 import fdupes.immutable.FileMetadata;
@@ -51,6 +52,10 @@ public class StreamHandler {
     }
 
     private <K> Stream<FileMetadata> removeUniqueFilesByKey(final Stream<FileMetadata> stream, final String name, final Function<FileMetadata, K> keyMapper, final boolean removeOriginals) {
+        Preconditions.checkNotNull(stream, "null pass stream");
+        Preconditions.checkNotNull(name, "null pass name");
+        Preconditions.checkNotNull(keyMapper, "null pass key mapper");
+
         final Multimap<K, FileMetadata> multimap = stream.collect(toMultimap(name("multimap", name), keyMapper));
 
         final Stream<Map.Entry<K, Collection<FileMetadata>>> entryWithDuplicates = multimap.asMap()
@@ -69,6 +74,8 @@ public class StreamHandler {
     }
 
     public Set<String> extractAbsolutePaths(final Stream<FileMetadata> stream) {
+        Preconditions.checkNotNull(stream, "null stream");
+
         return stream.map(FileMetadata::getAbsolutePath)
                      .map(PathEscapeFunction.INSTANCE)
                      .collect(Collectors.toCollection(TreeSet::new));

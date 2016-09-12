@@ -24,6 +24,8 @@
 
 package fdupes.io;
 
+import com.google.common.base.Preconditions;
+
 import java.util.function.Function;
 
 import static java.lang.String.format;
@@ -38,6 +40,8 @@ public class PathEscapeFunction implements Function<String, String> {
 
     @Override
     public String apply(final String s) {
+        Preconditions.checkNotNull(s, "null string to escape");
+
         return quoteString(
             escapeWhitespaces(s)
         );

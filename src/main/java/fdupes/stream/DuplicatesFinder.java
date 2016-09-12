@@ -24,6 +24,7 @@
 
 package fdupes.stream;
 
+import com.google.common.base.Preconditions;
 import fdupes.immutable.FileMetadata;
 import fdupes.io.ToByteStringFunction;
 import fdupes.md5.Md5Computer;
@@ -38,10 +39,14 @@ public class DuplicatesFinder {
     private final StreamHandler handler = new StreamHandler();
 
     public DuplicatesFinder(final Md5Computer md5) {
+        Preconditions.checkNotNull(md5, "null MD5 computer");
+
         this.md5 = md5;
     }
 
     public Set<String> extractDuplicates(final Collection<FileMetadata> elements) {
+        Preconditions.checkNotNull(elements, "null file metadata collection");
+
         Stream<FileMetadata> stream = elements.stream();
 
         stream = handler.removeUniqueFilesByKey(stream, "size", FileMetadata::getSize);

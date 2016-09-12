@@ -24,6 +24,8 @@
 
 package fdupes.immutable;
 
+import com.google.common.base.Preconditions;
+
 import java.nio.file.attribute.FileTime;
 
 public class FileMetadata {
@@ -39,6 +41,9 @@ public class FileMetadata {
                         final FileTime lastAccessTime,
                         final FileTime lastModifiedTime,
                         final long size) {
+        Preconditions.checkNotNull(absolutePath, "null absolute path");
+        Preconditions.checkNotNull(creationTime, "null creation time");
+
         this.absolutePath = absolutePath;
         this.creationTime = creationTime;
         this.lastAccessTime = lastAccessTime;

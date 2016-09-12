@@ -24,6 +24,8 @@
 
 package fdupes.io;
 
+import com.google.common.base.Preconditions;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,6 +42,8 @@ public class DuplicatesWriter {
     public static final String OUTPUT_FILENAME = "duplicates.log";
 
     public Path write(final Collection<String> inputPaths) throws IOException {
+        Preconditions.checkNotNull(inputPaths, "null input path collection");
+
         final Path output = Paths.get(WORKING_DIRECTORY, OUTPUT_FILENAME);
 
         final String absolutePaths = inputPaths.stream().collect(Collectors.joining(NEW_LINE));

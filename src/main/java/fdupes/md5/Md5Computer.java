@@ -25,6 +25,7 @@
 package fdupes.md5;
 
 import com.codahale.metrics.Timer;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.primitives.UnsignedBytes;
 import fdupes.immutable.FileMetadata;
@@ -62,6 +63,8 @@ public class Md5Computer {
     }
 
     public String compute(final FileMetadata fileMetadata) {
+        Preconditions.checkNotNull(fileMetadata, "null file metadata");
+
         try (final Timer.Context ignored = getMetricRegistry().timer(name("md5sum", "timer")).time()) {
             return doIt(fileMetadata);
         } catch (final Exception e) {
@@ -81,6 +84,8 @@ public class Md5Computer {
     }
 
     public String jvmMd5Sum(final FileMetadata fileMetadata) {
+        Preconditions.checkNotNull(fileMetadata, "null file metadata");
+
         try {
             final String separator = ":";
             final MessageDigest md = MessageDigest.getInstance("MD5");
@@ -95,6 +100,8 @@ public class Md5Computer {
     }
 
     public String nativeMd5Sum(final FileMetadata fileMetadata) {
+        Preconditions.checkNotNull(fileMetadata, "null file metadata");
+
         try {
             return new ProcessExecutor().command(getNativeMd5SumCommand(fileMetadata))
                                         .readOutput(true)
