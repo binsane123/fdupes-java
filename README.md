@@ -49,7 +49,7 @@ Duplicated input directories and files are filtered in [fdupes-java](https://git
 
 ## Algorithms
 
-* Files are compared by **file sizes**, followed by **MD5 signatures** comparison, then by a **byte-by-byte** buffered comparison.
+* Files are compared by **file sizes**, then by **MD5 signatures**, finally a buffered **byte-by-byte** comparison is done.
 * Original file is detected by comparing creation, last access and last modification time.
 
 ## Issues
