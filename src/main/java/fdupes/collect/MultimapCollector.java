@@ -29,6 +29,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -74,7 +75,7 @@ public final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K
 
     @Override
     public Supplier<Multimap<K, V>> supplier() {
-        return ArrayListMultimap::create;
+        return () -> Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
     }
 
     @Override

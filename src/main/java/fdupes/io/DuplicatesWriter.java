@@ -46,7 +46,7 @@ public class DuplicatesWriter {
 
         final Path output = Paths.get(WORKING_DIRECTORY, OUTPUT_FILENAME);
 
-        final String absolutePaths = inputPaths.stream().collect(Collectors.joining(NEW_LINE));
+        final String absolutePaths = inputPaths.parallelStream().collect(Collectors.joining(NEW_LINE));
 
         Files.write(output, absolutePaths.getBytes(UTF_8));
 

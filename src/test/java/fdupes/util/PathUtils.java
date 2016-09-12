@@ -125,19 +125,23 @@ public class PathUtils {
         return destination;
     }
 
-    private static final AtomicLong LINES_COUNT = new AtomicLong(1000);
+    private static final AtomicLong LINES_COUNT = new AtomicLong(10000);
+    private static final StringBuffer STRING_BUFFER = new StringBuffer();
+    private static final int MIN_LENGTH = 10;
+    private static final char PAD_CHAR = '0';
+
+    static {
+        for (long i = 0; i < LINES_COUNT.get(); i++) {
+            STRING_BUFFER.append(Strings.padStart(String.valueOf(i), MIN_LENGTH, PAD_CHAR));
+        }
+    }
 
     private Path createUniqueFileWithRandomContent(final Path parentDirectory) throws IOException {
         checkIsDirectory(parentDirectory);
 
-        final long max = LINES_COUNT.getAndAdd(1);
+        STRING_BUFFER.append(Strings.padStart(String.valueOf(LINES_COUNT.addAndGet(1)), MIN_LENGTH, PAD_CHAR));
 
-        final StringBuilder sb = new StringBuilder();
-        for (long i = 0; i < max; i++) {
-            sb.append(Strings.padStart(String.valueOf(i), 5, '0')).append(NEW_LINE);
-        }
-
-        return createFileWithContent(parentDirectory, uniqueString(), uniqueString(), sb.toString().getBytes(UTF_8));
+        return createFileWithContent(parentDirectory, uniqueString(), uniqueString(), STRING_BUFFER.toString().getBytes(UTF_8));
     }
 
     private Path createFileWithContent(final Path parentDirectory, final String subDirectoryName, final String filename, final byte[] content) throws IOException {

@@ -35,10 +35,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import static fdupes.collect.FilenamePredicate.FILENAME_STOP_WORDS;
 import static java.util.UUID.randomUUID;
-import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -47,9 +47,9 @@ public class FilenamePredicateTest {
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
-        return FILENAME_STOP_WORDS.stream()
+        return FILENAME_STOP_WORDS.parallelStream()
                                   .map(s -> new Object[] { s })
-                                  .collect(toList());
+                                  .collect(Collectors.toList());
     }
 
     private static final Logger LOGGER = getLogger(FilenamePredicateTest.class);
@@ -71,7 +71,7 @@ public class FilenamePredicateTest {
         final int expectedFilesCount = 1;
         final int actualFilesCount = Files.list(path)
                                           .filter(systemUnderTest::accept)
-                                          .collect(toList())
+                                          .collect(Collectors.toList())
                                           .size();
 
         assertEquals(expectedFilesCount, actualFilesCount);

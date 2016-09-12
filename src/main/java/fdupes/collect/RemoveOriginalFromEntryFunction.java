@@ -31,9 +31,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toList;
 
 public class RemoveOriginalFromEntryFunction<K> implements Function<Map.Entry<K, Collection<FileMetadata>>, Stream<? extends FileMetadata>> {
 
@@ -44,13 +43,13 @@ public class RemoveOriginalFromEntryFunction<K> implements Function<Map.Entry<K,
         Preconditions.checkNotNull(entry, "null file metadata entry");
 
         final List<FileMetadata> sorted = entry.getValue()
-                                               .stream()
+                                               .parallelStream()
                                                .sorted(comparator)
-                                               .collect(toList());
+                                               .collect(Collectors.toList());
 
         sorted.remove(0);
 
-        return sorted.stream();
+        return sorted.parallelStream();
     }
 
 }

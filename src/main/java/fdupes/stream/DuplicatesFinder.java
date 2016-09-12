@@ -54,7 +54,7 @@ public class DuplicatesFinder {
     public Set<String> extractDuplicates(final Collection<FileMetadata> elements) {
         Preconditions.checkNotNull(elements, "null file metadata collection");
 
-        Stream<FileMetadata> stream = elements.stream();
+        Stream<FileMetadata> stream = elements.parallelStream();
 
         final String passName1 = "size";
         LOGGER.info("Pass 1/3 - compare file by size ...");

@@ -60,12 +60,12 @@ public class StreamHandler {
 
         final Stream<Map.Entry<K, Collection<FileMetadata>>> entryWithDuplicates = multimap.asMap()
                                                                                            .entrySet()
-                                                                                           .stream()
+                                                                                           .parallelStream()
                                                                                            .filter(e -> e.getValue().size() > 1);
 
         final Stream<FileMetadata> result;
         if (!removeOriginals) {
-            result = entryWithDuplicates.flatMap(e -> e.getValue().stream());
+            result = entryWithDuplicates.flatMap(e -> e.getValue().parallelStream());
         } else {
             result = entryWithDuplicates.flatMap(new RemoveOriginalFromEntryFunction<>());
         }

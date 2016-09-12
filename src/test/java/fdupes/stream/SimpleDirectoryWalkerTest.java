@@ -35,9 +35,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 
 public class SimpleDirectoryWalkerTest {
@@ -68,16 +68,16 @@ public class SimpleDirectoryWalkerTest {
 
         // WHEN
         final Collection<String> actual = Files.readAllLines(
-            systemUnderTest.launchAndReport(filesWithDuplicates.stream().map(Path::toString).collect(toList()))
+            systemUnderTest.launchAndReport(filesWithDuplicates.parallelStream().map(Path::toString).collect(Collectors.toList()))
         );
 
         // THEN
         assertEquals(directoryDuplicationFactor * fileDuplicationFactor - distinctFilesCount, actual.size());
 
-        final List<String> escapedAbsolutePathWithDuplicates = filesWithDuplicates.stream()
+        final List<String> escapedAbsolutePathWithDuplicates = filesWithDuplicates.parallelStream()
                                                                                   .map(Path::toString)
                                                                                   .map(s -> format("\"%s\"", s))
-                                                                                  .collect(toList());
+                                                                                  .collect(Collectors.toList());
 
         actual.forEach(escapedAbsolutePathWithDuplicates::contains);
     }
