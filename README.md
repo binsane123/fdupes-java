@@ -17,15 +17,13 @@ latest one and run the command line below.
 java -jar fdupes-<version>-all.jar <PATH1> [<PATH2>]...
 ```
 
+**Note**: `<PATH1> [<PATH2>]...` can be either regular files, directories or both.
+
 ## Output
 
 Paths of duplicated files are reported in a `duplicates.log` file dumped in the current working directory.
 
-**Notes**:
-
-* Reported paths are "double quoted" and "escaped" to be *nix-compliant.
-
-`<PATH1> [<PATH2>]...` can be either regular files, directories or both.
+**Note**: reported paths are "double quoted" and "escaped" to be *nix-compliant.
 
 ## Requirements
 
