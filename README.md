@@ -13,7 +13,7 @@ A command line duplicated files finder written in Java 8 which finds all duplica
 Executable files are available on the [release page](https://github.com/cbismuth/fdupes-java/releases), download the
 latest one and run the command line below. 
 
-```bash
+```
 java -jar fdupes-<version>-all.jar <PATH1> [<PATH2>]...
 ```
 
