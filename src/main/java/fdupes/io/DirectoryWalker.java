@@ -76,7 +76,7 @@ public class DirectoryWalker {
             } else if (Files.isRegularFile(path)) {
                 handleRegularFile(path);
             } else {
-                LOGGER.warn("[{}] is not a directory", rootPath);
+                LOGGER.warn("[{}] is not a directory or a regular file", rootPath);
             }
         });
 

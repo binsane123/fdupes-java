@@ -24,7 +24,6 @@
 
 package fdupes;
 
-import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.Slf4jReporter;
 import fdupes.io.DirectoryWalker;
 import fdupes.io.DuplicatesWriter;
@@ -36,6 +35,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
+import static com.codahale.metrics.Slf4jReporter.LoggingLevel.TRACE;
 import static fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -61,10 +61,10 @@ public final class Main {
     }
 
     private static void launch(final String[] args) throws IOException {
-        try (final Slf4jReporter slf4jReporter = Slf4jReporter.forRegistry(getMetricRegistry()).outputTo(getLogger("metrics")).build();
-             final JmxReporter jmxReporter = JmxReporter.forRegistry(getMetricRegistry()).build()) {
+        try (final Slf4jReporter slf4jReporter = Slf4jReporter.forRegistry(getMetricRegistry())
+                                                              .outputTo(getLogger("fdupes"))
+                                                              .withLoggingLevel(TRACE).build()) {
             slf4jReporter.start(1L, MINUTES);
-            jmxReporter.start();
 
             doIt(args);
 

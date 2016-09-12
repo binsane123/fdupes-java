@@ -28,12 +28,19 @@ import com.google.common.base.Preconditions;
 import fdupes.immutable.FileMetadata;
 import fdupes.io.ToByteStringFunction;
 import fdupes.md5.Md5Computer;
+import org.slf4j.Logger;
 
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.codahale.metrics.MetricRegistry.name;
+import static fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class DuplicatesFinder {
+
+    private static final Logger LOGGER = getLogger(DuplicatesFinder.class);
 
     private final Md5Computer md5;
     private final StreamHandler handler = new StreamHandler();
@@ -49,11 +56,26 @@ public class DuplicatesFinder {
 
         Stream<FileMetadata> stream = elements.stream();
 
-        stream = handler.removeUniqueFilesByKey(stream, "size", FileMetadata::getSize);
-        stream = handler.removeUniqueFilesByKey(stream, "md5", md5::compute);
-        stream = handler.removeUniqueFilesByKeyAndOriginals(stream, "bytes", ToByteStringFunction.INSTANCE);
+        final String passName1 = "size";
+        LOGGER.info("Pass 1/3 - compare file by size ...");
+        stream = handler.removeUniqueFilesByKey(stream, passName1, FileMetadata::getSize);
+        LOGGER.info("Pass 1/3 - compare file by size completed! - {} duplicate(s) found", getCount(passName1));
+
+        final String passName2 = "md5";
+        LOGGER.info("Pass 2/3 - compare file by MD5 ...");
+        stream = handler.removeUniqueFilesByKey(stream, passName2, md5::compute);
+        LOGGER.info("Pass 2/3 - compare file by MD5 completed! - {} duplicate(s) found", getCount(passName2));
+
+        final String passName3 = "bytes";
+        LOGGER.info("Pass 3/3 - compare file byte-by-byte ...");
+        stream = handler.removeUniqueFilesByKeyAndOriginals(stream, passName3, ToByteStringFunction.INSTANCE);
+        LOGGER.info("Pass 3/3 - compare file byte-by-byte completed! - {} duplicate(s) found", getCount(passName3));
 
         return handler.extractAbsolutePaths(stream);
+    }
+
+    private long getCount(final String name) {
+        return getMetricRegistry().counter(name("multimap", name, "duplicates", "counter")).getCount();
     }
 
 }
