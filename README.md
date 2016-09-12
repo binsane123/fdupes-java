@@ -23,7 +23,7 @@ java -jar fdupes-<version>-all.jar <PATH1> [<PATH2>]...
 
 Paths of duplicated files are reported in a `duplicates.log` file dumped in the current working directory.
 
-**Note**: reported paths are "double quoted" and "escaped" to be *nix-compliant.
+**Note**: reported paths are **double-quoted** and **whitespace-escaped** to be *nix-compliant.
 
 ## Requirements
 
