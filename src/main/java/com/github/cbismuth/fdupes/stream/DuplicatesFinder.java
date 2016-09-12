@@ -25,7 +25,7 @@
 package com.github.cbismuth.fdupes.stream;
 
 import com.github.cbismuth.fdupes.immutable.FileMetadata;
-import com.github.cbismuth.fdupes.io.BufferedByteAnalyzer;
+import com.github.cbismuth.fdupes.io.BufferedAnalyzer;
 import com.github.cbismuth.fdupes.io.PathEscapeFunction;
 import com.github.cbismuth.fdupes.md5.Md5Computer;
 import com.google.common.base.Preconditions;
@@ -71,7 +71,7 @@ public class DuplicatesFinder {
         LOGGER.info("Pass 2/3 - compare file by MD5 completed! - {} duplicate(s) found", getCount(passName2));
 
         LOGGER.info("Pass 3/3 - compare file byte-by-byte ...");
-        final BufferedByteAnalyzer analyzer = new BufferedByteAnalyzer(stream.collect(toList()));
+        final BufferedAnalyzer analyzer = new BufferedAnalyzer(stream.collect(toList()));
         final Set<String> collect = analyzer.analyze()
                                             .asMap()
                                             .entrySet()

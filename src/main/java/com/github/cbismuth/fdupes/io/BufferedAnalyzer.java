@@ -40,13 +40,13 @@ import static com.google.common.collect.Multimaps.synchronizedListMultimap;
 import static com.google.common.collect.Multimaps.unmodifiableMultimap;
 import static java.util.stream.Collectors.toList;
 
-public class BufferedByteAnalyzer {
+public class BufferedAnalyzer {
 
     private final Collection<FileMetadata> input = newArrayList();
 
     private final Multimap<String, String> duplicates = synchronizedListMultimap(ArrayListMultimap.create());
 
-    public BufferedByteAnalyzer(final Collection<FileMetadata> input) {
+    public BufferedAnalyzer(final Collection<FileMetadata> input) {
         Preconditions.checkNotNull(input, "null file metadata collection");
 
         this.input.addAll(input);
