@@ -30,7 +30,7 @@ import com.github.cbismuth.fdupes.io.DirectoryWalker;
 import com.github.cbismuth.fdupes.io.DuplicatesWriter;
 import com.github.cbismuth.fdupes.md5.Md5Computer;
 import com.github.cbismuth.fdupes.util.PathUtils;
-import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -84,8 +84,8 @@ public class DirectoryWalkerTest {
         return mock;
     }
 
-    @After
-    public void tearDown() {
+    @Before
+    public void setUp() {
         getMetricRegistry().getMetrics()
                            .keySet()
                            .forEach(getMetricRegistry()::remove);

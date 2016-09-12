@@ -29,6 +29,7 @@ import com.github.cbismuth.fdupes.io.DirectoryWalker;
 import com.github.cbismuth.fdupes.io.DuplicatesWriter;
 import com.github.cbismuth.fdupes.md5.Md5Computer;
 import com.github.cbismuth.fdupes.util.PathUtils;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.nio.file.Files;
@@ -37,6 +38,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 
@@ -52,6 +54,13 @@ public class SimpleDirectoryWalkerTest {
         final DuplicatesWriter writer = new DuplicatesWriter();
 
         systemUnderTest = new Main(md5, walker, writer);
+    }
+
+    @Before
+    public void setUp() {
+        getMetricRegistry().getMetrics()
+                           .keySet()
+                           .forEach(getMetricRegistry()::remove);
     }
 
     @Test
