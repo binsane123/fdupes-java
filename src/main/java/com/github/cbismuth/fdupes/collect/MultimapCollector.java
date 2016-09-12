@@ -29,7 +29,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -40,6 +39,7 @@ import java.util.stream.Collector;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
+import static com.google.common.collect.Multimaps.synchronizedListMultimap;
 import static java.util.stream.Collector.Characteristics.UNORDERED;
 
 public final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K, V>, Multimap<K, V>> {
@@ -56,6 +56,13 @@ public final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K
 
         this.keyGetter = keyGetter;
         this.valueGetter = valueGetter;
+    }
+
+    public static <T, K, V> MultimapCollector<T, K, T> toMultimap(final Function<T, K> keyGetter) {
+        Preconditions.checkNotNull("", "null multimap name");
+        Preconditions.checkNotNull(keyGetter, "null multimap key getter");
+
+        return toMultimap("", keyGetter, v -> v);
     }
 
     public static <T, K, V> MultimapCollector<T, K, T> toMultimap(final String name, final Function<T, K> keyGetter) {
@@ -75,18 +82,20 @@ public final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K
 
     @Override
     public Supplier<Multimap<K, V>> supplier() {
-        return () -> Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
+        return () -> synchronizedListMultimap(ArrayListMultimap.create());
     }
 
     @Override
     public BiConsumer<Multimap<K, V>, T> accumulator() {
         return (map, element) -> {
-            getMetricRegistry().counter(name(name, "total", "counter")).inc();
+            if (!name.isEmpty()) {
+                getMetricRegistry().counter(name(name, "total", "counter")).inc();
+            }
 
             final K key = keyGetter.apply(element);
             final V value = valueGetter.apply(element);
 
-            if (map.containsKey(key)) {
+            if (!name.isEmpty() && map.containsKey(key)) {
                 getMetricRegistry().counter(name(name, "duplicates", "counter")).inc();
             }
 
@@ -104,7 +113,9 @@ public final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K
 
     @Override
     public Function<Multimap<K, V>, Multimap<K, V>> finisher() {
-        getMetricRegistry().register(name(name, "finished"), (Gauge<Boolean>) () -> true);
+        if (!name.isEmpty()) {
+            getMetricRegistry().register(name(name, "finished"), (Gauge<Boolean>) () -> true);
+        }
 
         return map -> map;
     }

@@ -26,16 +26,12 @@ package com.github.cbismuth.fdupes.stream;
 
 import com.github.cbismuth.fdupes.collect.RemoveOriginalFromEntryFunction;
 import com.github.cbismuth.fdupes.immutable.FileMetadata;
-import com.github.cbismuth.fdupes.io.PathEscapeFunction;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -45,10 +41,6 @@ public class StreamHandler {
 
     public <K> Stream<FileMetadata> removeUniqueFilesByKey(final Stream<FileMetadata> stream, final String name, final Function<FileMetadata, K> keyMapper) {
         return removeUniqueFilesByKey(stream, name, keyMapper, false);
-    }
-
-    public <K> Stream<FileMetadata> removeUniqueFilesByKeyAndOriginals(final Stream<FileMetadata> stream, final String name, final Function<FileMetadata, K> keyMapper) {
-        return removeUniqueFilesByKey(stream, name, keyMapper, true);
     }
 
     private <K> Stream<FileMetadata> removeUniqueFilesByKey(final Stream<FileMetadata> stream, final String name, final Function<FileMetadata, K> keyMapper, final boolean removeOriginals) {
@@ -71,14 +63,6 @@ public class StreamHandler {
         }
 
         return result;
-    }
-
-    public Set<String> extractAbsolutePaths(final Stream<FileMetadata> stream) {
-        Preconditions.checkNotNull(stream, "null stream");
-
-        return stream.map(FileMetadata::getAbsolutePath)
-                     .map(PathEscapeFunction.INSTANCE)
-                     .collect(Collectors.toCollection(TreeSet::new));
     }
 
 }

@@ -25,17 +25,21 @@
 package com.github.cbismuth.fdupes.stream;
 
 import com.github.cbismuth.fdupes.immutable.FileMetadata;
-import com.github.cbismuth.fdupes.io.ToByteStringFunction;
+import com.github.cbismuth.fdupes.io.BufferedByteAnalyzer;
+import com.github.cbismuth.fdupes.io.PathEscapeFunction;
 import com.github.cbismuth.fdupes.md5.Md5Computer;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class DuplicatesFinder {
@@ -66,12 +70,19 @@ public class DuplicatesFinder {
         stream = handler.removeUniqueFilesByKey(stream, passName2, md5::compute);
         LOGGER.info("Pass 2/3 - compare file by MD5 completed! - {} duplicate(s) found", getCount(passName2));
 
-        final String passName3 = "bytes";
         LOGGER.info("Pass 3/3 - compare file byte-by-byte ...");
-        stream = handler.removeUniqueFilesByKeyAndOriginals(stream, passName3, ToByteStringFunction.INSTANCE);
-        LOGGER.info("Pass 3/3 - compare file byte-by-byte completed! - {} duplicate(s) found", getCount(passName3));
+        final BufferedByteAnalyzer analyzer = new BufferedByteAnalyzer(stream.collect(toList()));
+        final Set<String> collect = analyzer.analyze()
+                                            .asMap()
+                                            .entrySet()
+                                            .parallelStream()
+                                            .map(Map.Entry::getValue)
+                                            .flatMap(Collection::stream)
+                                            .map(PathEscapeFunction.INSTANCE)
+                                            .collect(toSet());
+        LOGGER.info("Pass 3/3 - compare file byte-by-byte completed! - {} duplicate(s) found", collect.size());
 
-        return handler.extractAbsolutePaths(stream);
+        return collect;
     }
 
     private long getCount(final String name) {

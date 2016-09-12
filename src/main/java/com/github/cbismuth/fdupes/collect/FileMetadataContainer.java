@@ -28,9 +28,7 @@ import com.github.cbismuth.fdupes.immutable.FileMetadata;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 
 import static com.google.common.collect.Sets.newHashSet;
@@ -51,13 +49,7 @@ public class FileMetadataContainer {
         Preconditions.checkNotNull(path, "null path");
 
         try {
-            final BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
-
-            fileMetadataCollection.add(new FileMetadata(path.toString(),
-                                                        attributes.creationTime(),
-                                                        attributes.lastAccessTime(),
-                                                        attributes.lastModifiedTime(),
-                                                        Files.size(path)));
+            fileMetadataCollection.add(new FileMetadata(path));
         } catch (final Exception e) {
             LOGGER.error("Can't read file [{}] ({})", path, e.getClass().getSimpleName());
         }

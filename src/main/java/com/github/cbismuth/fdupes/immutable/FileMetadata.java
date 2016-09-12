@@ -25,7 +25,11 @@
 package com.github.cbismuth.fdupes.immutable;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 
 public class FileMetadata {
@@ -36,19 +40,21 @@ public class FileMetadata {
     private final FileTime lastModifiedTime;
     private final long size;
 
-    public FileMetadata(final String absolutePath,
-                        final FileTime creationTime,
-                        final FileTime lastAccessTime,
-                        final FileTime lastModifiedTime,
-                        final long size) {
-        Preconditions.checkNotNull(absolutePath, "null absolute path");
-        Preconditions.checkNotNull(creationTime, "null creation time");
+    public FileMetadata(final Path path) {
+        try {
+            final BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
 
-        this.absolutePath = absolutePath;
-        this.creationTime = creationTime;
-        this.lastAccessTime = lastAccessTime;
-        this.lastModifiedTime = lastModifiedTime;
-        this.size = size;
+            absolutePath = path.toString();
+            creationTime = attributes.creationTime();
+            lastAccessTime = attributes.lastAccessTime();
+            lastModifiedTime = attributes.lastModifiedTime();
+            size = Files.size(path);
+
+            Preconditions.checkNotNull(absolutePath, "null absolute path");
+            Preconditions.checkNotNull(creationTime, "null creation time");
+        } catch (final Exception e) {
+            throw Throwables.propagate(e);
+        }
     }
 
     public String getAbsolutePath() {

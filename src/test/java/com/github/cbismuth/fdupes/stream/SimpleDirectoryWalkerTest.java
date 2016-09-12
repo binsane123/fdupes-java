@@ -36,10 +36,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 
 public class SimpleDirectoryWalkerTest {
@@ -77,7 +77,9 @@ public class SimpleDirectoryWalkerTest {
 
         // WHEN
         final Collection<String> actual = Files.readAllLines(
-            systemUnderTest.launchAndReport(filesWithDuplicates.parallelStream().map(Path::toString).collect(Collectors.toList()))
+            systemUnderTest.launchAndReport(filesWithDuplicates.parallelStream()
+                                                               .map(Path::toString)
+                                                               .collect(toList()))
         );
 
         // THEN
@@ -86,7 +88,7 @@ public class SimpleDirectoryWalkerTest {
         final List<String> escapedAbsolutePathWithDuplicates = filesWithDuplicates.parallelStream()
                                                                                   .map(Path::toString)
                                                                                   .map(s -> format("\"%s\"", s))
-                                                                                  .collect(Collectors.toList());
+                                                                                  .collect(toList());
 
         actual.forEach(escapedAbsolutePathWithDuplicates::contains);
     }
