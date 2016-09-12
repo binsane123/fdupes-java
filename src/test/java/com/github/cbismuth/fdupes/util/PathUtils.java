@@ -43,8 +43,6 @@ import static java.util.UUID.randomUUID;
 
 public class PathUtils {
 
-    private static final String NEW_LINE = System.getProperty("line.separator");
-
     public Path createSingleEmptyFile(final Path parentDirectory) throws IOException {
         final Path path = createEmptyTempDirectory(parentDirectory);
 
@@ -125,7 +123,7 @@ public class PathUtils {
         return destination;
     }
 
-    private static final AtomicLong LINES_COUNT = new AtomicLong(10000);
+    private static final AtomicLong LINES_COUNT = new AtomicLong(100);
     private static final StringBuffer STRING_BUFFER = new StringBuffer();
     private static final int MIN_LENGTH = 10;
     private static final char PAD_CHAR = '0';
