@@ -81,7 +81,11 @@ public class ByteBuffer {
     }
 
     public String getByteString() {
-        return offset < buffer.length && length > 0 ? UnsignedBytes.join(":", Arrays.copyOf(buffer, length)) : "";
+        if (length > 0 && length < buffer.length) {
+            return UnsignedBytes.join(":", Arrays.copyOf(buffer, length));
+        } else {
+            return "";
+        }
     }
 
     public void read() {
