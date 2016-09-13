@@ -10,4 +10,4 @@ else
     echo "No Git tag detected - keep Maven POM version untouched"
 fi
 
-mvn clean deploy -P ossrh --settings $DEPLOY_DIR/maven/settings.xml -B -U
+mvn clean deploy -P bundle,ossrh --settings $DEPLOY_DIR/maven/settings.xml -B -U
