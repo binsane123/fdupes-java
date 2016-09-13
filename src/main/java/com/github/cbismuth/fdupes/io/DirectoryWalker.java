@@ -40,7 +40,6 @@ import java.util.Set;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
-import static java.util.Collections.singletonList;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class DirectoryWalker {
@@ -55,12 +54,6 @@ public class DirectoryWalker {
         Preconditions.checkNotNull(md5Computer, "null MD5 computer");
 
         duplicatesFinder = new DuplicatesFinder(md5Computer);
-    }
-
-    public Set<String> extractDuplicates(final String inputPath) {
-        Preconditions.checkNotNull(inputPath, "null input path");
-
-        return extractDuplicates(singletonList(inputPath));
     }
 
     public Set<String> extractDuplicates(final Iterable<String> inputPaths) {

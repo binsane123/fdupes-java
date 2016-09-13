@@ -24,7 +24,6 @@
 
 package com.github.cbismuth.fdupes.stream;
 
-import com.github.cbismuth.fdupes.collect.RemoveOriginalFromEntryFunction;
 import com.github.cbismuth.fdupes.immutable.FileMetadata;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
@@ -40,10 +39,6 @@ import static com.github.cbismuth.fdupes.collect.MultimapCollector.toMultimap;
 public class StreamHandler {
 
     public <K> Stream<FileMetadata> removeUniqueFilesByKey(final Stream<FileMetadata> stream, final String name, final Function<FileMetadata, K> keyMapper) {
-        return removeUniqueFilesByKey(stream, name, keyMapper, false);
-    }
-
-    private <K> Stream<FileMetadata> removeUniqueFilesByKey(final Stream<FileMetadata> stream, final String name, final Function<FileMetadata, K> keyMapper, final boolean removeOriginals) {
         Preconditions.checkNotNull(stream, "null pass stream");
         Preconditions.checkNotNull(name, "null pass name");
         Preconditions.checkNotNull(keyMapper, "null pass key mapper");
@@ -55,14 +50,7 @@ public class StreamHandler {
                                                                                            .parallelStream()
                                                                                            .filter(e -> e.getValue().size() > 1);
 
-        final Stream<FileMetadata> result;
-        if (!removeOriginals) {
-            result = entryWithDuplicates.flatMap(e -> e.getValue().parallelStream());
-        } else {
-            result = entryWithDuplicates.flatMap(new RemoveOriginalFromEntryFunction<>());
-        }
-
-        return result;
+        return entryWithDuplicates.flatMap(e -> e.getValue().parallelStream());
     }
 
 }
