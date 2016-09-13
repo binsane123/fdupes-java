@@ -57,9 +57,9 @@ public class Md5SumCommandChecker {
         }
 
         if (binaryName == null) {
-            LOGGER.info("Native MD5 command found at [{}]", binaryName);
-        } else {
             LOGGER.warn("No native MD5 command found (slower JVM implementation will be used)");
+        } else {
+            LOGGER.info("Native MD5 command found at [{}]", binaryName);
         }
 
         return binaryName;
