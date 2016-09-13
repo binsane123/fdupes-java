@@ -25,7 +25,6 @@
 package com.github.cbismuth.fdupes.util;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 
 import java.io.IOException;
@@ -123,23 +122,19 @@ public class PathUtils {
         return destination;
     }
 
-    private static final AtomicLong LINES_COUNT = new AtomicLong(100);
-    private static final StringBuffer STRING_BUFFER = new StringBuffer();
-    private static final int MIN_LENGTH = 10;
-    private static final char PAD_CHAR = '0';
-
-    static {
-        for (long i = 0; i < LINES_COUNT.get(); i++) {
-            STRING_BUFFER.append(Strings.padStart(String.valueOf(i), MIN_LENGTH, PAD_CHAR));
-        }
-    }
+    private static final AtomicLong LINES_COUNT = new AtomicLong(1);
 
     private Path createUniqueFileWithRandomContent(final Path parentDirectory) throws IOException {
         checkIsDirectory(parentDirectory);
 
-        STRING_BUFFER.append(Strings.padStart(String.valueOf(LINES_COUNT.addAndGet(1)), MIN_LENGTH, PAD_CHAR));
+        final long max = LINES_COUNT.getAndIncrement();
 
-        return createFileWithContent(parentDirectory, uniqueString(), uniqueString(), STRING_BUFFER.toString().getBytes(UTF_8));
+        final StringBuilder sb = new StringBuilder();
+        for (long i = 0; i < max; i++) {
+            sb.append(randomUUID()).append("\n");
+        }
+
+        return createFileWithContent(parentDirectory, uniqueString(), uniqueString(), sb.toString().getBytes(UTF_8));
     }
 
     private Path createFileWithContent(final Path parentDirectory, final String subDirectoryName, final String filename, final byte[] content) throws IOException {
