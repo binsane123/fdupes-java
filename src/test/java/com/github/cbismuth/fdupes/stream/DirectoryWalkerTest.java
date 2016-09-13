@@ -93,7 +93,7 @@ public class DirectoryWalkerTest {
 
     private static final long UNIQUE_FILES_COUNT = 2L;
     private static final long DIRECTORY_DUPLICATION_FACTOR = 10L;
-    private static final long FILE_DUPLICATION_FACTOR = 200L;
+    private static final long FILE_DUPLICATION_FACTOR = 20L;
 
     private final PathUtils helper = new PathUtils();
 
