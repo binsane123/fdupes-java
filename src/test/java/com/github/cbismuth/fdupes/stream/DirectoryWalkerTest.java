@@ -125,6 +125,7 @@ public class DirectoryWalkerTest {
     @Test
     public void testExtractDuplicates_emptyPaths() throws Exception {
         final Path parentDirectory = Files.createTempDirectory(helper.uniqueString());
+        parentDirectory.toFile().deleteOnExit();
 
         // GIVEN
         final Collection<Path> sources = newArrayList();
@@ -146,6 +147,7 @@ public class DirectoryWalkerTest {
     @Test
     public void testExtractDuplicates_singleEmptyFile() throws Exception {
         final Path parentDirectory = Files.createTempDirectory(helper.uniqueString());
+        parentDirectory.toFile().deleteOnExit();
 
         // GIVEN
         final Collection<Path> sources = newArrayList();
@@ -165,6 +167,7 @@ public class DirectoryWalkerTest {
     @Test
     public void testExtractDuplicates_duplicatesBySizeOnly() throws Exception {
         final Path parentDirectory = Files.createTempDirectory(helper.uniqueString());
+        parentDirectory.toFile().deleteOnExit();
 
         // GIVEN
         final Collection<Path> sources = newArrayList();
@@ -184,6 +187,7 @@ public class DirectoryWalkerTest {
     @Test
     public void testExtractDuplicates_duplicatesByMd5SumOnly() throws Exception {
         final Path parentDirectory = Files.createTempDirectory(helper.uniqueString());
+        parentDirectory.toFile().deleteOnExit();
 
         // GIVEN
         final Collection<Path> sources = newArrayList();
@@ -203,6 +207,7 @@ public class DirectoryWalkerTest {
     @Test
     public void testExtractDuplicates_all() throws Exception {
         final Path parentDirectory = Files.createTempDirectory(helper.uniqueString());
+        parentDirectory.toFile().deleteOnExit();
 
         // GIVEN
         final Collection<Path> sources = newArrayList();

@@ -65,14 +65,19 @@ public class SimpleDirectoryWalkerTest {
 
     @Test
     public void testExtractDuplicates_simple() throws Exception {
+        final Path parentDirectory = Files.createTempDirectory(getClass().getSimpleName());
+        parentDirectory.toFile().deleteOnExit();
+
         // GIVEN
         final int distinctFilesCount = 1;
         final int directoryDuplicationFactor = 8;
         final int fileDuplicationFactor = 100;
 
         final Collection<Path> filesWithDuplicates = helper.createNewSetWithDuplicatesByMd5Sum(
-            Files.createTempDirectory(getClass().getSimpleName()),
-            distinctFilesCount, directoryDuplicationFactor, fileDuplicationFactor
+            parentDirectory,
+            distinctFilesCount,
+            directoryDuplicationFactor,
+            fileDuplicationFactor
         );
 
         // WHEN

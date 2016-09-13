@@ -64,6 +64,7 @@ public class FilenamePredicateTest {
     @Test
     public void testAccept() throws IOException {
         final Path path = Files.createTempDirectory(randomUUID().toString());
+        path.toFile().deleteOnExit();
 
         createFileWithSubstringInName(path, " a substring ");
         createFileWithSubstringInName(path, forbiddenSubstring);
