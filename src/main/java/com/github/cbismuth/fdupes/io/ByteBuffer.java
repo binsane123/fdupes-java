@@ -27,6 +27,7 @@ package com.github.cbismuth.fdupes.io;
 import com.github.cbismuth.fdupes.immutable.FileMetadata;
 import com.google.common.base.Throwables;
 import com.google.common.primitives.UnsignedBytes;
+import org.slf4j.Logger;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -34,7 +35,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class ByteBuffer implements AutoCloseable {
+import static org.slf4j.LoggerFactory.getLogger;
+
+public class ByteBuffer {
+
+    private static final Logger LOGGER = getLogger(ByteBuffer.class);
 
     private static final int BUFFER_SIZE = 64 * 1024;
 
@@ -73,9 +78,14 @@ public class ByteBuffer implements AutoCloseable {
         }
     }
 
-    @Override
-    public void close() throws Exception {
-        inputStream.close();
+    public ByteBuffer close() {
+        try {
+            inputStream.close();
+        } catch (final IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+
+        return this;
     }
 
 }

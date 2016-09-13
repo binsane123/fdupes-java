@@ -74,6 +74,7 @@ public class BufferedAnalyzer {
 
             if (buffers.iterator().next().getByteString().isEmpty()) {
                 final List<String> collect = buffers.parallelStream()
+                                                    .peek(ByteBuffer::close)
                                                     .map(ByteBuffer::getFileMetadata)
                                                     .sorted(FileMetadataComparator.INSTANCE)
                                                     .map(FileMetadata::getAbsolutePath)
@@ -90,7 +91,7 @@ public class BufferedAnalyzer {
                        .parallelStream()
                        .forEach(e -> {
                            if (e.getValue().size() == 1) {
-                               input.remove(e.getValue().iterator().next().getFileMetadata());
+                               input.remove(e.getValue().iterator().next().close().getFileMetadata());
                            } else {
                                removeUniqueFiles(e.getValue());
                            }
