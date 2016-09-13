@@ -27,6 +27,7 @@ package com.github.cbismuth.fdupes.io;
 import com.github.cbismuth.fdupes.immutable.FileMetadata;
 import com.google.common.base.Throwables;
 import com.google.common.primitives.UnsignedBytes;
+import org.apache.spark.network.util.JavaUtils;
 import org.slf4j.Logger;
 
 import java.io.BufferedInputStream;
@@ -41,7 +42,22 @@ public class ByteBuffer {
 
     private static final Logger LOGGER = getLogger(ByteBuffer.class);
 
-    private static final int BUFFER_SIZE = 64 * 1024;
+    private static final int BUFFER_SIZE = extractByteSize(System.getProperty("fdupes.buffer.size"));
+
+    private static int extractByteSize(final String property) {
+        int size = 64 * 1024;
+
+        if (property != null) {
+            try {
+                size = Math.toIntExact(JavaUtils.byteStringAsBytes(property));
+                LOGGER.info("Byte buffer size size set to {} byte(s)", size);
+            } catch (final NumberFormatException e) {
+                LOGGER.error(e.getMessage());
+            }
+        }
+
+        return size;
+    }
 
     private final FileMetadata fileMetadata;
     private final BufferedInputStream inputStream;

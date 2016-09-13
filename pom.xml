@@ -86,6 +86,7 @@
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.7</nexus-staging-maven-plugin.version>
 
+        <spark.version>1.6.2</spark.version>
         <zt-exec.version>1.9</zt-exec.version>
         <guava.version>19.0</guava.version>
         <metrics-core.version>3.1.2</metrics-core.version>
@@ -288,6 +289,12 @@
     </profiles>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-network-common_2.11</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.zeroturnaround</groupId>
             <artifactId>zt-exec</artifactId>

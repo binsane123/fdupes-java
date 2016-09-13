@@ -102,7 +102,16 @@ public final class Main {
     }
 
     private Path launch(final Collection<String> args) throws IOException {
-        return writer.write(walker.extractDuplicates(args));
+        try {
+            return writer.write(walker.extractDuplicates(args));
+        } catch (final OutOfMemoryError e) {
+            LOGGER.error("Not enough memory, solutions are:");
+            LOGGER.error("\t- increase Java heap size (e.g. -Xmx256m),");
+            LOGGER.error("\t- decrease byte buffer size (e.g. -Dfdupes.buffer.size=128k - default is 64k),");
+            LOGGER.error("\t- reduce the level of parallelism (e.g. -Djava.util.concurrent.ForkJoinPool.common.parallelism=2).");
+
+            return null;
+        }
     }
 
 }
