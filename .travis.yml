@@ -2,8 +2,8 @@ language: java
 jdk: oraclejdk8
 install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 before_script:
-  - echo "MAVEN_OPTS='-ea -Xmx32m -Dfdupes.buffer.size=128b -Djava.util.concurrent.ForkJoinPool.common.parallelism=2'" > ~/.mavenrc
-script: mvn test jacoco:report coveralls:report -P coverage -Dmaven.javadoc.skip=true -B -V
+  - echo "MAVEN_OPTS='-ea -Xmx32m'" > ~/.mavenrc
+script: mvn test jacoco:report coveralls:report -P coverage -Dmaven.javadoc.skip=true -Dfdupes.buffer.size=128b -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -B -V
 cache:
   directories:
     - "$HOME/.m2"
