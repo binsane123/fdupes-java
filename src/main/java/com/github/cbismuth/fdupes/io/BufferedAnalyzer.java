@@ -31,6 +31,7 @@ import com.google.common.collect.Multimap;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
+import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -68,8 +69,7 @@ public class BufferedAnalyzer {
                        .collect(toList())
              ));
 
-        final long sizeInMb = input.stream().mapToLong(PathUtils::getPathSize).sum() / 1024 / 1024;
-        LOGGER.info("Total size of duplicated files is {} mb", sizeInMb);
+        reportDuplicationSize();
 
         return unmodifiableMultimap(duplicates);
     }
@@ -104,6 +104,11 @@ public class BufferedAnalyzer {
                        });
             }
         }
+    }
+
+    private void reportDuplicationSize() {
+        final double sizeInMb = input.stream().mapToLong(PathUtils::getPathSize).sum() / 1024.0 / 1024.0;
+        LOGGER.info("Total size of duplicated files is {} mb", NumberFormat.getNumberInstance().format(sizeInMb));
     }
 
 }
