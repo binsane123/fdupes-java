@@ -77,7 +77,7 @@ public class OpenSslChecker {
 
     private boolean checkCommand(final Path path, final String command) {
         try {
-            new ProcessExecutor().command(command, path.toString())
+            new ProcessExecutor().command(command, "md5", path.toString())
                                  .exitValueNormal()
                                  .execute()
                                  .getExitValue();
