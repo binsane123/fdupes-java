@@ -22,59 +22,39 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.github.cbismuth.fdupes.immutable;
+package com.github.cbismuth.fdupes.collect;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ComparisonChain;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
+import java.util.Comparator;
 
-public class FileMetadata {
+public class PathComparator implements Comparator<Path> {
 
-    private final String absolutePath;
-    private final FileTime creationTime;
-    private final FileTime lastAccessTime;
-    private final FileTime lastModifiedTime;
-    private final long size;
+    public static final PathComparator INSTANCE = new PathComparator();
 
-    public FileMetadata(final Path path) {
+    @Override
+    public int compare(final Path o1, final Path o2) {
+        Preconditions.checkNotNull(o1, "null path 1");
+        Preconditions.checkNotNull(o2, "null path 2");
+
         try {
-            final BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
+            final BasicFileAttributes a1 = Files.readAttributes(o1, BasicFileAttributes.class);
+            final BasicFileAttributes a2 = Files.readAttributes(o2, BasicFileAttributes.class);
 
-            absolutePath = path.toString();
-            creationTime = attributes.creationTime();
-            lastAccessTime = attributes.lastAccessTime();
-            lastModifiedTime = attributes.lastModifiedTime();
-            size = Files.size(path);
-
-            Preconditions.checkNotNull(absolutePath, "null absolute path");
-            Preconditions.checkNotNull(creationTime, "null creation time");
+            return ComparisonChain.start()
+                                  .compare(a1.creationTime(), a2.creationTime())
+                                  .compare(a1.lastAccessTime(), a2.lastAccessTime())
+                                  .compare(a1.lastModifiedTime(), a2.lastModifiedTime())
+                                  .compare(o1.toString(), o2.toString())
+                                  .result();
         } catch (final Exception e) {
             throw Throwables.propagate(e);
         }
-    }
-
-    public String getAbsolutePath() {
-        return absolutePath;
-    }
-
-    public FileTime getCreationTime() {
-        return creationTime;
-    }
-
-    public FileTime getLastAccessTime() {
-        return lastAccessTime;
-    }
-
-    public FileTime getLastModifiedTime() {
-        return lastModifiedTime;
-    }
-
-    public long getSize() {
-        return size;
     }
 
 }

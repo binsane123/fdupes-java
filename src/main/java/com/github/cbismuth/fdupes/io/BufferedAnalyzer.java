@@ -24,12 +24,16 @@
 
 package com.github.cbismuth.fdupes.io;
 
-import com.github.cbismuth.fdupes.collect.FileMetadataComparator;
-import com.github.cbismuth.fdupes.immutable.FileMetadata;
+import com.github.cbismuth.fdupes.collect.PathComparator;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -42,11 +46,11 @@ import static java.util.stream.Collectors.toList;
 
 public class BufferedAnalyzer {
 
-    private final Collection<FileMetadata> input = newArrayList();
+    private final Collection<Path> input = newArrayList();
 
     private final Multimap<String, String> duplicates = synchronizedListMultimap(ArrayListMultimap.create());
 
-    public BufferedAnalyzer(final Collection<FileMetadata> input) {
+    public BufferedAnalyzer(final Collection<Path> input) {
         Preconditions.checkNotNull(input, "null file metadata collection");
 
         this.input.addAll(input);
@@ -54,7 +58,13 @@ public class BufferedAnalyzer {
 
     public Multimap<String, String> analyze() {
         input.parallelStream()
-             .collect(toMultimap(FileMetadata::getSize))
+             .collect(toMultimap(path -> {
+                 try {
+                     return Files.readAttributes(path, BasicFileAttributes.class).size();
+                 } catch (IOException e) {
+                     throw Throwables.propagate(e);
+                 }
+             }))
              .asMap()
              .entrySet()
              .parallelStream()
@@ -75,9 +85,9 @@ public class BufferedAnalyzer {
             if (buffers.iterator().next().getByteString().isEmpty()) {
                 final List<String> collect = buffers.parallelStream()
                                                     .peek(ByteBuffer::close)
-                                                    .map(ByteBuffer::getFileMetadata)
-                                                    .sorted(FileMetadataComparator.INSTANCE)
-                                                    .map(FileMetadata::getAbsolutePath)
+                                                    .map(ByteBuffer::getPath)
+                                                    .sorted(PathComparator.INSTANCE)
+                                                    .map(Path::toString)
                                                     .collect(toList());
 
                 final String original = collect.remove(0);
@@ -91,7 +101,7 @@ public class BufferedAnalyzer {
                        .parallelStream()
                        .forEach(e -> {
                            if (e.getValue().size() == 1) {
-                               input.remove(e.getValue().iterator().next().close().getFileMetadata());
+                               input.remove(e.getValue().iterator().next().close().getPath());
                            } else {
                                removeUniqueFiles(e.getValue());
                            }

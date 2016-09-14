@@ -24,10 +24,10 @@
 
 package com.github.cbismuth.fdupes.stream;
 
-import com.github.cbismuth.fdupes.immutable.FileMetadata;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
@@ -38,17 +38,21 @@ import static com.github.cbismuth.fdupes.collect.MultimapCollector.toMultimap;
 
 public class StreamHandler {
 
-    public <K> Stream<FileMetadata> removeUniqueFilesByKey(final Stream<FileMetadata> stream, final String name, final Function<FileMetadata, K> keyMapper) {
+    public <K> Stream<Path> removeUniqueFilesByKey(final Stream<Path> stream, final String name, final Function<Path, K> keyMapper) {
+        return removeUniqueFilesByKey(stream, name, keyMapper, false);
+    }
+
+    private <K> Stream<Path> removeUniqueFilesByKey(final Stream<Path> stream, final String name, final Function<Path, K> keyMapper, final boolean removeOriginals) {
         Preconditions.checkNotNull(stream, "null pass stream");
         Preconditions.checkNotNull(name, "null pass name");
         Preconditions.checkNotNull(keyMapper, "null pass key mapper");
 
-        final Multimap<K, FileMetadata> multimap = stream.collect(toMultimap(name("multimap", name), keyMapper));
+        final Multimap<K, Path> multimap = stream.collect(toMultimap(name("multimap", name), keyMapper));
 
-        final Stream<Map.Entry<K, Collection<FileMetadata>>> entryWithDuplicates = multimap.asMap()
-                                                                                           .entrySet()
-                                                                                           .parallelStream()
-                                                                                           .filter(e -> e.getValue().size() > 1);
+        final Stream<Map.Entry<K, Collection<Path>>> entryWithDuplicates = multimap.asMap()
+                                                                                   .entrySet()
+                                                                                   .parallelStream()
+                                                                                   .filter(e -> e.getValue().size() > 1);
 
         return entryWithDuplicates.flatMap(e -> e.getValue().parallelStream());
     }

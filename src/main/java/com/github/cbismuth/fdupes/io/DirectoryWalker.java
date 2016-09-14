@@ -24,7 +24,6 @@
 
 package com.github.cbismuth.fdupes.io;
 
-import com.github.cbismuth.fdupes.collect.FileMetadataContainer;
 import com.github.cbismuth.fdupes.collect.FilenamePredicate;
 import com.github.cbismuth.fdupes.md5.Md5Computer;
 import com.github.cbismuth.fdupes.stream.DuplicatesFinder;
@@ -40,6 +39,7 @@ import java.util.Set;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
+import static com.google.common.collect.Sets.newConcurrentHashSet;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class DirectoryWalker {
@@ -48,7 +48,7 @@ public class DirectoryWalker {
 
     private final DuplicatesFinder duplicatesFinder;
 
-    private final FileMetadataContainer fileMetadataContainer = new FileMetadataContainer();
+    private final Set<Path> paths = newConcurrentHashSet();
 
     public DirectoryWalker(final Md5Computer md5Computer) {
         Preconditions.checkNotNull(md5Computer, "null MD5 computer");
@@ -59,7 +59,7 @@ public class DirectoryWalker {
     public Set<String> extractDuplicates(final Iterable<String> inputPaths) {
         Preconditions.checkNotNull(inputPaths, "null input path collection");
 
-        fileMetadataContainer.clear();
+        paths.clear();
 
         inputPaths.forEach(rootPath -> {
             final Path path = Paths.get(rootPath);
@@ -73,7 +73,7 @@ public class DirectoryWalker {
             }
         });
 
-        return duplicatesFinder.extractDuplicates(fileMetadataContainer.getElements());
+        return duplicatesFinder.extractDuplicates(paths);
     }
 
     private void handleDirectory(final Path path) {
@@ -95,7 +95,7 @@ public class DirectoryWalker {
     private void handleRegularFile(final Path path) {
         getMetricRegistry().counter(name("walker", "files", "counter")).inc();
 
-        fileMetadataContainer.addFile(path);
+        paths.add(path);
     }
 
 }

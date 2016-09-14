@@ -22,33 +22,26 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.github.cbismuth.fdupes.collect;
+package com.github.cbismuth.fdupes.io;
 
-import com.github.cbismuth.fdupes.immutable.FileMetadata;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ComparisonChain;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.function.Function;
 
-import java.util.Comparator;
+import static com.google.common.base.Throwables.propagate;
 
-public class FileMetadataComparator implements Comparator<FileMetadata> {
+public class PathSizeFunction implements Function<Path, Long> {
 
-    public static final FileMetadataComparator INSTANCE = new FileMetadataComparator();
-
-    private FileMetadataComparator() {
-        // NOT ALLOWED
-    }
+    public static final PathSizeFunction INSTANCE = new PathSizeFunction();
 
     @Override
-    public int compare(final FileMetadata o1, final FileMetadata o2) {
-        Preconditions.checkNotNull(o1, "null file metadata 1");
-        Preconditions.checkNotNull(o2, "null file metadata 2");
-
-        return ComparisonChain.start()
-                              .compare(o1.getCreationTime(), o2.getCreationTime())
-                              .compare(o1.getLastAccessTime(), o2.getLastAccessTime())
-                              .compare(o1.getLastModifiedTime(), o2.getLastModifiedTime())
-                              .compare(o1.getAbsolutePath(), o2.getAbsolutePath())
-                              .result();
+    public Long apply(final Path path) {
+        try {
+            return Files.readAttributes(path, BasicFileAttributes.class).size();
+        } catch (final Exception e) {
+            throw propagate(e);
+        }
     }
 
 }

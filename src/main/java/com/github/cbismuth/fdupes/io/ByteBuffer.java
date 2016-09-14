@@ -24,7 +24,6 @@
 
 package com.github.cbismuth.fdupes.io;
 
-import com.github.cbismuth.fdupes.immutable.FileMetadata;
 import com.google.common.base.Throwables;
 import com.google.common.primitives.UnsignedBytes;
 import org.apache.spark.network.util.JavaUtils;
@@ -34,6 +33,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -59,25 +59,25 @@ public class ByteBuffer {
         return size;
     }
 
-    private final FileMetadata fileMetadata;
+    private final Path path;
     private final BufferedInputStream inputStream;
 
     private int offset;
     private int length;
     private final byte[] buffer = new byte[BUFFER_SIZE];
 
-    public ByteBuffer(final FileMetadata fileMetadata) {
-        this.fileMetadata = fileMetadata;
+    public ByteBuffer(final Path path) {
+        this.path = path;
 
         try {
-            inputStream = new BufferedInputStream(new FileInputStream(new File(this.fileMetadata.getAbsolutePath())));
+            inputStream = new BufferedInputStream(new FileInputStream(new File(this.path.toString())));
         } catch (final Exception e) {
             throw Throwables.propagate(e);
         }
     }
 
-    public FileMetadata getFileMetadata() {
-        return fileMetadata;
+    public Path getPath() {
+        return path;
     }
 
     public String getByteString() {

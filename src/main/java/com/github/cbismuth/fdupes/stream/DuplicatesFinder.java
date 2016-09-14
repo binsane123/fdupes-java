@@ -24,13 +24,14 @@
 
 package com.github.cbismuth.fdupes.stream;
 
-import com.github.cbismuth.fdupes.immutable.FileMetadata;
 import com.github.cbismuth.fdupes.io.BufferedAnalyzer;
 import com.github.cbismuth.fdupes.io.PathEscapeFunction;
+import com.github.cbismuth.fdupes.io.PathSizeFunction;
 import com.github.cbismuth.fdupes.md5.Md5Computer;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -55,14 +56,14 @@ public class DuplicatesFinder {
         this.md5 = md5;
     }
 
-    public Set<String> extractDuplicates(final Collection<FileMetadata> elements) {
+    public Set<String> extractDuplicates(final Collection<Path> elements) {
         Preconditions.checkNotNull(elements, "null file metadata collection");
 
-        Stream<FileMetadata> stream = elements.parallelStream();
+        Stream<Path> stream = elements.parallelStream();
 
         final String passName1 = "size";
         LOGGER.info("Pass 1/3 - compare file by size ...");
-        stream = handler.removeUniqueFilesByKey(stream, passName1, FileMetadata::getSize);
+        stream = handler.removeUniqueFilesByKey(stream, passName1, PathSizeFunction.INSTANCE);
         LOGGER.info("Pass 1/3 - compare file by size completed! - {} duplicate(s) found", getCount(passName1));
 
         final String passName2 = "md5";

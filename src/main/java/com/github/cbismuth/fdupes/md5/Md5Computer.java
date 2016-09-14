@@ -25,7 +25,6 @@
 package com.github.cbismuth.fdupes.md5;
 
 import com.codahale.metrics.Timer;
-import com.github.cbismuth.fdupes.immutable.FileMetadata;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.primitives.UnsignedBytes;
@@ -35,7 +34,6 @@ import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.util.Collection;
 import java.util.Objects;
@@ -62,34 +60,33 @@ public class Md5Computer {
         this.binaryName = Optional.ofNullable(binaryName);
     }
 
-    public String compute(final FileMetadata fileMetadata) {
-        Preconditions.checkNotNull(fileMetadata, "null file metadata");
+    public String compute(final Path path) {
+        Preconditions.checkNotNull(path, "null file metadata");
 
         try (final Timer.Context ignored = getMetricRegistry().timer(name("md5sum", "timer")).time()) {
-            return doIt(fileMetadata);
+            return doIt(path);
         } catch (final Exception e) {
             LOGGER.error("Can't compute md5sum from file [{}] ([{}]: [{}])",
-                         fileMetadata.getAbsolutePath(), e.getClass().getSimpleName(), e.getMessage());
+                         path, e.getClass().getSimpleName(), e.getMessage());
 
             return randomUUID().toString();
         }
     }
 
-    private String doIt(final FileMetadata fileMetadata) {
+    private String doIt(final Path path) {
         if (binaryName.isPresent()) {
-            return nativeMd5Sum(fileMetadata);
+            return nativeMd5Sum(path);
         } else {
-            return jvmMd5Sum(fileMetadata);
+            return jvmMd5Sum(path);
         }
     }
 
-    public String jvmMd5Sum(final FileMetadata fileMetadata) {
-        Preconditions.checkNotNull(fileMetadata, "null file metadata");
+    public String jvmMd5Sum(final Path path) {
+        Preconditions.checkNotNull(path, "null file metadata");
 
         try {
             final String separator = ":";
             final MessageDigest md = MessageDigest.getInstance("MD5");
-            final Path path = Paths.get(fileMetadata.getAbsolutePath());
             final byte[] bytes = Files.readAllBytes(path);
             final byte[] digest = md.digest(bytes);
 
@@ -99,11 +96,11 @@ public class Md5Computer {
         }
     }
 
-    public String nativeMd5Sum(final FileMetadata fileMetadata) {
-        Preconditions.checkNotNull(fileMetadata, "null file metadata");
+    public String nativeMd5Sum(final Path path) {
+        Preconditions.checkNotNull(path, "null file metadata");
 
         try {
-            return new ProcessExecutor().command(getNativeMd5SumCommand(fileMetadata))
+            return new ProcessExecutor().command(getNativeMd5SumCommand(path))
                                         .readOutput(true)
                                         .redirectOutput(Slf4jStream.of("md5sum").asTrace())
                                         .execute()
@@ -114,7 +111,7 @@ public class Md5Computer {
         }
     }
 
-    private Iterable<String> getNativeMd5SumCommand(final FileMetadata fileMetadata) {
+    private Iterable<String> getNativeMd5SumCommand(final Path path) {
         final Collection<String> command = newArrayList();
 
         if (binaryName.isPresent() && Objects.equals("md5sum", binaryName.get())) {
@@ -126,7 +123,7 @@ public class Md5Computer {
             throw new UnsupportedOperationException(format("Unsupported binary name [%s]!", binaryName));
         }
 
-        command.add(fileMetadata.getAbsolutePath());
+        command.add(path.toString());
 
         return command;
     }

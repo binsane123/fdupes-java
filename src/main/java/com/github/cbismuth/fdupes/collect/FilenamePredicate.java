@@ -82,7 +82,6 @@ public final class FilenamePredicate implements DirectoryStream.Filter<Path> {
 
     private boolean containsForbiddenSubstring(final Path path, final Collection<String> exclusionList) {
         for (final String s : exclusionList) {
-            // FIXME promote locale value as an application property
             final Locale locale = Locale.getDefault();
 
             final String actual = path.toString().toLowerCase(locale);
