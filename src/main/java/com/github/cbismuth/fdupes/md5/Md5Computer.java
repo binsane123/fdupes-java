@@ -74,13 +74,13 @@ public class Md5Computer {
 
     private String doIt(final Path path) {
         if (binaryName.isPresent()) {
-            return nativeMd5Sum(path);
+            return nativeMd5(path);
         } else {
-            return jvmMd5Sum(path);
+            return jvmMd5(path);
         }
     }
 
-    public String jvmMd5Sum(final Path path) {
+    public String jvmMd5(final Path path) {
         Preconditions.checkNotNull(path, "null file metadata");
 
         try {
@@ -95,11 +95,11 @@ public class Md5Computer {
         }
     }
 
-    public String nativeMd5Sum(final Path path) {
+    public String nativeMd5(final Path path) {
         Preconditions.checkNotNull(path, "null file metadata");
 
         try {
-            return new ProcessExecutor().command(getNativeMd5SumCommand(path))
+            return new ProcessExecutor().command(getNativeMd5Command(path))
                                         .readOutput(true)
                                         .execute()
                                         .outputUTF8()
@@ -109,7 +109,7 @@ public class Md5Computer {
         }
     }
 
-    private Iterable<String> getNativeMd5SumCommand(final Path path) {
+    private Iterable<String> getNativeMd5Command(final Path path) {
         final Collection<String> command = newArrayList();
 
         if (binaryName.isPresent() && Objects.equals("openssl", binaryName.get())) {

@@ -73,7 +73,7 @@ public class SimpleDirectoryWalkerTest {
         final int directoryDuplicationFactor = 8;
         final int fileDuplicationFactor = 100;
 
-        final Collection<Path> filesWithDuplicates = helper.createNewSetWithDuplicatesByMd5Sum(
+        final Collection<Path> filesWithDuplicates = helper.createNewSetWithDuplicatesByMd5(
             parentDirectory,
             distinctFilesCount,
             directoryDuplicationFactor,

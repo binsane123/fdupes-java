@@ -56,8 +56,8 @@ public class DirectoryWalkerTest {
                 { new Md5Computer() },
                 { new Md5Computer(null) },
                 { newForceByteComparisonMock() },
-                { newNativeMd5SumWithExceptionMock() },
-                { newJvmMd5SumWithExceptionMock() }
+                { newNativeMd5WithExceptionMock() },
+                { newJvmMd5WithExceptionMock() }
             }
         );
     }
@@ -69,16 +69,16 @@ public class DirectoryWalkerTest {
         return mock;
     }
 
-    private static Md5Computer newNativeMd5SumWithExceptionMock() {
+    private static Md5Computer newNativeMd5WithExceptionMock() {
         final Md5Computer mock = Mockito.mock(Md5Computer.class);
-        Mockito.when(mock.nativeMd5Sum(Mockito.any(Path.class))).thenThrow(new RuntimeException());
+        Mockito.when(mock.nativeMd5(Mockito.any(Path.class))).thenThrow(new RuntimeException());
         Mockito.when(mock.toString()).thenReturn("mock-exception-md5-native");
         return mock;
     }
 
-    private static Md5Computer newJvmMd5SumWithExceptionMock() {
+    private static Md5Computer newJvmMd5WithExceptionMock() {
         final Md5Computer mock = Mockito.mock(Md5Computer.class);
-        Mockito.when(mock.jvmMd5Sum(Mockito.any(Path.class))).thenThrow(new RuntimeException());
+        Mockito.when(mock.jvmMd5(Mockito.any(Path.class))).thenThrow(new RuntimeException());
         Mockito.when(mock.toString()).thenReturn("mock-exception-md5-jvm");
         return mock;
     }
@@ -116,9 +116,9 @@ public class DirectoryWalkerTest {
         );
 
         // THEN
-        final long expectedDuplicatesByMd5SumCount = 0L;
-        final long actualDuplicatesByMd5SumCount = (long) duplicates.size();
-        assertEquals(expectedDuplicatesByMd5SumCount, actualDuplicatesByMd5SumCount);
+        final long expectedDuplicatesByMd5Count = 0L;
+        final long actualDuplicatesByMd5Count = (long) duplicates.size();
+        assertEquals(expectedDuplicatesByMd5Count, actualDuplicatesByMd5Count);
     }
 
     @Test
@@ -138,9 +138,9 @@ public class DirectoryWalkerTest {
         );
 
         // THEN
-        final long expectedDuplicatesByMd5SumCount = 0L;
-        final long actualDuplicatesByMd5SumCount = (long) duplicates.size();
-        assertEquals(expectedDuplicatesByMd5SumCount, actualDuplicatesByMd5SumCount);
+        final long expectedDuplicatesByMd5Count = 0L;
+        final long actualDuplicatesByMd5Count = (long) duplicates.size();
+        assertEquals(expectedDuplicatesByMd5Count, actualDuplicatesByMd5Count);
     }
 
     @Test
@@ -158,9 +158,9 @@ public class DirectoryWalkerTest {
         );
 
         // THEN
-        final long expectedDuplicatesByMd5SumCount = 0L;
-        final long actualDuplicatesByMd5SumCount = (long) duplicates.size();
-        assertEquals(expectedDuplicatesByMd5SumCount, actualDuplicatesByMd5SumCount);
+        final long expectedDuplicatesByMd5Count = 0L;
+        final long actualDuplicatesByMd5Count = (long) duplicates.size();
+        assertEquals(expectedDuplicatesByMd5Count, actualDuplicatesByMd5Count);
     }
 
     @Test
@@ -178,19 +178,19 @@ public class DirectoryWalkerTest {
         );
 
         // THEN
-        final long expectedDuplicatesByMd5SumCount = 0L;
-        final long actualDuplicatesByMd5SumCount = (long) duplicates.size();
-        assertEquals(expectedDuplicatesByMd5SumCount, actualDuplicatesByMd5SumCount);
+        final long expectedDuplicatesByMd5Count = 0L;
+        final long actualDuplicatesByMd5Count = (long) duplicates.size();
+        assertEquals(expectedDuplicatesByMd5Count, actualDuplicatesByMd5Count);
     }
 
     @Test
-    public void testExtractDuplicates_duplicatesByMd5SumOnly() throws Exception {
+    public void testExtractDuplicates_duplicatesByMd5Only() throws Exception {
         final Path parentDirectory = Files.createTempDirectory(helper.uniqueString());
         parentDirectory.toFile().deleteOnExit();
 
         // GIVEN
         final Collection<Path> sources = newArrayList();
-        sources.addAll(helper.createNewSetWithDuplicatesByMd5Sum(parentDirectory, UNIQUE_FILES_COUNT, DIRECTORY_DUPLICATION_FACTOR, FILE_DUPLICATION_FACTOR));
+        sources.addAll(helper.createNewSetWithDuplicatesByMd5(parentDirectory, UNIQUE_FILES_COUNT, DIRECTORY_DUPLICATION_FACTOR, FILE_DUPLICATION_FACTOR));
 
         // WHEN
         final Collection<String> duplicates = Files.readAllLines(
@@ -198,9 +198,9 @@ public class DirectoryWalkerTest {
         );
 
         // THEN
-        final long expectedDuplicatesByMd5SumCount = UNIQUE_FILES_COUNT * FILE_DUPLICATION_FACTOR * DIRECTORY_DUPLICATION_FACTOR - UNIQUE_FILES_COUNT;
-        final long actualDuplicatesByMd5SumCount = (long) duplicates.size();
-        assertEquals(expectedDuplicatesByMd5SumCount, actualDuplicatesByMd5SumCount);
+        final long expectedDuplicatesByMd5Count = UNIQUE_FILES_COUNT * FILE_DUPLICATION_FACTOR * DIRECTORY_DUPLICATION_FACTOR - UNIQUE_FILES_COUNT;
+        final long actualDuplicatesByMd5Count = (long) duplicates.size();
+        assertEquals(expectedDuplicatesByMd5Count, actualDuplicatesByMd5Count);
     }
 
     @Test
@@ -213,7 +213,7 @@ public class DirectoryWalkerTest {
         sources.add(helper.createEmptyTempDirectory(parentDirectory));
         sources.add(helper.createSingleEmptyFile(parentDirectory));
         sources.addAll(helper.createNewSetWithDuplicatesBySize(parentDirectory, DIRECTORY_DUPLICATION_FACTOR, UNIQUE_FILES_COUNT));
-        sources.addAll(helper.createNewSetWithDuplicatesByMd5Sum(parentDirectory, UNIQUE_FILES_COUNT, DIRECTORY_DUPLICATION_FACTOR, FILE_DUPLICATION_FACTOR));
+        sources.addAll(helper.createNewSetWithDuplicatesByMd5(parentDirectory, UNIQUE_FILES_COUNT, DIRECTORY_DUPLICATION_FACTOR, FILE_DUPLICATION_FACTOR));
 
         // WHEN
         final Collection<String> duplicates = Files.readAllLines(
@@ -221,9 +221,9 @@ public class DirectoryWalkerTest {
         );
 
         // THEN
-        final long expectedDuplicatesByMd5SumCount = UNIQUE_FILES_COUNT * FILE_DUPLICATION_FACTOR * DIRECTORY_DUPLICATION_FACTOR - UNIQUE_FILES_COUNT;
-        final long actualDuplicatesByMd5SumCount = (long) duplicates.size();
-        assertEquals(expectedDuplicatesByMd5SumCount, actualDuplicatesByMd5SumCount);
+        final long expectedDuplicatesByMd5Count = UNIQUE_FILES_COUNT * FILE_DUPLICATION_FACTOR * DIRECTORY_DUPLICATION_FACTOR - UNIQUE_FILES_COUNT;
+        final long actualDuplicatesByMd5Count = (long) duplicates.size();
+        assertEquals(expectedDuplicatesByMd5Count, actualDuplicatesByMd5Count);
     }
 
 }

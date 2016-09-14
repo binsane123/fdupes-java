@@ -76,7 +76,7 @@ public class PathUtils {
         return destination;
     }
 
-    public Collection<Path> createNewSetWithDuplicatesByMd5Sum(final Path parentDirectory, final long distinctFilesCount, final long directoryDuplicationFactor, final long fileDuplicationFactor) throws IOException {
+    public Collection<Path> createNewSetWithDuplicatesByMd5(final Path parentDirectory, final long distinctFilesCount, final long directoryDuplicationFactor, final long fileDuplicationFactor) throws IOException {
         final Collection<Path> originals = createUniqueFilesWithRandomContent(Files.createTempDirectory(uniqueString()), distinctFilesCount);
 
         final Collection<Path> destination = newArrayList();
