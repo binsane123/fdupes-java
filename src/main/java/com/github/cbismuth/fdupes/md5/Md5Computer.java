@@ -102,7 +102,7 @@ public class Md5Computer {
             return new ProcessExecutor().command(getNativeMd5Command(path))
                                         .readOutput(true)
                                         .execute()
-                                        .outputUTF8()
+                                        .outputString()
                                         .split("\\s")[1];
         } catch (final Throwable e) {
             throw Throwables.propagate(e);

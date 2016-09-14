@@ -78,11 +78,12 @@ public class OpenSslChecker {
     private boolean checkCommand(final Path path, final String command) {
         try {
             new ProcessExecutor().command(command, "md5", path.toString())
-                                 .exitValueNormal()
+                                 .readOutput(true)
                                  .execute()
-                                 .getExitValue();
+                                 .outputString();
             return true;
-        } catch (final Exception ignored) {
+        } catch (final Exception e) {
+            LOGGER.error(e.getMessage());
             return false;
         }
     }
