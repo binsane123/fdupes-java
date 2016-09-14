@@ -3,8 +3,8 @@
 [![build](https://travis-ci.org/cbismuth/fdupes-java.svg?branch=master)](https://travis-ci.org/cbismuth/fdupes-java)
 [![coverage](https://coveralls.io/repos/github/cbismuth/fdupes-java/badge.svg?branch=master)](https://coveralls.io/github/cbismuth/fdupes-java?branch=master)
 [![javadoc](http://javadoc.io/badge/com.github.cbismuth/fdupes-java.svg)](http://javadoc.io/doc/com.github.cbismuth/fdupes-java)
-[![issues](https://img.shields.io/github/issues/cbismuth/fdupes-java.svg)](https://github.com/cbismuth/fdupes-java/issues)
 [![repository](https://maven-badges.herokuapp.com/maven-central/com.github.cbismuth/fdupes-java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.cbismuth/fdupes-java/)
+[![issues](https://img.shields.io/github/issues/cbismuth/fdupes-java.svg)](https://github.com/cbismuth/fdupes-java/issues)
 [![licence](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/cbismuth/fdupes-java/master/LICENSE.md)
 
 ## Description
