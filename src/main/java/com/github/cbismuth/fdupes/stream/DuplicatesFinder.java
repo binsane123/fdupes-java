@@ -39,7 +39,6 @@ import java.util.stream.Stream;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -72,13 +71,14 @@ public class DuplicatesFinder {
         LOGGER.info("Pass 2/3 - compare file by MD5 completed! - {} duplicate(s) found", getCount(passName2));
 
         LOGGER.info("Pass 3/3 - compare file byte-by-byte ...");
-        final BufferedAnalyzer analyzer = new BufferedAnalyzer(stream.collect(toList()));
-        final Set<String> collect = analyzer.analyze()
+        final BufferedAnalyzer analyzer = new BufferedAnalyzer();
+        final Set<String> collect = analyzer.analyze(stream)
                                             .asMap()
                                             .entrySet()
                                             .parallelStream()
                                             .map(Map.Entry::getValue)
                                             .flatMap(Collection::stream)
+                                            .map(Path::toString)
                                             .map(PathEscapeFunction.INSTANCE)
                                             .collect(toSet());
         LOGGER.info("Pass 3/3 - compare file byte-by-byte completed! - {} duplicate(s) found", collect.size());

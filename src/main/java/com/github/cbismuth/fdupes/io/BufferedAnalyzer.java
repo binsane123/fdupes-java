@@ -25,7 +25,6 @@
 package com.github.cbismuth.fdupes.io;
 
 import com.github.cbismuth.fdupes.collect.PathComparator;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.slf4j.Logger;
@@ -35,11 +34,10 @@ import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static com.github.cbismuth.fdupes.collect.MultimapCollector.toMultimap;
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Multimaps.synchronizedListMultimap;
-import static com.google.common.collect.Multimaps.unmodifiableMultimap;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -47,46 +45,38 @@ public class BufferedAnalyzer {
 
     private static final Logger LOGGER = getLogger(BufferedAnalyzer.class);
 
-    private final Collection<Path> input = newArrayList();
-    private final Multimap<String, String> duplicates = synchronizedListMultimap(ArrayListMultimap.create());
+    public Multimap<Path, Path> analyze(final Stream<Path> stream) {
+        final Multimap<Path, Path> duplicates = synchronizedListMultimap(ArrayListMultimap.create());
 
-    public BufferedAnalyzer(final Collection<Path> input) {
-        Preconditions.checkNotNull(input, "null file metadata collection");
+        stream.collect(toMultimap(PathUtils::getPathSize))
+              .asMap()
+              .entrySet()
+              .parallelStream()
+              .map(Map.Entry::getValue)
+              .forEach(values -> removeUniqueFiles(
+                  duplicates,
+                  values.parallelStream()
+                        .map(ByteBuffer::new)
+                        .collect(toList())
+              ));
 
-        this.input.addAll(input);
+        reportDuplicationSize(duplicates);
+
+        return duplicates;
     }
 
-    public Multimap<String, String> analyze() {
-        input.parallelStream()
-             .collect(toMultimap(PathUtils::getPathSize))
-             .asMap()
-             .entrySet()
-             .parallelStream()
-             .map(Map.Entry::getValue)
-             .forEach(values -> removeUniqueFiles(
-                 values.parallelStream()
-                       .map(ByteBuffer::new)
-                       .collect(toList())
-             ));
-
-        reportDuplicationSize();
-
-        return unmodifiableMultimap(duplicates);
-    }
-
-    private void removeUniqueFiles(final Collection<ByteBuffer> buffers) {
+    private void removeUniqueFiles(final Multimap<Path, Path> duplicates, final Collection<ByteBuffer> buffers) {
         if (!buffers.isEmpty() && buffers.size() != 1) {
             buffers.forEach(ByteBuffer::read);
 
             if (buffers.iterator().next().getByteString().isEmpty()) {
-                final List<String> collect = buffers.parallelStream()
-                                                    .peek(ByteBuffer::close)
-                                                    .map(ByteBuffer::getPath)
-                                                    .sorted(PathComparator.INSTANCE)
-                                                    .map(Path::toString)
-                                                    .collect(toList());
+                final List<Path> collect = buffers.parallelStream()
+                                                  .peek(ByteBuffer::close)
+                                                  .map(ByteBuffer::getPath)
+                                                  .sorted(PathComparator.INSTANCE)
+                                                  .collect(toList());
 
-                final String original = collect.remove(0);
+                final Path original = collect.remove(0);
 
                 duplicates.putAll(original, collect);
             } else {
@@ -96,18 +86,22 @@ public class BufferedAnalyzer {
                        .entrySet()
                        .parallelStream()
                        .forEach(e -> {
-                           if (e.getValue().size() == 1) {
-                               input.remove(e.getValue().iterator().next().close().getPath());
-                           } else {
-                               removeUniqueFiles(e.getValue());
+                           if (e.getValue().size() > 1) {
+                               removeUniqueFiles(duplicates, e.getValue());
                            }
                        });
             }
         }
     }
 
-    private void reportDuplicationSize() {
-        final double sizeInMb = input.stream().mapToLong(PathUtils::getPathSize).sum() / 1024.0 / 1024.0;
+    private void reportDuplicationSize(final Multimap<Path, Path> duplicates) {
+        final double sizeInMb = duplicates.asMap()
+                                          .values()
+                                          .parallelStream()
+                                          .flatMap(Collection::parallelStream)
+                                          .mapToLong(PathUtils::getPathSize)
+                                          .sum() / 1024.0 / 1024.0;
+
         LOGGER.info("Total size of duplicated files is {} mb", NumberFormat.getNumberInstance().format(sizeInMb));
     }
 
