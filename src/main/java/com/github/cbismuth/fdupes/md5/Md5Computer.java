@@ -30,7 +30,6 @@ import com.google.common.base.Throwables;
 import com.google.common.primitives.UnsignedBytes;
 import org.slf4j.Logger;
 import org.zeroturnaround.exec.ProcessExecutor;
-import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,7 +52,7 @@ public class Md5Computer {
     private final Optional<String> binaryName;
 
     public Md5Computer() {
-        this(new Md5SumCommandChecker().getBinaryName());
+        this(new OpenSslChecker().getBinaryName());
     }
 
     public Md5Computer(final String binaryName) {
@@ -63,10 +62,10 @@ public class Md5Computer {
     public String compute(final Path path) {
         Preconditions.checkNotNull(path, "null file metadata");
 
-        try (final Timer.Context ignored = getMetricRegistry().timer(name("md5sum", "timer")).time()) {
+        try (final Timer.Context ignored = getMetricRegistry().timer(name("md5", "timer")).time()) {
             return doIt(path);
         } catch (final Exception e) {
-            LOGGER.error("Can't compute md5sum from file [{}] ([{}]: [{}])",
+            LOGGER.error("Can't compute MD5 from file [{}] ([{}]: [{}])",
                          path, e.getClass().getSimpleName(), e.getMessage());
 
             return randomUUID().toString();
@@ -102,10 +101,9 @@ public class Md5Computer {
         try {
             return new ProcessExecutor().command(getNativeMd5SumCommand(path))
                                         .readOutput(true)
-                                        .redirectOutput(Slf4jStream.of("md5sum").asTrace())
                                         .execute()
                                         .outputUTF8()
-                                        .split("\\s")[0];
+                                        .split("\\s")[1];
         } catch (final Throwable e) {
             throw Throwables.propagate(e);
         }
@@ -114,11 +112,9 @@ public class Md5Computer {
     private Iterable<String> getNativeMd5SumCommand(final Path path) {
         final Collection<String> command = newArrayList();
 
-        if (binaryName.isPresent() && Objects.equals("md5sum", binaryName.get())) {
-            command.add("md5sum");
-        } else if (binaryName.isPresent() && Objects.equals("md5", binaryName.get())) {
+        if (binaryName.isPresent() && Objects.equals("openssl", binaryName.get())) {
+            command.add("openssl");
             command.add("md5");
-            command.add("-q");
         } else {
             throw new UnsupportedOperationException(format("Unsupported binary name [%s]!", binaryName));
         }

@@ -35,9 +35,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.UUID.randomUUID;
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class Md5SumCommandChecker {
+public class OpenSslChecker {
 
-    private static final Logger LOGGER = getLogger(Md5SumCommandChecker.class);
+    private static final Logger LOGGER = getLogger(OpenSslChecker.class);
 
     public String getBinaryName() {
         String binaryName;
@@ -45,10 +45,8 @@ public class Md5SumCommandChecker {
         try {
             final Path path = newTempFile();
 
-            if (checkCommand(path, "md5sum")) {
-                binaryName = "md5sum";
-            } else if (checkCommand(path, "md5")) {
-                binaryName = "md5";
+            if (checkCommand(path, "openssl")) {
+                binaryName = "openssl";
             } else {
                 binaryName = null;
             }
@@ -57,9 +55,9 @@ public class Md5SumCommandChecker {
         }
 
         if (binaryName == null) {
-            LOGGER.warn("No native MD5 command found (slower JVM implementation will be used)");
+            LOGGER.warn("No native OpenSSL command found (slower JVM implementation will be used)");
         } else {
-            LOGGER.info("Native MD5 command found at [{}]", binaryName);
+            LOGGER.info("Native OpenSSL command found at [{}]", binaryName);
         }
 
         return binaryName;
@@ -69,7 +67,7 @@ public class Md5SumCommandChecker {
         final String uuid = randomUUID().toString();
 
         final Path path = Files.write(
-            Files.createTempFile(Md5SumCommandChecker.class.getName(), uuid),
+            Files.createTempFile(OpenSslChecker.class.getName(), uuid),
             uuid.getBytes(UTF_8)
         );
         path.toFile().deleteOnExit();

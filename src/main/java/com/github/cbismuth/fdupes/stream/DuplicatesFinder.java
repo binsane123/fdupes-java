@@ -46,13 +46,13 @@ public class DuplicatesFinder {
 
     private static final Logger LOGGER = getLogger(DuplicatesFinder.class);
 
-    private final Md5Computer md5;
+    private final Md5Computer md5Computer;
     private final StreamHandler handler = new StreamHandler();
 
-    public DuplicatesFinder(final Md5Computer md5) {
-        Preconditions.checkNotNull(md5, "null MD5 computer");
+    public DuplicatesFinder(final Md5Computer md5Computer) {
+        Preconditions.checkNotNull(md5Computer, "null MD5 computer");
 
-        this.md5 = md5;
+        this.md5Computer = md5Computer;
     }
 
     public Set<String> extractDuplicates(final Collection<Path> elements) {
@@ -67,7 +67,7 @@ public class DuplicatesFinder {
 
         final String passName2 = "md5";
         LOGGER.info("Pass 2/3 - compare file by MD5 ...");
-        stream = handler.removeUniqueFilesByKey(stream, passName2, md5::compute);
+        stream = handler.removeUniqueFilesByKey(stream, passName2, md5Computer::compute);
         LOGGER.info("Pass 2/3 - compare file by MD5 completed! - {} duplicate(s) found", getCount(passName2));
 
         LOGGER.info("Pass 3/3 - compare file byte-by-byte ...");
