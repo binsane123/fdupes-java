@@ -31,7 +31,7 @@
 
     <groupId>com.github.cbismuth</groupId>
     <artifactId>fdupes-java</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.0-RC2</version>
 
     <name>File duplicate finder</name>
     <description>A file duplicate finder written in Java 8 with native MD5 check support.</description>
