@@ -26,7 +26,7 @@ package com.github.cbismuth.fdupes.stream;
 
 import com.github.cbismuth.fdupes.io.BufferedAnalyzer;
 import com.github.cbismuth.fdupes.io.PathEscapeFunction;
-import com.github.cbismuth.fdupes.io.PathSizeFunction;
+import com.github.cbismuth.fdupes.io.PathUtils;
 import com.github.cbismuth.fdupes.md5.Md5Computer;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
@@ -63,7 +63,7 @@ public class DuplicatesFinder {
 
         final String passName1 = "size";
         LOGGER.info("Pass 1/3 - compare file by size ...");
-        stream = handler.removeUniqueFilesByKey(stream, passName1, PathSizeFunction.INSTANCE);
+        stream = handler.removeUniqueFilesByKey(stream, passName1, PathUtils::getPathSize);
         LOGGER.info("Pass 1/3 - compare file by size completed! - {} duplicate(s) found", getCount(passName1));
 
         final String passName2 = "md5";

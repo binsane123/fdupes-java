@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.github.cbismuth.fdupes.util;
+package com.github.cbismuth.fdupes.io;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -41,6 +42,14 @@ import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.util.UUID.randomUUID;
 
 public class PathUtils {
+
+    public static Long getPathSize(final Path path) {
+        try {
+            return Files.readAttributes(path, BasicFileAttributes.class).size();
+        } catch (final Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
 
     public Path createSingleEmptyFile(final Path parentDirectory) throws IOException {
         final Path path = createEmptyTempDirectory(parentDirectory);

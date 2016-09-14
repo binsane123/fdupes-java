@@ -26,14 +26,11 @@ package com.github.cbismuth.fdupes.io;
 
 import com.github.cbismuth.fdupes.collect.PathComparator;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.slf4j.Logger;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -43,11 +40,13 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Multimaps.synchronizedListMultimap;
 import static com.google.common.collect.Multimaps.unmodifiableMultimap;
 import static java.util.stream.Collectors.toList;
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class BufferedAnalyzer {
 
-    private final Collection<Path> input = newArrayList();
+    private static final Logger LOGGER = getLogger(BufferedAnalyzer.class);
 
+    private final Collection<Path> input = newArrayList();
     private final Multimap<String, String> duplicates = synchronizedListMultimap(ArrayListMultimap.create());
 
     public BufferedAnalyzer(final Collection<Path> input) {
@@ -58,13 +57,7 @@ public class BufferedAnalyzer {
 
     public Multimap<String, String> analyze() {
         input.parallelStream()
-             .collect(toMultimap(path -> {
-                 try {
-                     return Files.readAttributes(path, BasicFileAttributes.class).size();
-                 } catch (IOException e) {
-                     throw Throwables.propagate(e);
-                 }
-             }))
+             .collect(toMultimap(PathUtils::getPathSize))
              .asMap()
              .entrySet()
              .parallelStream()
@@ -74,6 +67,9 @@ public class BufferedAnalyzer {
                        .map(ByteBuffer::new)
                        .collect(toList())
              ));
+
+        final long sizeInMb = input.stream().mapToLong(PathUtils::getPathSize).sum() / 1024 / 1024;
+        LOGGER.info("Total size of duplicated files is {} mb", sizeInMb);
 
         return unmodifiableMultimap(duplicates);
     }
