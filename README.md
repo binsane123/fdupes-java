@@ -44,7 +44,7 @@ java -jar fdupes-1.2.0-all.jar ~/pictures
 
 Find duplicated files in a two directories with custom options:
 
-```bash
+```
 java -Xmx1g                       \
      -Dfdupes.parallelism=8       \
      -Dfdupes.buffer.size=3m      \
