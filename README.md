@@ -38,7 +38,7 @@ Here are optional command line switches:
 
 Find duplicated files in a single directory and its subdirectories with default options:
 
-```bash
+```
 java -jar fdupes-1.2.0-all.jar ~/pictures
 ```
 
