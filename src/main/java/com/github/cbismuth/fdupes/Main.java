@@ -34,10 +34,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 
-import static com.codahale.metrics.Slf4jReporter.LoggingLevel.TRACE;
+import static com.codahale.metrics.Slf4jReporter.LoggingLevel.DEBUG;
 import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public final class Main {
@@ -92,8 +92,8 @@ public final class Main {
     public Path launchAndReport(final Collection<String> args) throws IOException {
         try (final Slf4jReporter slf4jReporter = Slf4jReporter.forRegistry(getMetricRegistry())
                                                               .outputTo(getLogger("fdupes"))
-                                                              .withLoggingLevel(TRACE).build()) {
-            slf4jReporter.start(1L, MINUTES);
+                                                              .withLoggingLevel(DEBUG).build()) {
+            slf4jReporter.start(15L, SECONDS);
             final Path outputPath = launch(args);
             slf4jReporter.report();
 

@@ -24,16 +24,18 @@
   ~ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   -->
 
-<configuration scan="true" scanPeriod="5 seconds">
+<configuration>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{ISO8601,UTC} ${LOG_LEVEL_PATTERN:-%5p} %m%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS,UTC} %highlight(%-5level) %m%n</pattern>
             <charset>utf8</charset>
         </encoder>
     </appender>
 
-    <root level="INFO">
+    <logger name="com.github.cbismuth.fdupes" level="${logging.level.fdupes:-INFO}"/>
+
+    <root level="${logging.level.root:-WARN}">
         <appender-ref ref="CONSOLE"/>
     </root>
 

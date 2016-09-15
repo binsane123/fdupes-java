@@ -86,11 +86,16 @@
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.7</nexus-staging-maven-plugin.version>
 
+        <guava.version>19.0</guava.version>
         <spark.version>1.6.2</spark.version>
         <zt-exec.version>1.9</zt-exec.version>
-        <guava.version>19.0</guava.version>
+
         <metrics-core.version>3.1.2</metrics-core.version>
+
+        <slf4j-api.version>1.7.21</slf4j-api.version>
         <logback-classic.version>1.1.7</logback-classic.version>
+        <jansi.version>1.13</jansi.version>
+
         <junit.version>4.12</junit.version>
         <mockito-core.version>1.10.19</mockito-core.version>
     </properties>
@@ -290,43 +295,61 @@
 
     <dependencies>
         <dependency>
+            <!-- multimap support -->
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <!-- byte unit parser -->
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-network-common_2.11</artifactId>
             <version>${spark.version}</version>
         </dependency>
-
         <dependency>
+            <!-- command line dsl -->
             <groupId>org.zeroturnaround</groupId>
             <artifactId>zt-exec</artifactId>
             <version>${zt-exec.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
-
-        <dependency>
+            <!-- metric accumulator -->
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>
             <version>${metrics-core.version}</version>
         </dependency>
 
         <dependency>
+            <!-- logging api -->
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j-api.version}</version>
+        </dependency>
+        <dependency>
+            <!-- logging implementation -->
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback-classic.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <!-- console colouring -->
+            <groupId>org.fusesource.jansi</groupId>
+            <artifactId>jansi</artifactId>
+            <version>${jansi.version}</version>
+            <scope>runtime</scope>
         </dependency>
 
         <dependency>
+            <!-- testing api -->
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
+            <!-- mocking api-->
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>${mockito-core.version}</version>

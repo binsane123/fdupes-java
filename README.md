@@ -16,8 +16,42 @@ A command line duplicated files finder written in Java 8 which finds all duplica
 Executable files are available on the [release page](https://github.com/cbismuth/fdupes-java/releases), download the
 latest one and run the command line below. 
 
-```
+```bash
 java -jar fdupes-<version>-all.jar <PATH1> [<PATH2>]...
+```
+
+### Options
+
+Here are optional command line switches:
+
+```
+-Dlogging.level.fdupes=<LEVEL> the logging level of fdupes-java, may be one of [ALL,TRACE,DEBUG,INFO,WARN,ERROR,OFF] (default is INFO)
+-Dlogging.level.root=<LEVEL>   the logging level of embedded libraries, may be one of [ALL,TRACE,DEBUG,INFO,WARN,ERROR,OFF] (default is WARN)
+
+-Xmx<size><unit>               the max amount of memory to allocate to the Java Runtime Environment (JRE)
+
+-Djava.util.concurrent.ForkJoinPool.common.parallelism=<THREADS> the numbers to threads to parallelize execution (default is number of available processors)
+```
+
+### Examples
+
+Find duplicated files in a single directory and its subdirectories with default options:
+
+```bash
+java -jar fdupes-1.2.0-all.jar ~/pictures
+```
+
+Find duplicated files in a two directories with custom options:
+
+```bash
+java -Xmx128m                                                 \
+     -Djava.util.concurrent.ForkJoinPool.common.parallelism=8 \
+     -Dlogging.level.fdupes=DEBUG                             \
+     -Dlogging.level.root=DEBUG                               \
+     -jar fdupes-1.2.0-all.jar                                \
+     ~/pictures                                               \
+     ~/downloads                                              \
+     ~/desktop/DSC00042.JPG
 ```
 
 **Note**: `<PATH1> [<PATH2>]...` can be either regular files, directories or both.
