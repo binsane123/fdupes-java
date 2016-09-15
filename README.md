@@ -16,7 +16,7 @@ A command line duplicated files finder written in Java 8 which finds all duplica
 Executable files are available on the [release page](https://github.com/cbismuth/fdupes-java/releases), download the
 latest one and run the command line below. 
 
-```bash
+```
 java -jar fdupes-<version>-all.jar <PATH1> [<PATH2>]...
 ```
 
@@ -28,10 +28,10 @@ Here are optional command line switches:
 -Dlogging.level.fdupes=<LEVEL>    the logging level of fdupes-java, may be one of [ALL,TRACE,DEBUG,INFO,WARN,ERROR,OFF] (default is INFO)
 -Dlogging.level.root=<LEVEL>      the logging level of embedded libraries, may be one of [ALL,TRACE,DEBUG,INFO,WARN,ERROR,OFF] (default is WARN)
 
--Xmx<size><unit>                  the max amount of memory to allocate to the Java Runtime Environment (JRE)
+-Xmx<SIZE><UNIT>                  the max amount of memory to allocate to the Java Runtime Environment (e.g. 512m)
 
 -Dfdupes.parallelism=<NUMBER>     the numbers of threads to parallelize execution  (default is 1)
--Dfdupes.buffer.size=<size><unit> the buffer size used for byte-by-byte comparison (default is 64k)
+-Dfdupes.buffer.size=<SIZE><UNIT> the buffer size used for byte-by-byte comparison (default is 64k)
 ```
 
 ### Examples
