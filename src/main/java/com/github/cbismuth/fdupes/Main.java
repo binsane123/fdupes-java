@@ -28,6 +28,7 @@ import com.codahale.metrics.Slf4jReporter;
 import com.github.cbismuth.fdupes.io.DirectoryWalker;
 import com.github.cbismuth.fdupes.io.DuplicatesWriter;
 import com.github.cbismuth.fdupes.md5.Md5Computer;
+import org.apache.spark.network.util.JavaUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -43,6 +44,46 @@ import static org.slf4j.LoggerFactory.getLogger;
 public final class Main {
 
     private static final Logger LOGGER = getLogger(Main.class);
+
+    static {
+        initPoolSize();
+    }
+
+    private static void initPoolSize() {
+        int size = 1;
+
+        final String value = System.getProperty("fdupes.parallelism");
+        if (value != null) {
+            try {
+                size = Integer.valueOf(value);
+            } catch (final NumberFormatException e) {
+                LOGGER.error(e.getMessage());
+            }
+        }
+
+        final String name = "java.util.concurrent.ForkJoinPool.common.parallelism";
+        System.setProperty(name, String.valueOf(size));
+        LOGGER.warn("Thread pool size set to [{}]", System.getProperty(name));
+    }
+
+    public static final int BUFFER_SIZE = extractBufferSize();
+
+    private static int extractBufferSize() {
+        int size = 64 * 1024;
+
+        final String value = System.getProperty("fdupes.buffer.size");
+        if (value != null) {
+            try {
+                size = Math.toIntExact(JavaUtils.byteStringAsBytes(value));
+            } catch (final NumberFormatException e) {
+                LOGGER.error(e.getMessage());
+            }
+        }
+
+        LOGGER.warn("Byte buffer size size set to [{}] byte(s)", size);
+
+        return size;
+    }
 
     public static void main(final String... args) throws IOException {
         if (args.length == 0) {
@@ -106,9 +147,9 @@ public final class Main {
             return writer.write(walker.extractDuplicates(args));
         } catch (final OutOfMemoryError e) {
             LOGGER.error("Not enough memory, solutions are:");
-            LOGGER.error("\t- increase Java heap size (e.g. -Xmx256m),");
-            LOGGER.error("\t- decrease byte buffer size (e.g. -Dfdupes.buffer.size=128k - default is 64k),");
-            LOGGER.error("\t- reduce the level of parallelism (e.g. -Djava.util.concurrent.ForkJoinPool.common.parallelism=2).");
+            LOGGER.error("\t- increase Java heap size (e.g. -Xmx512m),");
+            LOGGER.error("\t- decrease byte buffer size (e.g. -Dfdupes.buffer.size=8k - default is 64k),");
+            LOGGER.error("\t- reduce the level of parallelism (e.g. -Dfdupes.parallelism=1).");
 
             return null;
         }

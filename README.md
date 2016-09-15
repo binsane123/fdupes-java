@@ -25,12 +25,13 @@ java -jar fdupes-<version>-all.jar <PATH1> [<PATH2>]...
 Here are optional command line switches:
 
 ```
--Dlogging.level.fdupes=<LEVEL> the logging level of fdupes-java, may be one of [ALL,TRACE,DEBUG,INFO,WARN,ERROR,OFF] (default is INFO)
--Dlogging.level.root=<LEVEL>   the logging level of embedded libraries, may be one of [ALL,TRACE,DEBUG,INFO,WARN,ERROR,OFF] (default is WARN)
+-Dlogging.level.fdupes=<LEVEL>   the logging level of fdupes-java, may be one of [ALL,TRACE,DEBUG,INFO,WARN,ERROR,OFF] (default is INFO)
+-Dlogging.level.root=<LEVEL>     the logging level of embedded libraries, may be one of [ALL,TRACE,DEBUG,INFO,WARN,ERROR,OFF] (default is WARN)
 
--Xmx<size><unit>               the max amount of memory to allocate to the Java Runtime Environment (JRE)
+-Xmx<size><unit>                 the max amount of memory to allocate to the Java Runtime Environment (JRE)
 
--Djava.util.concurrent.ForkJoinPool.common.parallelism=<THREADS> the numbers to threads to parallelize execution (default is number of available processors)
+-Dfdupes.parallelism=<NUMBER>         the numbers of threads to parallelize execution  (default is 1)
+-Dfdupes.buffer.size=<size><unit> the buffer size used for byte-by-byte comparison (default is 64k)
 ```
 
 ### Examples
@@ -44,8 +45,9 @@ java -jar fdupes-1.2.0-all.jar ~/pictures
 Find duplicated files in a two directories with custom options:
 
 ```bash
-java -Xmx128m                                                 \
-     -Djava.util.concurrent.ForkJoinPool.common.parallelism=8 \
+java -Xmx1g                                                   \
+     -Dfdupes.parallelism=8                                   \
+     -Dfdupes.buffer.size=3m                                  \
      -Dlogging.level.fdupes=DEBUG                             \
      -Dlogging.level.root=DEBUG                               \
      -jar fdupes-1.2.0-all.jar                                \

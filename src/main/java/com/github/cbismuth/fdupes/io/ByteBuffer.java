@@ -26,7 +26,6 @@ package com.github.cbismuth.fdupes.io;
 
 import com.google.common.base.Throwables;
 import com.google.common.primitives.UnsignedBytes;
-import org.apache.spark.network.util.JavaUtils;
 import org.slf4j.Logger;
 
 import java.io.BufferedInputStream;
@@ -36,28 +35,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 
+import static com.github.cbismuth.fdupes.Main.BUFFER_SIZE;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class ByteBuffer {
 
     private static final Logger LOGGER = getLogger(ByteBuffer.class);
-
-    private static final int BUFFER_SIZE = extractByteSize(System.getProperty("fdupes.buffer.size"));
-
-    private static int extractByteSize(final String property) {
-        int size = 64 * 1024;
-
-        if (property != null) {
-            try {
-                size = Math.toIntExact(JavaUtils.byteStringAsBytes(property));
-                LOGGER.info("Byte buffer size size set to {} byte(s)", size);
-            } catch (final NumberFormatException e) {
-                LOGGER.error(e.getMessage());
-            }
-        }
-
-        return size;
-    }
 
     private final Path path;
     private final BufferedInputStream inputStream;
