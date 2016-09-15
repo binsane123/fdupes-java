@@ -75,7 +75,7 @@ public final class Main {
         if (value != null) {
             try {
                 size = Math.toIntExact(JavaUtils.byteStringAsBytes(value));
-            } catch (final NumberFormatException e) {
+            } catch (final NumberFormatException | ArithmeticException e) {
                 LOGGER.error(e.getMessage());
             }
         }
