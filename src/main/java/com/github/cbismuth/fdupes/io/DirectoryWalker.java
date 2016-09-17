@@ -80,7 +80,7 @@ public class DirectoryWalker {
         try (final DirectoryStream<Path> stream = Files.newDirectoryStream(path, FilenamePredicate.INSTANCE)) {
             stream.forEach(p -> {
                 if (Files.isDirectory(p)) {
-                    getMetricRegistry().counter(name("walker", "directories", "counter")).inc();
+                    getMetricRegistry().counter(name("fs", "counter", "directories")).inc();
 
                     handleDirectory(p);
                 } else {
@@ -93,7 +93,7 @@ public class DirectoryWalker {
     }
 
     private void handleRegularFile(final Path path) {
-        getMetricRegistry().counter(name("walker", "files", "counter")).inc();
+        getMetricRegistry().counter(name("fs", "counter", "files")).inc();
 
         paths.add(path);
     }

@@ -62,7 +62,7 @@ public class Md5Computer {
     public String compute(final Path path) {
         Preconditions.checkNotNull(path, "null file metadata");
 
-        try (final Timer.Context ignored = getMetricRegistry().timer(name("md5", "timer")).time()) {
+        try (final Timer.Context ignored = getMetricRegistry().timer(name("timer", "md5")).time()) {
             return doIt(path);
         } catch (final Exception e) {
             LOGGER.error("Can't compute MD5 from file [{}] ([{}]: [{}])",

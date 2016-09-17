@@ -89,14 +89,14 @@ public final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K
     public BiConsumer<Multimap<K, V>, T> accumulator() {
         return (map, element) -> {
             if (!name.isEmpty()) {
-                getMetricRegistry().counter(name(name, "total", "counter")).inc();
+                getMetricRegistry().counter(name("collector", name, "counter", "total")).inc();
             }
 
             final K key = keyGetter.apply(element);
             final V value = valueGetter.apply(element);
 
             if (!name.isEmpty() && map.containsKey(key)) {
-                getMetricRegistry().counter(name(name, "duplicates", "counter")).inc();
+                getMetricRegistry().counter(name("collector", name, "counter", "duplicates")).inc();
             }
 
             map.put(key, value);
@@ -114,7 +114,7 @@ public final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K
     @Override
     public Function<Multimap<K, V>, Multimap<K, V>> finisher() {
         if (!name.isEmpty()) {
-            getMetricRegistry().register(name(name, "finished"), (Gauge<Boolean>) () -> true);
+            getMetricRegistry().register(name("collector", name, "status", "finished"), (Gauge<Boolean>) () -> true);
         }
 
         return map -> map;

@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static com.codahale.metrics.MetricRegistry.name;
 import static com.github.cbismuth.fdupes.collect.MultimapCollector.toMultimap;
 
 public class StreamHandler {
@@ -47,7 +46,7 @@ public class StreamHandler {
         Preconditions.checkNotNull(name, "null pass name");
         Preconditions.checkNotNull(keyMapper, "null pass key mapper");
 
-        final Multimap<K, Path> multimap = stream.collect(toMultimap(name("multimap", name), keyMapper));
+        final Multimap<K, Path> multimap = stream.collect(toMultimap(name, keyMapper));
 
         final Stream<Map.Entry<K, Collection<Path>>> entryWithDuplicates = multimap.asMap()
                                                                                    .entrySet()

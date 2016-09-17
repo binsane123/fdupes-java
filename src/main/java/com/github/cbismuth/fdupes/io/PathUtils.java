@@ -24,6 +24,7 @@
 
 package com.github.cbismuth.fdupes.io;
 
+import com.codahale.metrics.Timer;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 
@@ -35,6 +36,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.codahale.metrics.MetricRegistry.name;
+import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -45,7 +48,9 @@ public class PathUtils {
 
     public static Long getPathSize(final Path path) {
         try {
-            return Files.readAttributes(path, BasicFileAttributes.class).size();
+            try (final Timer.Context ignored = getMetricRegistry().timer(name("timer", "fs", "attributes", "read")).time()) {
+                return Files.readAttributes(path, BasicFileAttributes.class).size();
+            }
         } catch (final Exception e) {
             throw Throwables.propagate(e);
         }

@@ -87,7 +87,7 @@ public class DuplicatesFinder {
     }
 
     private long getCount(final String name) {
-        return getMetricRegistry().counter(name("multimap", name, "duplicates", "counter")).getCount();
+        return getMetricRegistry().counter(name("collector", name, "counter", "duplicates")).getCount();
     }
 
 }
