@@ -132,7 +132,7 @@ public final class Main {
 
     public Path launchAndReport(final Collection<String> args) throws IOException {
         try (final Slf4jReporter slf4jReporter = Slf4jReporter.forRegistry(getMetricRegistry())
-                                                              .outputTo(getLogger("fdupes"))
+                                                              .outputTo(getLogger(getClass()))
                                                               .withLoggingLevel(DEBUG).build()) {
             slf4jReporter.start(15L, SECONDS);
             final Path outputPath = launch(args);
