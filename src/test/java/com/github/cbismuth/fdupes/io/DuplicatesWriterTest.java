@@ -32,7 +32,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 
-import static com.github.cbismuth.fdupes.io.DuplicatesWriter.NEW_LINE;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
@@ -50,7 +49,7 @@ public class DuplicatesWriterTest {
 
         // THEN
         final String actual = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-        assertEquals("abcd" + NEW_LINE + "xyz", actual);
+        assertEquals("abcd" + System.getProperty("line.separator") + "xyz", actual);
     }
 
 }

@@ -24,7 +24,6 @@
 
 package com.github.cbismuth.fdupes.io;
 
-import com.codahale.metrics.Timer;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 
@@ -32,12 +31,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static com.codahale.metrics.MetricRegistry.name;
-import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -45,16 +41,6 @@ import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.util.UUID.randomUUID;
 
 public class PathUtils {
-
-    public static Long getPathSize(final Path path) {
-        try {
-            try (final Timer.Context ignored = getMetricRegistry().timer(name("timer", "fs", "attributes", "read")).time()) {
-                return Files.readAttributes(path, BasicFileAttributes.class).size();
-            }
-        } catch (final Exception e) {
-            throw Throwables.propagate(e);
-        }
-    }
 
     public Path createSingleEmptyFile(final Path parentDirectory) throws IOException {
         final Path path = createEmptyTempDirectory(parentDirectory);

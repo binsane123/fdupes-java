@@ -25,6 +25,7 @@
 package com.github.cbismuth.fdupes.stream;
 
 import com.github.cbismuth.fdupes.Main;
+import com.github.cbismuth.fdupes.immutable.PathElement;
 import com.github.cbismuth.fdupes.io.DirectoryWalker;
 import com.github.cbismuth.fdupes.io.DuplicatesWriter;
 import com.github.cbismuth.fdupes.io.PathUtils;
@@ -64,21 +65,21 @@ public class DirectoryWalkerTest {
 
     private static Md5Computer newForceByteComparisonMock() {
         final Md5Computer mock = Mockito.mock(Md5Computer.class);
-        Mockito.when(mock.compute(Mockito.any(Path.class))).thenReturn(randomUUID().toString());
+        Mockito.when(mock.compute(Mockito.any(PathElement.class))).thenReturn(randomUUID().toString());
         Mockito.when(mock.toString()).thenReturn("byte-by-byte");
         return mock;
     }
 
     private static Md5Computer newNativeMd5WithExceptionMock() {
         final Md5Computer mock = Mockito.mock(Md5Computer.class);
-        Mockito.when(mock.nativeMd5(Mockito.any(Path.class))).thenThrow(new RuntimeException());
+        Mockito.when(mock.nativeMd5(Mockito.any(PathElement.class))).thenThrow(new RuntimeException());
         Mockito.when(mock.toString()).thenReturn("mock-exception-md5-native");
         return mock;
     }
 
     private static Md5Computer newJvmMd5WithExceptionMock() {
         final Md5Computer mock = Mockito.mock(Md5Computer.class);
-        Mockito.when(mock.jvmMd5(Mockito.any(Path.class))).thenThrow(new RuntimeException());
+        Mockito.when(mock.jvmMd5(Mockito.any(PathElement.class))).thenThrow(new RuntimeException());
         Mockito.when(mock.toString()).thenReturn("mock-exception-md5-jvm");
         return mock;
     }

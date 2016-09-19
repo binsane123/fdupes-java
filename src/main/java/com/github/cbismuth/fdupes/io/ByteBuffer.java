@@ -24,6 +24,7 @@
 
 package com.github.cbismuth.fdupes.io;
 
+import com.github.cbismuth.fdupes.immutable.PathElement;
 import com.google.common.base.Throwables;
 import com.google.common.primitives.UnsignedBytes;
 import org.slf4j.Logger;
@@ -32,7 +33,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Arrays;
 
 import static com.github.cbismuth.fdupes.Main.BUFFER_SIZE;
@@ -42,25 +42,25 @@ public class ByteBuffer {
 
     private static final Logger LOGGER = getLogger(ByteBuffer.class);
 
-    private final Path path;
+    private final PathElement element;
     private final BufferedInputStream inputStream;
 
     private int offset;
     private int length;
     private final byte[] buffer = new byte[BUFFER_SIZE];
 
-    public ByteBuffer(final Path path) {
-        this.path = path;
+    public ByteBuffer(final PathElement element) {
+        this.element = element;
 
         try {
-            inputStream = new BufferedInputStream(new FileInputStream(new File(this.path.toString())));
+            inputStream = new BufferedInputStream(new FileInputStream(new File(this.element.toString())));
         } catch (final Exception e) {
             throw Throwables.propagate(e);
         }
     }
 
-    public Path getPath() {
-        return path;
+    public PathElement getElement() {
+        return element;
     }
 
     public String getByteString() {

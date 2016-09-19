@@ -31,24 +31,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.joining;
 
 public class DuplicatesWriter {
-
-    public static final String NEW_LINE = System.getProperty("line.separator");
-    public static final String WORKING_DIRECTORY = System.getProperty("user.dir");
-    public static final String OUTPUT_FILENAME = "duplicates.log";
 
     public Path write(final Collection<String> inputPaths) throws IOException {
         Preconditions.checkNotNull(inputPaths, "null input path collection");
 
-        final Path output = Paths.get(WORKING_DIRECTORY, OUTPUT_FILENAME);
+        final Path output = Paths.get(System.getProperty("user.dir"), "duplicates.log");
+        final String content = inputPaths.parallelStream().collect(joining(System.getProperty("line.separator")));
 
-        final String absolutePaths = inputPaths.parallelStream().collect(Collectors.joining(NEW_LINE));
-
-        Files.write(output, absolutePaths.getBytes(UTF_8));
+        Files.write(output, content.getBytes(UTF_8));
 
         return output;
     }

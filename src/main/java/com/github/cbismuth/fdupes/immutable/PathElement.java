@@ -22,34 +22,45 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.github.cbismuth.fdupes.collect;
+package com.github.cbismuth.fdupes.immutable;
 
-import com.github.cbismuth.fdupes.immutable.PathElement;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
-import com.google.common.collect.ComparisonChain;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 
-import java.util.Comparator;
+public class PathElement {
 
-public class PathComparator implements Comparator<PathElement> {
+    private final Path path;
+    private final BasicFileAttributes attributes;
 
-    public static final PathComparator INSTANCE = new PathComparator();
+    public PathElement(final Path path,
+                       final BasicFileAttributes attributes) {
+        this.path = path;
+        this.attributes = attributes;
+    }
+
+    public Path getPath() {
+        return path;
+    }
+
+    public long size() {
+        return attributes.size();
+    }
+
+    public long creationTime() {
+        return attributes.creationTime().toMillis();
+    }
+
+    public long lastModifiedTime() {
+        return attributes.lastModifiedTime().toMillis();
+    }
+
+    public long lastAccessTime() {
+        return attributes.lastAccessTime().toMillis();
+    }
 
     @Override
-    public int compare(final PathElement o1, final PathElement o2) {
-        Preconditions.checkNotNull(o1, "null path element 1");
-        Preconditions.checkNotNull(o2, "null path element 2");
-
-        try {
-            return ComparisonChain.start()
-                                  .compare(o1.creationTime(), o2.creationTime())
-                                  .compare(o1.lastAccessTime(), o2.lastAccessTime())
-                                  .compare(o1.lastModifiedTime(), o2.lastModifiedTime())
-                                  .compare(o1.toString(), o2.toString())
-                                  .result();
-        } catch (final Exception e) {
-            throw Throwables.propagate(e);
-        }
+    public String toString() {
+        return path.toString();
     }
 
 }

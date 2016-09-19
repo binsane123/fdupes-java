@@ -25,11 +25,11 @@
 package com.github.cbismuth.fdupes.io;
 
 import com.github.cbismuth.fdupes.collect.PathComparator;
+import com.github.cbismuth.fdupes.immutable.PathElement;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.slf4j.Logger;
 
-import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.List;
@@ -45,10 +45,10 @@ public class BufferedAnalyzer {
 
     private static final Logger LOGGER = getLogger(BufferedAnalyzer.class);
 
-    public Multimap<Path, Path> analyze(final Stream<Path> stream) {
-        final Multimap<Path, Path> duplicates = synchronizedListMultimap(ArrayListMultimap.create());
+    public Multimap<PathElement, PathElement> analyze(final Stream<PathElement> stream) {
+        final Multimap<PathElement, PathElement> duplicates = synchronizedListMultimap(ArrayListMultimap.create());
 
-        stream.collect(toMultimap(PathUtils::getPathSize))
+        stream.collect(toMultimap(PathElement::size))
               .asMap()
               .entrySet()
               .parallelStream()
@@ -65,18 +65,18 @@ public class BufferedAnalyzer {
         return duplicates;
     }
 
-    private void removeUniqueFiles(final Multimap<Path, Path> duplicates, final Collection<ByteBuffer> buffers) {
+    private void removeUniqueFiles(final Multimap<PathElement, PathElement> duplicates, final Collection<ByteBuffer> buffers) {
         if (!buffers.isEmpty() && buffers.size() != 1) {
             buffers.forEach(ByteBuffer::read);
 
             if (buffers.iterator().next().getByteString().isEmpty()) {
-                final List<Path> collect = buffers.parallelStream()
-                                                  .peek(ByteBuffer::close)
-                                                  .map(ByteBuffer::getPath)
-                                                  .sorted(PathComparator.INSTANCE)
-                                                  .collect(toList());
+                final List<PathElement> collect = buffers.parallelStream()
+                                                         .peek(ByteBuffer::close)
+                                                         .map(ByteBuffer::getElement)
+                                                         .sorted(PathComparator.INSTANCE)
+                                                         .collect(toList());
 
-                final Path original = collect.remove(0);
+                final PathElement original = collect.remove(0);
 
                 duplicates.putAll(original, collect);
             } else {
@@ -94,12 +94,12 @@ public class BufferedAnalyzer {
         }
     }
 
-    private void reportDuplicationSize(final Multimap<Path, Path> duplicates) {
+    private void reportDuplicationSize(final Multimap<PathElement, PathElement> duplicates) {
         final double sizeInMb = duplicates.asMap()
                                           .values()
                                           .parallelStream()
                                           .flatMap(Collection::parallelStream)
-                                          .mapToLong(PathUtils::getPathSize)
+                                          .mapToLong(PathElement::size)
                                           .sum() / 1024.0 / 1024.0;
 
         LOGGER.info("Total size of duplicated files is {} mb", NumberFormat.getNumberInstance().format(sizeInMb));

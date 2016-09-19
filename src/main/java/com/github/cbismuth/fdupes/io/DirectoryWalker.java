@@ -24,7 +24,9 @@
 
 package com.github.cbismuth.fdupes.io;
 
+import com.codahale.metrics.Timer;
 import com.github.cbismuth.fdupes.collect.FilenamePredicate;
+import com.github.cbismuth.fdupes.immutable.PathElement;
 import com.github.cbismuth.fdupes.md5.Md5Computer;
 import com.github.cbismuth.fdupes.stream.DuplicatesFinder;
 import com.google.common.base.Preconditions;
@@ -35,11 +37,14 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Set;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static com.google.common.collect.Sets.newConcurrentHashSet;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.joining;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class DirectoryWalker {
@@ -48,7 +53,8 @@ public class DirectoryWalker {
 
     private final DuplicatesFinder duplicatesFinder;
 
-    private final Set<Path> paths = newConcurrentHashSet();
+    private final Set<PathElement> paths = newConcurrentHashSet();
+    private final Set<Path> pathsInError = newConcurrentHashSet();
 
     public DirectoryWalker(final Md5Computer md5Computer) {
         Preconditions.checkNotNull(md5Computer, "null MD5 computer");
@@ -56,7 +62,7 @@ public class DirectoryWalker {
         duplicatesFinder = new DuplicatesFinder(md5Computer);
     }
 
-    public Set<String> extractDuplicates(final Iterable<String> inputPaths) {
+    public Set<String> extractDuplicates(final Iterable<String> inputPaths) throws IOException {
         Preconditions.checkNotNull(inputPaths, "null input path collection");
 
         paths.clear();
@@ -64,14 +70,18 @@ public class DirectoryWalker {
         inputPaths.forEach(rootPath -> {
             final Path path = Paths.get(rootPath);
 
-            if (Files.isDirectory(path)) {
-                handleDirectory(path);
-            } else if (Files.isRegularFile(path)) {
-                handleRegularFile(path);
-            } else {
-                LOGGER.warn("[{}] is not a directory or a regular file", rootPath);
+            if (FilenamePredicate.INSTANCE.accept(path)) {
+                if (Files.isDirectory(path)) {
+                    handleDirectory(path);
+                } else if (Files.isRegularFile(path)) {
+                    handleRegularFile(path);
+                } else {
+                    LOGGER.warn("[{}] is not a directory or a regular file", rootPath);
+                }
             }
         });
+
+        reportPathsInError();
 
         return duplicatesFinder.extractDuplicates(paths);
     }
@@ -93,9 +103,27 @@ public class DirectoryWalker {
     }
 
     private void handleRegularFile(final Path path) {
-        getMetricRegistry().counter(name("fs", "counter", "files")).inc();
+        try {
+            try (final Timer.Context ignored = getMetricRegistry().timer(name("fs", "timer", "files", "attributes", "read")).time()) {
+                paths.add(new PathElement(path, Files.readAttributes(path, BasicFileAttributes.class)));
+            }
 
-        paths.add(path);
+            getMetricRegistry().counter(name("fs", "counter", "files", "ok")).inc();
+        } catch (final IOException e) {
+            pathsInError.add(path);
+
+            getMetricRegistry().counter(name("fs", "counter", "files", "ko")).inc();
+        }
+    }
+
+    private void reportPathsInError() throws IOException {
+        final Path output = Paths.get(System.getProperty("user.dir"), "errors.log");
+        final String content = pathsInError.parallelStream()
+                                           .map(Path::toString)
+                                           .map(PathEscapeFunction.INSTANCE)
+                                           .collect(joining(System.getProperty("line.separator")));
+
+        Files.write(output, content.getBytes(UTF_8));
     }
 
 }

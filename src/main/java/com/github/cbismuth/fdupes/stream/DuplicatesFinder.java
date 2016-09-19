@@ -24,14 +24,13 @@
 
 package com.github.cbismuth.fdupes.stream;
 
+import com.github.cbismuth.fdupes.immutable.PathElement;
 import com.github.cbismuth.fdupes.io.BufferedAnalyzer;
 import com.github.cbismuth.fdupes.io.PathEscapeFunction;
-import com.github.cbismuth.fdupes.io.PathUtils;
 import com.github.cbismuth.fdupes.md5.Md5Computer;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -55,14 +54,14 @@ public class DuplicatesFinder {
         this.md5Computer = md5Computer;
     }
 
-    public Set<String> extractDuplicates(final Collection<Path> elements) {
+    public Set<String> extractDuplicates(final Collection<PathElement> elements) {
         Preconditions.checkNotNull(elements, "null file metadata collection");
 
-        Stream<Path> stream = elements.parallelStream();
+        Stream<PathElement> stream = elements.parallelStream();
 
         final String passName1 = "size";
         LOGGER.info("Pass 1/3 - compare file by size ...");
-        stream = handler.removeUniqueFilesByKey(stream, passName1, PathUtils::getPathSize);
+        stream = handler.removeUniqueFilesByKey(stream, passName1, PathElement::size);
         LOGGER.info("Pass 1/3 - compare file by size completed! - {} duplicate(s) found", getCount(passName1));
 
         final String passName2 = "md5";
@@ -78,7 +77,7 @@ public class DuplicatesFinder {
                                             .parallelStream()
                                             .map(Map.Entry::getValue)
                                             .flatMap(Collection::stream)
-                                            .map(Path::toString)
+                                            .map(PathElement::toString)
                                             .map(PathEscapeFunction.INSTANCE)
                                             .collect(toSet());
         LOGGER.info("Pass 3/3 - compare file byte-by-byte completed! - {} duplicate(s) found", collect.size());
