@@ -27,7 +27,7 @@ package com.github.cbismuth.fdupes.stream;
 import com.github.cbismuth.fdupes.Main;
 import com.github.cbismuth.fdupes.io.DirectoryWalker;
 import com.github.cbismuth.fdupes.io.DuplicatesWriter;
-import com.github.cbismuth.fdupes.io.PathUtils;
+import com.github.cbismuth.fdupes.io.PathHelper;
 import com.github.cbismuth.fdupes.md5.Md5Computer;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +44,7 @@ import static org.junit.Assert.assertEquals;
 
 public class SimpleDirectoryWalkerTest {
 
-    private final PathUtils helper = new PathUtils();
+    private final PathHelper helper = new PathHelper();
 
     private final Main systemUnderTest;
 

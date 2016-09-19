@@ -28,7 +28,7 @@ import com.github.cbismuth.fdupes.Main;
 import com.github.cbismuth.fdupes.immutable.PathElement;
 import com.github.cbismuth.fdupes.io.DirectoryWalker;
 import com.github.cbismuth.fdupes.io.DuplicatesWriter;
-import com.github.cbismuth.fdupes.io.PathUtils;
+import com.github.cbismuth.fdupes.io.PathHelper;
 import com.github.cbismuth.fdupes.md5.Md5Computer;
 import org.junit.Before;
 import org.junit.Test;
@@ -95,7 +95,7 @@ public class DirectoryWalkerTest {
     private static final long DIRECTORY_DUPLICATION_FACTOR = 10L;
     private static final long FILE_DUPLICATION_FACTOR = 20L;
 
-    private final PathUtils helper = new PathUtils();
+    private final PathHelper helper = new PathHelper();
 
     private final Main systemUnderTest;
 
