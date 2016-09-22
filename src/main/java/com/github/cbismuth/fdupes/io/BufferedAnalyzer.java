@@ -36,7 +36,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static com.codahale.metrics.MetricRegistry.name;
 import static com.github.cbismuth.fdupes.collect.MultimapCollector.toMultimap;
+import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static com.google.common.collect.Multimaps.synchronizedListMultimap;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -76,7 +78,11 @@ public class BufferedAnalyzer {
                                                          .sorted(PathComparator.INSTANCE)
                                                          .collect(toList());
 
+                getMetricRegistry().counter(name("collector", "bytes", "counter", "total")).inc(collect.size());
+
                 final PathElement original = collect.remove(0);
+
+                getMetricRegistry().counter(name("collector", "bytes", "counter", "duplicates")).inc(collect.size());
 
                 duplicates.putAll(original, collect);
             } else {
