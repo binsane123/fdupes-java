@@ -312,6 +312,12 @@
             <artifactId>zt-exec</artifactId>
             <version>${zt-exec.version}</version>
         </dependency>
+        <dependency>
+            <!-- csv reporting parser -->
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>3.8</version>
+        </dependency>
 
         <dependency>
             <!-- metric accumulator -->
