@@ -89,13 +89,10 @@ public class BufferedAnalyzer {
                 buffers.parallelStream()
                        .collect(toMultimap(ByteBuffer::getByteString))
                        .asMap()
-                       .entrySet()
+                       .values()
                        .parallelStream()
-                       .forEach(e -> {
-                           if (e.getValue().size() > 1) {
-                               removeUniqueFiles(duplicates, e.getValue());
-                           }
-                       });
+                       .filter(c -> c.size() > 1)
+                       .forEach(c -> removeUniqueFiles(duplicates, c));
             }
         }
     }
