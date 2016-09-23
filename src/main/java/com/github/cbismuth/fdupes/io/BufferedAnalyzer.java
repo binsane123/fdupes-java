@@ -24,6 +24,7 @@
 
 package com.github.cbismuth.fdupes.io;
 
+import com.codahale.metrics.Gauge;
 import com.github.cbismuth.fdupes.collect.PathComparator;
 import com.github.cbismuth.fdupes.immutable.PathElement;
 import com.google.common.collect.ArrayListMultimap;
@@ -61,6 +62,8 @@ public class BufferedAnalyzer {
                         .map(ByteBuffer::new)
                         .collect(toList())
               ));
+
+        getMetricRegistry().register(name("collector", "bytes", "status", "finished"), (Gauge<Boolean>) () -> true);
 
         reportDuplicationSize(duplicates);
 
