@@ -109,19 +109,16 @@ public final class Main {
         final DirectoryWalker walker = new DirectoryWalker(md5);
         final DuplicatesWriter writer = new DuplicatesWriter();
 
-        final Path outputPath = new Main(md5, walker, writer).launchAndReport(args);
+        final Path outputPath = new Main(walker, writer).launchAndReport(args);
 
         LOGGER.info("Output file written at [{}]", outputPath);
     }
 
-    private final Md5Computer md5;
     private final DirectoryWalker walker;
     private final DuplicatesWriter writer;
 
-    public Main(final Md5Computer md5,
-                final DirectoryWalker walker,
+    public Main(final DirectoryWalker walker,
                 final DuplicatesWriter writer) {
-        this.md5 = md5;
         this.walker = walker;
         this.writer = writer;
     }
@@ -145,7 +142,7 @@ public final class Main {
     private Path launch(final Collection<String> args) throws IOException {
         try {
             return writer.write(walker.extractDuplicates(args));
-        } catch (final OutOfMemoryError e) {
+        } catch (final OutOfMemoryError ignored) {
             LOGGER.error("Not enough memory, solutions are:");
             LOGGER.error("\t- increase Java heap size (e.g. -Xmx512m),");
             LOGGER.error("\t- decrease byte buffer size (e.g. -Dfdupes.buffer.size=8k - default is 64k),");

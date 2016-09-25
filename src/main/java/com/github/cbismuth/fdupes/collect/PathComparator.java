@@ -33,7 +33,7 @@ import java.util.Comparator;
 
 public class PathComparator implements Comparator<PathElement> {
 
-    public static final PathComparator INSTANCE = new PathComparator();
+    public static final Comparator<PathElement> INSTANCE = new PathComparator();
 
     @Override
     public int compare(final PathElement o1, final PathElement o2) {

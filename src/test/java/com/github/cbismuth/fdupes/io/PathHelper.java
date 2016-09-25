@@ -131,7 +131,7 @@ public class PathHelper {
 
         final StringBuilder sb = new StringBuilder();
         for (long i = 0; i < max; i++) {
-            sb.append(randomUUID()).append("\n");
+            sb.append(randomUUID()).append('\n');
         }
 
         return createFileWithContent(parentDirectory, uniqueString(), uniqueString(), sb.toString().getBytes(UTF_8));

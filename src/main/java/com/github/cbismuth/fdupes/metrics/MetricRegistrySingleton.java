@@ -26,7 +26,7 @@ package com.github.cbismuth.fdupes.metrics;
 
 import com.codahale.metrics.MetricRegistry;
 
-public class MetricRegistrySingleton {
+public final class MetricRegistrySingleton {
 
     private static final MetricRegistrySingleton INSTANCE = new MetricRegistrySingleton();
 

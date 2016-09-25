@@ -67,13 +67,13 @@ public class DuplicatesFinder {
 
         Stream<PathElement> stream = elements.parallelStream();
 
-        final String passName1 = "size";
         LOGGER.info("Pass 1/3 - compare file by size ...");
+        final String passName1 = "size";
         stream = handler.removeUniqueFilesByKey(stream, passName1, PathElement::size);
         LOGGER.info("Pass 1/3 - compare file by size completed! - {} duplicate(s) found", getCount(passName1));
 
-        final String passName2 = "md5";
         LOGGER.info("Pass 2/3 - compare file by MD5 ...");
+        final String passName2 = "md5";
         stream = handler.removeUniqueFilesByKey(stream, passName2, md5Computer::compute);
         LOGGER.info("Pass 2/3 - compare file by MD5 completed! - {} duplicate(s) found", getCount(passName2));
 

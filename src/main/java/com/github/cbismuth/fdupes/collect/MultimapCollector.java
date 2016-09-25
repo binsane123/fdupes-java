@@ -121,7 +121,7 @@ public final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K
     }
 
     @Override
-    public Set<Characteristics> characteristics() {
+    public Set<Collector.Characteristics> characteristics() {
         return ImmutableSet.of(UNORDERED);
     }
 

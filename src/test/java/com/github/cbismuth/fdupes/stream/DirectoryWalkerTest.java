@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import java.nio.file.Files;
@@ -65,21 +66,21 @@ public class DirectoryWalkerTest {
 
     private static Md5Computer newForceByteComparisonMock() {
         final Md5Computer mock = Mockito.mock(Md5Computer.class);
-        Mockito.when(mock.compute(Mockito.any(PathElement.class))).thenReturn(randomUUID().toString());
+        Mockito.when(mock.compute(Matchers.any(PathElement.class))).thenReturn(randomUUID().toString());
         Mockito.when(mock.toString()).thenReturn("byte-by-byte");
         return mock;
     }
 
     private static Md5Computer newNativeMd5WithExceptionMock() {
         final Md5Computer mock = Mockito.mock(Md5Computer.class);
-        Mockito.when(mock.nativeMd5(Mockito.any(PathElement.class))).thenThrow(new RuntimeException());
+        Mockito.when(mock.nativeMd5(Matchers.any(PathElement.class))).thenThrow(new RuntimeException());
         Mockito.when(mock.toString()).thenReturn("mock-exception-md5-native");
         return mock;
     }
 
     private static Md5Computer newJvmMd5WithExceptionMock() {
         final Md5Computer mock = Mockito.mock(Md5Computer.class);
-        Mockito.when(mock.jvmMd5(Mockito.any(PathElement.class))).thenThrow(new RuntimeException());
+        Mockito.when(mock.jvmMd5(Matchers.any(PathElement.class))).thenThrow(new RuntimeException());
         Mockito.when(mock.toString()).thenReturn("mock-exception-md5-jvm");
         return mock;
     }
@@ -103,7 +104,7 @@ public class DirectoryWalkerTest {
         final DirectoryWalker walker = new DirectoryWalker(md5);
         final DuplicatesWriter writer = new DuplicatesWriter();
 
-        systemUnderTest = new Main(md5, walker, writer);
+        systemUnderTest = new Main(walker, writer);
     }
 
     @Test

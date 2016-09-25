@@ -45,8 +45,8 @@ public class ByteBuffer {
     private final PathElement element;
     private final BufferedInputStream inputStream;
 
-    private int offset;
-    private int length;
+    private int offset = 0;
+    private int length = 0;
     private final byte[] buffer = new byte[BUFFER_SIZE];
 
     public ByteBuffer(final PathElement element) {

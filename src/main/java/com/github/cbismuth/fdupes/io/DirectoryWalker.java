@@ -109,7 +109,7 @@ public class DirectoryWalker {
             }
 
             getMetricRegistry().counter(name("fs", "counter", "files", "ok")).inc();
-        } catch (final IOException e) {
+        } catch (final IOException ignored) {
             pathsInError.add(path);
 
             getMetricRegistry().counter(name("fs", "counter", "files", "ko")).inc();

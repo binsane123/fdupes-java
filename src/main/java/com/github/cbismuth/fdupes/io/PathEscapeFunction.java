@@ -30,7 +30,7 @@ import java.util.function.Function;
 
 import static java.lang.String.format;
 
-public class PathEscapeFunction implements Function<String, String> {
+public final class PathEscapeFunction implements Function<String, String> {
 
     public static final PathEscapeFunction INSTANCE = new PathEscapeFunction();
 

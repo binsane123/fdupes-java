@@ -53,7 +53,7 @@ public class SimpleDirectoryWalkerTest {
         final DirectoryWalker walker = new DirectoryWalker(md5);
         final DuplicatesWriter writer = new DuplicatesWriter();
 
-        systemUnderTest = new Main(md5, walker, writer);
+        systemUnderTest = new Main(walker, writer);
     }
 
     @Before
