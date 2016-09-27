@@ -24,6 +24,7 @@
 
 package com.github.cbismuth.fdupes.stream;
 
+import com.github.cbismuth.fdupes.collect.PathAnalyser;
 import com.github.cbismuth.fdupes.immutable.PathElement;
 import com.github.cbismuth.fdupes.io.BufferedAnalyzer;
 import com.github.cbismuth.fdupes.io.PathEscapeFunction;
@@ -35,6 +36,9 @@ import org.slf4j.Logger;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -44,6 +48,7 @@ import java.util.stream.StreamSupport;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
+import static java.lang.System.currentTimeMillis;
 import static java.util.Spliterator.ORDERED;
 import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.stream.Collectors.toSet;
@@ -80,7 +85,11 @@ public class DuplicatesFinder {
         LOGGER.info("Pass 3/3 - compare file byte-by-byte ...");
         final BufferedAnalyzer analyzer = new BufferedAnalyzer();
         final Multimap<PathElement, PathElement> duplicates = analyzer.analyze(stream);
+
+        // TODO these API should be moved to dedicated components
         reportDuplicatesAsCsv(duplicates);
+        moveUniqueFilesWithTimestampBasedName(duplicates.keySet());
+
         final Set<String> collect = duplicates.asMap()
                                               .entrySet()
                                               .parallelStream()
@@ -92,6 +101,21 @@ public class DuplicatesFinder {
         LOGGER.info("Pass 3/3 - compare file byte-by-byte completed! - {} duplicate(s) found", collect.size());
 
         return collect;
+    }
+
+    private void moveUniqueFilesWithTimestampBasedName(final Iterable<PathElement> pathElements) throws IOException {
+        // TODO the target directory should be retrieve from program arguments and check for non-existence
+        final Path destination = Files.createDirectory(Paths.get(String.valueOf(currentTimeMillis())));
+        final PathAnalyser pathAnalyser = new PathAnalyser();
+
+        pathElements.forEach(pathElement -> pathAnalyser.getTimestampPath(destination, pathElement.getPath())
+                                                        .ifPresent(path -> {
+                                                            try {
+                                                                Files.move(pathElement.getPath(), path);
+                                                            } catch (final IOException e) {
+                                                                LOGGER.error(e.getMessage(), e);
+                                                            }
+                                                        }));
     }
 
     private void reportDuplicatesAsCsv(final Multimap<PathElement, PathElement> duplicates) throws IOException {
