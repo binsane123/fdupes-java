@@ -28,8 +28,10 @@ import com.codahale.metrics.Timer;
 import com.github.cbismuth.fdupes.collect.FilenamePredicate;
 import com.github.cbismuth.fdupes.immutable.PathElement;
 import com.github.cbismuth.fdupes.md5.Md5Computer;
+import com.github.cbismuth.fdupes.report.ErrorReporter;
 import com.github.cbismuth.fdupes.stream.DuplicatesFinder;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Multimap;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -43,8 +45,6 @@ import java.util.Set;
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static com.google.common.collect.Sets.newConcurrentHashSet;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.stream.Collectors.joining;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class DirectoryWalker {
@@ -62,7 +62,7 @@ public class DirectoryWalker {
         duplicatesFinder = new DuplicatesFinder(md5Computer);
     }
 
-    public Set<String> extractDuplicates(final Iterable<String> inputPaths) throws IOException {
+    public Multimap<PathElement, PathElement> extractDuplicates(final Iterable<String> inputPaths) throws IOException {
         Preconditions.checkNotNull(inputPaths, "null input path collection");
 
         paths.clear();
@@ -81,7 +81,7 @@ public class DirectoryWalker {
             }
         });
 
-        reportPathsInError();
+        new ErrorReporter().report(pathsInError);
 
         return duplicatesFinder.extractDuplicates(paths);
     }
@@ -114,16 +114,6 @@ public class DirectoryWalker {
 
             getMetricRegistry().counter(name("fs", "counter", "files", "ko")).inc();
         }
-    }
-
-    private void reportPathsInError() throws IOException {
-        final Path output = Paths.get(System.getProperty("user.dir"), "errors.log");
-        final String content = pathsInError.parallelStream()
-                                           .map(Path::toString)
-                                           .map(PathEscapeFunction.INSTANCE)
-                                           .collect(joining(System.getProperty("line.separator")));
-
-        Files.write(output, content.getBytes(UTF_8));
     }
 
 }

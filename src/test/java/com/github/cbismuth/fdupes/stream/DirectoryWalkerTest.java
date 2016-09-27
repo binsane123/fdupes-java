@@ -27,7 +27,6 @@ package com.github.cbismuth.fdupes.stream;
 import com.github.cbismuth.fdupes.Main;
 import com.github.cbismuth.fdupes.immutable.PathElement;
 import com.github.cbismuth.fdupes.io.DirectoryWalker;
-import com.github.cbismuth.fdupes.io.DuplicatesWriter;
 import com.github.cbismuth.fdupes.io.PathHelper;
 import com.github.cbismuth.fdupes.md5.Md5Computer;
 import org.junit.Before;
@@ -102,9 +101,8 @@ public class DirectoryWalkerTest {
 
     public DirectoryWalkerTest(final Md5Computer md5) {
         final DirectoryWalker walker = new DirectoryWalker(md5);
-        final DuplicatesWriter writer = new DuplicatesWriter();
 
-        systemUnderTest = new Main(walker, writer);
+        systemUnderTest = new Main(walker);
     }
 
     @Test

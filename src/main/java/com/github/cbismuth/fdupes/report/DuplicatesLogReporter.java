@@ -22,26 +22,35 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.github.cbismuth.fdupes.io;
+package com.github.cbismuth.fdupes.report;
 
-import com.google.common.base.Preconditions;
+import com.github.cbismuth.fdupes.immutable.PathElement;
+import com.github.cbismuth.fdupes.io.PathEscapeFunction;
+import com.google.common.collect.Multimap;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 
-public class DuplicatesWriter {
+public class DuplicatesLogReporter {
 
-    public Path write(final Collection<String> inputPaths) throws IOException {
-        Preconditions.checkNotNull(inputPaths, "null input path collection");
-
+    public Path report(final Multimap<PathElement, PathElement> duplicates) throws IOException {
         final Path output = Paths.get(System.getProperty("user.dir"), "duplicates.log");
-        final String content = inputPaths.parallelStream().collect(joining(System.getProperty("line.separator")));
+
+        final String content = duplicates.asMap()
+                                         .entrySet()
+                                         .stream()
+                                         .map(Map.Entry::getValue)
+                                         .flatMap(Collection::stream)
+                                         .map(PathElement::toString)
+                                         .map(PathEscapeFunction.INSTANCE)
+                                         .collect(joining(System.getProperty("line.separator")));
 
         Files.write(output, content.getBytes(UTF_8));
 

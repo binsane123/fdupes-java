@@ -25,9 +25,13 @@
 package com.github.cbismuth.fdupes;
 
 import com.codahale.metrics.Slf4jReporter;
+import com.github.cbismuth.fdupes.immutable.PathElement;
 import com.github.cbismuth.fdupes.io.DirectoryWalker;
-import com.github.cbismuth.fdupes.io.DuplicatesWriter;
+import com.github.cbismuth.fdupes.io.PathOrganizer;
 import com.github.cbismuth.fdupes.md5.Md5Computer;
+import com.github.cbismuth.fdupes.report.DuplicatesCsvReporter;
+import com.github.cbismuth.fdupes.report.DuplicatesLogReporter;
+import com.google.common.collect.Multimap;
 import org.apache.spark.network.util.JavaUtils;
 import org.slf4j.Logger;
 
@@ -107,20 +111,16 @@ public final class Main {
     private static void execute(final String[] args) throws IOException {
         final Md5Computer md5 = new Md5Computer();
         final DirectoryWalker walker = new DirectoryWalker(md5);
-        final DuplicatesWriter writer = new DuplicatesWriter();
 
-        final Path outputPath = new Main(walker, writer).launchAndReport(args);
+        final Path outputPath = new Main(walker).launchAndReport(args);
 
         LOGGER.info("Output file written at [{}]", outputPath);
     }
 
     private final DirectoryWalker walker;
-    private final DuplicatesWriter writer;
 
-    public Main(final DirectoryWalker walker,
-                final DuplicatesWriter writer) {
+    public Main(final DirectoryWalker walker) {
         this.walker = walker;
-        this.writer = writer;
     }
 
     public Path launchAndReport(final String... args) throws IOException {
@@ -141,7 +141,14 @@ public final class Main {
 
     private Path launch(final Collection<String> args) throws IOException {
         try {
-            return writer.write(walker.extractDuplicates(args));
+            final Multimap<PathElement, PathElement> duplicates = walker.extractDuplicates(args);
+
+            new DuplicatesCsvReporter().report(duplicates);
+
+            // TODO add option to organize files by timestamp
+            new PathOrganizer().organize(duplicates.keys());
+
+            return new DuplicatesLogReporter().report(duplicates);
         } catch (final OutOfMemoryError ignored) {
             LOGGER.error("Not enough memory, solutions are:");
             LOGGER.error("\t- increase Java heap size (e.g. -Xmx512m),");

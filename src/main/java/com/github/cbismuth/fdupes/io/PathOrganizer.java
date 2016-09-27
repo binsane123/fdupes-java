@@ -24,32 +24,34 @@
 
 package com.github.cbismuth.fdupes.io;
 
-import org.junit.Test;
+import com.github.cbismuth.fdupes.collect.PathAnalyser;
+import com.github.cbismuth.fdupes.immutable.PathElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
+import java.nio.file.Paths;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
+import static java.lang.System.currentTimeMillis;
 
-public class DuplicatesWriterTest {
+public class PathOrganizer {
 
-    private final DuplicatesWriter systemUnderTest = new DuplicatesWriter();
+    private static final Logger LOGGER = LoggerFactory.getLogger(PathOrganizer.class);
 
-    @Test
-    public void testWrite() throws IOException {
-        // GIVEN
-        final Collection<String> strings = asList("abcd", "xyz");
+    public void organize(final Iterable<PathElement> pathElements) throws IOException {
+        final Path destination = Files.createDirectory(Paths.get(String.valueOf(currentTimeMillis())));
+        final PathAnalyser pathAnalyser = new PathAnalyser();
 
-        // WHEN
-        final Path path = systemUnderTest.write(strings);
-
-        // THEN
-        final String actual = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-        assertEquals("abcd" + System.getProperty("line.separator") + "xyz", actual);
+        pathElements.forEach(pathElement -> pathAnalyser.getTimestampPath(destination, pathElement.getPath())
+                                                        .ifPresent(path -> {
+                                                            try {
+                                                                Files.move(pathElement.getPath(), path);
+                                                            } catch (final IOException e) {
+                                                                LOGGER.error(e.getMessage(), e);
+                                                            }
+                                                        }));
     }
 
 }
