@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.github.cbismuth.fdupes.immutable;
+package com.github.cbismuth.fdupes.container.immutable;
 
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -56,11 +56,6 @@ public class PathElement {
 
     public long lastAccessTime() {
         return attributes.lastAccessTime().toMillis();
-    }
-
-    @Override
-    public String toString() {
-        return path.toString();
     }
 
 }

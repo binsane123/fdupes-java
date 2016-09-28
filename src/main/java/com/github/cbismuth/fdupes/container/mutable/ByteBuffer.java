@@ -22,9 +22,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.github.cbismuth.fdupes.io;
+package com.github.cbismuth.fdupes.container.mutable;
 
-import com.github.cbismuth.fdupes.immutable.PathElement;
+import com.github.cbismuth.fdupes.container.immutable.PathElement;
 import com.google.common.base.Throwables;
 import com.google.common.primitives.UnsignedBytes;
 import org.slf4j.Logger;
@@ -35,32 +35,33 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static com.github.cbismuth.fdupes.Main.BUFFER_SIZE;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class ByteBuffer {
 
     private static final Logger LOGGER = getLogger(ByteBuffer.class);
 
-    private final PathElement element;
+    private final PathElement pathElement;
     private final BufferedInputStream inputStream;
 
     private int offset = 0;
     private int length = 0;
-    private final byte[] buffer = new byte[BUFFER_SIZE];
+    private final byte[] buffer;
 
-    public ByteBuffer(final PathElement element) {
-        this.element = element;
+    public ByteBuffer(final PathElement pathElement, final int bufferSize) {
+        this.pathElement = pathElement;
 
         try {
-            inputStream = new BufferedInputStream(new FileInputStream(new File(this.element.toString())));
+            inputStream = new BufferedInputStream(new FileInputStream(new File(this.pathElement.getPath().toString())));
         } catch (final Exception e) {
             throw Throwables.propagate(e);
         }
+
+        buffer = new byte[bufferSize];
     }
 
-    public PathElement getElement() {
-        return element;
+    public PathElement getPathElement() {
+        return pathElement;
     }
 
     public String getByteString() {

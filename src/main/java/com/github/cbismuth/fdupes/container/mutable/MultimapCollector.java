@@ -22,9 +22,8 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.github.cbismuth.fdupes.collect;
+package com.github.cbismuth.fdupes.container.mutable;
 
-import com.codahale.metrics.Gauge;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
@@ -37,47 +36,31 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
-import static com.codahale.metrics.MetricRegistry.name;
-import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static com.google.common.collect.Multimaps.synchronizedListMultimap;
 import static java.util.stream.Collector.Characteristics.UNORDERED;
 
 public final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K, V>, Multimap<K, V>> {
 
-    private final String name;
-
     private final Function<T, K> keyGetter;
     private final Function<T, V> valueGetter;
 
-    private MultimapCollector(final String name,
-                              final Function<T, K> keyGetter,
+    private MultimapCollector(final Function<T, K> keyGetter,
                               final Function<T, V> valueGetter) {
-        this.name = name;
-
         this.keyGetter = keyGetter;
         this.valueGetter = valueGetter;
     }
 
     public static <T, K, V> MultimapCollector<T, K, T> toMultimap(final Function<T, K> keyGetter) {
-        Preconditions.checkNotNull("", "null multimap name");
         Preconditions.checkNotNull(keyGetter, "null multimap key getter");
 
-        return toMultimap("", keyGetter, v -> v);
+        return toMultimap(keyGetter, v -> v);
     }
 
-    public static <T, K, V> MultimapCollector<T, K, T> toMultimap(final String name, final Function<T, K> keyGetter) {
-        Preconditions.checkNotNull(name, "null multimap name");
-        Preconditions.checkNotNull(keyGetter, "null multimap key getter");
-
-        return toMultimap(name, keyGetter, v -> v);
-    }
-
-    public static <T, K, V> MultimapCollector<T, K, V> toMultimap(final String name, final Function<T, K> keyGetter, final Function<T, V> valueGetter) {
-        Preconditions.checkNotNull(name, "null multimap name");
+    public static <T, K, V> MultimapCollector<T, K, V> toMultimap(final Function<T, K> keyGetter, final Function<T, V> valueGetter) {
         Preconditions.checkNotNull(keyGetter, "null multimap key getter");
         Preconditions.checkNotNull(valueGetter, "null multimap value getter");
 
-        return new MultimapCollector<>(name, keyGetter, valueGetter);
+        return new MultimapCollector<>(keyGetter, valueGetter);
     }
 
     @Override
@@ -88,16 +71,8 @@ public final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K
     @Override
     public BiConsumer<Multimap<K, V>, T> accumulator() {
         return (map, element) -> {
-            if (!name.isEmpty()) {
-                getMetricRegistry().counter(name("collector", name, "counter", "total")).inc();
-            }
-
             final K key = keyGetter.apply(element);
             final V value = valueGetter.apply(element);
-
-            if (!name.isEmpty() && map.containsKey(key)) {
-                getMetricRegistry().counter(name("collector", name, "counter", "duplicates")).inc();
-            }
 
             map.put(key, value);
         };
@@ -113,10 +88,6 @@ public final class MultimapCollector<T, K, V> implements Collector<T, Multimap<K
 
     @Override
     public Function<Multimap<K, V>, Multimap<K, V>> finisher() {
-        if (!name.isEmpty()) {
-            getMetricRegistry().register(name("collector", name, "status", "finished"), (Gauge<Boolean>) () -> true);
-        }
-
         return map -> map;
     }
 

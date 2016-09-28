@@ -41,12 +41,12 @@ public class PathAnalyserTest {
     @Test
     public void testGetTimestampPath_onMatch_notExisting() throws IOException {
         final Path destination = Files.createTempDirectory(getClass().getSimpleName());
-        final Path path = Paths.get("/somewhere/on/disk/20160102121314-1.JPG");
+        final Path path = Paths.get("somewhere", "on", "disk", "MOV20160102121314-1.MOV");
 
         final Optional<Path> actual = systemUnderTest.getTimestampPath(destination, path);
         final Path expected = Paths.get(destination.toString(),
                                         "2016", "01", "02",
-                                        "20160102121314.JPG");
+                                        "20160102121314.MOV");
 
         assertEquals(expected.toString(), actual.get().toString());
     }
@@ -56,20 +56,20 @@ public class PathAnalyserTest {
         final Path destination = Files.createTempDirectory(getClass().getSimpleName());
         final Path path = Paths.get(destination.toString(),
                                     "2016", "01", "02",
-                                    "20160102121314.JPG");
+                                    "MOV20160102121314.MOV");
 
         Files.createDirectories(Paths.get(destination.toString(), "2016", "01", "02"));
         final Path created1 = Files.createFile(Paths.get(destination.toString(),
                                                          "2016", "01", "02",
-                                                         "20160102121314.JPG"));
+                                                         "20160102121314.MOV"));
         final Path created2 = Files.createFile(Paths.get(destination.toString(),
                                                          "2016", "01", "02",
-                                                         "20160102121314-1.JPG"));
+                                                         "20160102121314-1.MOV"));
 
         final Optional<Path> actual = systemUnderTest.getTimestampPath(destination, path);
         final Path expected = Paths.get(destination.toString(),
                                         "2016", "01", "02",
-                                        "20160102121314-2.JPG");
+                                        "20160102121314-2.MOV");
 
         assertEquals(expected.toString(), actual.get().toString());
 
@@ -80,7 +80,7 @@ public class PathAnalyserTest {
     @Test
     public void testGetTimestampPath_onNotMatch() throws IOException {
         final Path destination = Files.createTempDirectory(getClass().getSimpleName());
-        final Path path = Paths.get("/somewhere/on/disk/2016-01-02-12-13-14.JPG");
+        final Path path = Paths.get("somewhere", "on", "disk", "MOV2016-01-02-12-13-14.MOV");
 
         final Optional<Path> actual = systemUnderTest.getTimestampPath(destination, path);
 

@@ -24,78 +24,90 @@
 
 package com.github.cbismuth.fdupes.io;
 
-import com.codahale.metrics.Gauge;
+import com.github.cbismuth.fdupes.cli.SystemPropertyGetter;
 import com.github.cbismuth.fdupes.collect.PathComparator;
-import com.github.cbismuth.fdupes.immutable.PathElement;
-import com.google.common.collect.ArrayListMultimap;
+import com.github.cbismuth.fdupes.container.immutable.PathElement;
+import com.github.cbismuth.fdupes.container.mutable.ByteBuffer;
 import com.google.common.collect.Multimap;
 import org.slf4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
+import java.util.Set;
 
-import static com.codahale.metrics.MetricRegistry.name;
-import static com.github.cbismuth.fdupes.collect.MultimapCollector.toMultimap;
-import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
-import static com.google.common.collect.Multimaps.synchronizedListMultimap;
+import static com.github.cbismuth.fdupes.container.mutable.MultimapCollector.toMultimap;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 
+@Component
 public class BufferedAnalyzer {
 
     private static final Logger LOGGER = getLogger(BufferedAnalyzer.class);
 
-    public Multimap<PathElement, PathElement> analyze(final Stream<PathElement> stream) {
-        final Multimap<PathElement, PathElement> duplicates = synchronizedListMultimap(ArrayListMultimap.create());
+    private final PathComparator pathComparator;
+    private final SystemPropertyGetter systemPropertyGetter;
 
-        stream.collect(toMultimap(PathElement::size))
-              .asMap()
-              .entrySet()
-              .parallelStream()
-              .map(Map.Entry::getValue)
-              .forEach(values -> removeUniqueFiles(
-                  duplicates,
-                  values.parallelStream()
-                        .map(ByteBuffer::new)
-                        .collect(toList())
-              ));
-
-        getMetricRegistry().register(name("collector", "bytes", "status", "finished"), (Gauge<Boolean>) () -> true);
-
-        reportDuplicationSize(duplicates);
-
-        return duplicates;
+    public BufferedAnalyzer(final PathComparator pathComparator,
+                            final SystemPropertyGetter systemPropertyGetter) {
+        this.pathComparator = pathComparator;
+        this.systemPropertyGetter = systemPropertyGetter;
     }
 
-    private void removeUniqueFiles(final Multimap<PathElement, PathElement> duplicates, final Collection<ByteBuffer> buffers) {
+    public void analyze(final Collection<PathElement> input,
+                        final Set<PathElement> uniquesElements,
+                        final Multimap<PathElement, PathElement> duplicates) {
+        input.parallelStream()
+             .collect(toMultimap(PathElement::size))
+             .asMap()
+             .entrySet()
+             .parallelStream()
+             .map(Map.Entry::getValue)
+             .forEach(values -> removeUniqueFiles(
+                 values.parallelStream()
+                       .map(pathElement -> new ByteBuffer(pathElement, systemPropertyGetter.getBufferSize()))
+                       .collect(toList()),
+                 uniquesElements,
+                 duplicates
+             ));
+
+        reportDuplicationSize(duplicates);
+    }
+
+    private void removeUniqueFiles(final Collection<ByteBuffer> buffers,
+                                   final Set<PathElement> uniquesElements,
+                                   final Multimap<PathElement, PathElement> duplicates) {
         if (!buffers.isEmpty() && buffers.size() != 1) {
             buffers.forEach(ByteBuffer::read);
 
             if (buffers.iterator().next().getByteString().isEmpty()) {
                 final List<PathElement> collect = buffers.parallelStream()
                                                          .peek(ByteBuffer::close)
-                                                         .map(ByteBuffer::getElement)
-                                                         .sorted(PathComparator.INSTANCE)
+                                                         .map(ByteBuffer::getPathElement)
+                                                         .sorted(pathComparator)
                                                          .collect(toList());
-
-                getMetricRegistry().counter(name("collector", "bytes", "counter", "total")).inc(collect.size());
 
                 final PathElement original = collect.remove(0);
 
-                getMetricRegistry().counter(name("collector", "bytes", "counter", "duplicates")).inc(collect.size());
-
+                uniquesElements.add(original);
                 duplicates.putAll(original, collect);
             } else {
-                buffers.parallelStream()
-                       .collect(toMultimap(ByteBuffer::getByteString))
-                       .asMap()
-                       .values()
-                       .parallelStream()
-                       .filter(c -> c.size() > 1)
-                       .forEach(c -> removeUniqueFiles(duplicates, c));
+                final Collection<Collection<ByteBuffer>> values = buffers.parallelStream()
+                                                                         .collect(toMultimap(ByteBuffer::getByteString))
+                                                                         .asMap()
+                                                                         .values();
+
+                values.parallelStream()
+                      .filter(collection -> collection.size() == 1)
+                      .flatMap(Collection::stream)
+                      .map(ByteBuffer::getPathElement)
+                      .forEach(uniquesElements::add);
+
+                values.parallelStream()
+                      .filter(collection -> collection.size() > 1)
+                      .forEach(collection -> removeUniqueFiles(collection, uniquesElements, duplicates));
             }
         }
     }

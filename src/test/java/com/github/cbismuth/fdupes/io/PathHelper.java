@@ -26,6 +26,7 @@ package com.github.cbismuth.fdupes.io;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,6 +41,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.util.UUID.randomUUID;
 
+@Component
 public class PathHelper {
 
     public Path createSingleEmptyFile(final Path parentDirectory) throws IOException {
@@ -55,7 +57,7 @@ public class PathHelper {
     public Collection<Path> createNewSetWithDuplicatesBySize(final Path parentDirectory, final long directoryDuplicationFactor, final long fileDuplicationFactor) throws IOException {
         final Collection<Path> destination = newArrayList();
 
-        for (long i = 0L; i < directoryDuplicationFactor; i++) {
+        for (long l = 0L; l < directoryDuplicationFactor; l++) {
             final String subDirectoryName = uniqueString();
             final Path parentSubDirectory = createSubDirectory(parentDirectory, subDirectoryName);
 
@@ -72,7 +74,7 @@ public class PathHelper {
 
         final Collection<Path> destination = newArrayList();
 
-        for (long i = 0L; i < directoryDuplicationFactor; i++) {
+        for (long l = 0L; l < directoryDuplicationFactor; l++) {
             final String subDirectoryName = uniqueString();
             final Path parentSubDirectory = createSubDirectory(parentDirectory, subDirectoryName);
 
@@ -83,17 +85,17 @@ public class PathHelper {
     }
 
     private Path createEmptyFile(final Path parentDirectory, final String subDirectoryName, final String filename) throws IOException {
-        checkIsDirectory(parentDirectory);
+        checkDirectory(parentDirectory);
 
         return createFileWithContent(parentDirectory, subDirectoryName, filename, "".getBytes(UTF_8));
     }
 
     private Collection<Path> createUniqueFilesWithSingleUUIDContent(final Path parentDirectory, final long fileDuplicationFactor) throws IOException {
-        checkIsDirectory(parentDirectory);
+        checkDirectory(parentDirectory);
 
         final Collection<Path> destination = newArrayList();
 
-        for (long i = 0L; i < fileDuplicationFactor; i++) {
+        for (long l = 0L; l < fileDuplicationFactor; l++) {
             final Path uniqueFile = createUniqueFileWithSingleUUIDContent(parentDirectory);
 
             destination.add(uniqueFile);
@@ -103,17 +105,17 @@ public class PathHelper {
     }
 
     private Path createUniqueFileWithSingleUUIDContent(final Path parentDirectory) throws IOException {
-        checkIsDirectory(parentDirectory);
+        checkDirectory(parentDirectory);
 
         return createFileWithContent(parentDirectory, uniqueString(), uniqueString(), uniqueString().getBytes(UTF_8));
     }
 
     private Collection<Path> createUniqueFilesWithRandomContent(final Path parentDirectory, final long fileDuplicationFactor) throws IOException {
-        checkIsDirectory(parentDirectory);
+        checkDirectory(parentDirectory);
 
         final Collection<Path> destination = newArrayList();
 
-        for (long i = 0L; i < fileDuplicationFactor; i++) {
+        for (long l = 0L; l < fileDuplicationFactor; l++) {
             final Path uniqueFile = createUniqueFileWithRandomContent(parentDirectory);
 
             destination.add(uniqueFile);
@@ -122,23 +124,23 @@ public class PathHelper {
         return destination;
     }
 
-    private static final AtomicLong LINES_COUNT = new AtomicLong(1);
+    private static final AtomicLong LINES_COUNT = new AtomicLong(100);
 
     private Path createUniqueFileWithRandomContent(final Path parentDirectory) throws IOException {
-        checkIsDirectory(parentDirectory);
+        checkDirectory(parentDirectory);
 
         final long max = LINES_COUNT.getAndIncrement();
 
-        final StringBuilder sb = new StringBuilder();
-        for (long i = 0; i < max; i++) {
-            sb.append(randomUUID()).append('\n');
+        final StringBuilder content = new StringBuilder();
+        for (long l = 0; l < max; l++) {
+            content.append(randomUUID()).append(System.getProperty("line.separator"));
         }
 
-        return createFileWithContent(parentDirectory, uniqueString(), uniqueString(), sb.toString().getBytes(UTF_8));
+        return createFileWithContent(parentDirectory, uniqueString(), uniqueString(), content.toString().getBytes(UTF_8));
     }
 
     private Path createFileWithContent(final Path parentDirectory, final String subDirectoryName, final String filename, final byte[] content) throws IOException {
-        checkIsDirectory(parentDirectory);
+        checkDirectory(parentDirectory);
 
         final Path parentPath = createSubDirectory(parentDirectory, subDirectoryName);
         final Path filePath = Paths.get(parentPath.toString(), filename);
@@ -149,7 +151,7 @@ public class PathHelper {
     }
 
     private Path createSubDirectory(final Path parentDirectory, final String subDirectoryName) throws IOException {
-        checkIsDirectory(parentDirectory);
+        checkDirectory(parentDirectory);
 
         final Path path = Paths.get(parentDirectory.toString(), subDirectoryName);
 
@@ -163,8 +165,8 @@ public class PathHelper {
 
         inputFiles.forEach(inputFile -> {
             try {
-                for (long i = 0L; i < fileDuplicationFactor; i++) {
-                    final Path duplicatedFile = duplicateFile(inputFile, outputDirectory, String.valueOf(i));
+                for (long l = 0L; l < fileDuplicationFactor; l++) {
+                    final Path duplicatedFile = duplicateFile(inputFile, outputDirectory, String.valueOf(l));
 
                     duplicatedFiles.add(duplicatedFile);
                 }
@@ -177,8 +179,8 @@ public class PathHelper {
     }
 
     private Path duplicateFile(final Path inputFile, final Path outputDirectory, final String suffix) throws IOException {
-        checkIsRegularFile(inputFile);
-        checkIsDirectory(outputDirectory);
+        checkRegularFile(inputFile);
+        checkDirectory(outputDirectory);
 
         final String outputFilename = format("%s%s", inputFile.getFileName(), suffix);
         final Path duplicatedFile = Paths.get(outputDirectory.toString(), outputFilename);
@@ -186,11 +188,11 @@ public class PathHelper {
         return Files.copy(inputFile, duplicatedFile, COPY_ATTRIBUTES);
     }
 
-    private void checkIsRegularFile(final Path path) {
+    private void checkRegularFile(final Path path) {
         Preconditions.checkArgument(Files.isRegularFile(path), format("[%s] isn't a regular file", path));
     }
 
-    private void checkIsDirectory(final Path path) {
+    private void checkDirectory(final Path path) {
         Preconditions.checkArgument(Files.isDirectory(path), format("[%s] isn't a directory", path));
     }
 

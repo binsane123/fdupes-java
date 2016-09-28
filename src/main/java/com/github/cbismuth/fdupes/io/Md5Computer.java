@@ -22,82 +22,41 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.github.cbismuth.fdupes.md5;
+package com.github.cbismuth.fdupes.io;
 
 import com.codahale.metrics.Timer;
-import com.github.cbismuth.fdupes.immutable.PathElement;
+import com.github.cbismuth.fdupes.container.immutable.PathElement;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.google.common.primitives.UnsignedBytes;
 import org.slf4j.Logger;
+import org.springframework.stereotype.Component;
 import org.zeroturnaround.exec.ProcessExecutor;
-
-import java.nio.file.Files;
-import java.security.MessageDigest;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Optional;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static com.google.common.collect.Lists.newArrayList;
-import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 import static org.slf4j.LoggerFactory.getLogger;
 
+@Component
 public class Md5Computer {
 
     private static final Logger LOGGER = getLogger(Md5Computer.class);
 
-    private final Optional<String> binaryName;
-
-    public Md5Computer() {
-        this(new OpenSslChecker().getBinaryName());
-    }
-
-    public Md5Computer(final String binaryName) {
-        this.binaryName = Optional.ofNullable(binaryName);
-    }
-
-    public String compute(final PathElement element) {
-        Preconditions.checkNotNull(element, "null file metadata");
+    public String compute(final PathElement pathElement) {
+        Preconditions.checkNotNull(pathElement, "null file metadata");
 
         try (final Timer.Context ignored = getMetricRegistry().timer(name("md5", "timer")).time()) {
-            return doIt(element);
+            return doIt(pathElement);
         } catch (final Exception e) {
             LOGGER.error("Can't compute MD5 from file [{}] ([{}]: [{}])",
-                         element, e.getClass().getSimpleName(), e.getMessage());
+                         pathElement.getPath(), e.getClass().getSimpleName(), e.getMessage());
 
             return randomUUID().toString();
         }
     }
 
     private String doIt(final PathElement element) {
-        if (binaryName.isPresent()) {
-            return nativeMd5(element);
-        } else {
-            return jvmMd5(element);
-        }
-    }
-
-    public String jvmMd5(final PathElement element) {
-        Preconditions.checkNotNull(element, "null file metadata");
-
-        try {
-            final String separator = ":";
-            final MessageDigest md = MessageDigest.getInstance("MD5");
-            final byte[] bytes = Files.readAllBytes(element.getPath());
-            final byte[] digest = md.digest(bytes);
-
-            return UnsignedBytes.join(separator, digest);
-        } catch (final Throwable e) {
-            throw Throwables.propagate(e);
-        }
-    }
-
-    public String nativeMd5(final PathElement element) {
-        Preconditions.checkNotNull(element, "null file metadata");
-
         try {
             return new ProcessExecutor().command(getNativeMd5Command(element))
                                         .readOutput(true)
@@ -110,23 +69,7 @@ public class Md5Computer {
     }
 
     private Iterable<String> getNativeMd5Command(final PathElement element) {
-        final Collection<String> command = newArrayList();
-
-        if (binaryName.isPresent() && Objects.equals("openssl", binaryName.get())) {
-            command.add("openssl");
-            command.add("md5");
-        } else {
-            throw new UnsupportedOperationException(format("Unsupported binary name [%s]!", binaryName));
-        }
-
-        command.add(element.toString());
-
-        return command;
-    }
-
-    @Override
-    public String toString() {
-        return binaryName.isPresent() ? "md5-native" : "md5-jvm";
+        return newArrayList("openssl", "md5", element.getPath().toString());
     }
 
 }

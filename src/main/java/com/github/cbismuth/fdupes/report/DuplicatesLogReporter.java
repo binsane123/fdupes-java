@@ -24,9 +24,10 @@
 
 package com.github.cbismuth.fdupes.report;
 
-import com.github.cbismuth.fdupes.immutable.PathElement;
+import com.github.cbismuth.fdupes.container.immutable.PathElement;
 import com.github.cbismuth.fdupes.io.PathEscapeFunction;
 import com.google.common.collect.Multimap;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,7 +39,14 @@ import java.util.Map;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 
+@Component
 public class DuplicatesLogReporter {
+
+    private final PathEscapeFunction pathEscapeFunction;
+
+    public DuplicatesLogReporter(final PathEscapeFunction pathEscapeFunction) {
+        this.pathEscapeFunction = pathEscapeFunction;
+    }
 
     public Path report(final Multimap<PathElement, PathElement> duplicates) throws IOException {
         final Path output = Paths.get(System.getProperty("user.dir"), "duplicates.log");
@@ -48,8 +56,9 @@ public class DuplicatesLogReporter {
                                          .stream()
                                          .map(Map.Entry::getValue)
                                          .flatMap(Collection::stream)
-                                         .map(PathElement::toString)
-                                         .map(PathEscapeFunction.INSTANCE)
+                                         .map(PathElement::getPath)
+                                         .map(Path::toString)
+                                         .map(pathEscapeFunction)
                                          .collect(joining(System.getProperty("line.separator")));
 
         Files.write(output, content.getBytes(UTF_8));

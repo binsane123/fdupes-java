@@ -25,6 +25,7 @@
 package com.github.cbismuth.fdupes.collect;
 
 import com.google.common.base.Preconditions;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -33,12 +34,12 @@ import java.util.Collection;
 import java.util.Locale;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Collections.unmodifiableCollection;
 
+@Component
 public final class FilenamePredicate implements DirectoryStream.Filter<Path> {
 
-    public static final FilenamePredicate INSTANCE = new FilenamePredicate();
-
-    public static final Collection<String> FILENAME_STOP_WORDS = newArrayList(
+    public static final Collection<String> FILENAME_STOP_WORDS = unmodifiableCollection(newArrayList(
         // OS X
         ".ds_store",
 
@@ -56,24 +57,25 @@ public final class FilenamePredicate implements DirectoryStream.Filter<Path> {
         "@SynologyCloudSync",
         "cloudsync_encrypt.info",
         "#recycle"
-    );
-
-    private FilenamePredicate() {
-        // PRIVATE
-    }
+    ));
 
     @Override
     public boolean accept(final Path path) {
         Preconditions.checkNotNull(path, "null path");
 
-        final boolean isDirectory = Files.isDirectory(path);
+        final boolean isAllowedDirectory = Files.isDirectory(path)
+                                           && Files.isReadable(path)
+                                           && !Files.isSymbolicLink(path)
+                                           && !isHiddenFile(path.toString())
+                                           && !containsForbiddenSubstring(path, FILENAME_STOP_WORDS);
 
-        final boolean isAllowedFile = !Files.isSymbolicLink(path)
+        final boolean isAllowedFile = !Files.isDirectory(path)
                                       && Files.isReadable(path)
+                                      && !Files.isSymbolicLink(path)
                                       && !isHiddenFile(path.toString())
                                       && !containsForbiddenSubstring(path, FILENAME_STOP_WORDS);
 
-        return isDirectory || isAllowedFile;
+        return isAllowedDirectory || isAllowedFile;
     }
 
     private boolean isHiddenFile(final String name) {

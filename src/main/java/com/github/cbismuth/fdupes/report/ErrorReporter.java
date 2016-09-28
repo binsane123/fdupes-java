@@ -25,6 +25,7 @@
 package com.github.cbismuth.fdupes.report;
 
 import com.github.cbismuth.fdupes.io.PathEscapeFunction;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,14 +36,21 @@ import java.util.Collection;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 
+@Component
 public class ErrorReporter {
+
+    private final PathEscapeFunction pathEscapeFunction;
+
+    public ErrorReporter(final PathEscapeFunction pathEscapeFunction) {
+        this.pathEscapeFunction = pathEscapeFunction;
+    }
 
     public Path report(final Collection<Path> pathsInError) throws IOException {
         final Path output = Paths.get(System.getProperty("user.dir"), "errors.log");
 
         final String content = pathsInError.stream()
                                            .map(Path::toString)
-                                           .map(PathEscapeFunction.INSTANCE)
+                                           .map(pathEscapeFunction)
                                            .collect(joining(System.getProperty("line.separator")));
 
         Files.write(output, content.getBytes(UTF_8));

@@ -24,12 +24,15 @@
 
 package com.github.cbismuth.fdupes.report;
 
-import com.github.cbismuth.fdupes.immutable.PathElement;
+import com.github.cbismuth.fdupes.container.immutable.PathElement;
 import com.google.common.collect.Multimap;
 import com.opencsv.CSVWriter;
+import org.springframework.stereotype.Component;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -39,14 +42,19 @@ import java.util.stream.StreamSupport;
 import static java.util.Spliterator.ORDERED;
 import static java.util.Spliterators.spliteratorUnknownSize;
 
+@Component
 public class DuplicatesCsvReporter {
 
-    public void report(final Multimap<PathElement, PathElement> duplicates) throws IOException {
-        try (CSVWriter writer = new CSVWriter(new FileWriter("report.csv", false))) {
+    public Path report(final Multimap<PathElement, PathElement> duplicates) throws IOException {
+        final Path output = Paths.get(System.getProperty("user.dir"), "report.csv");
+
+        try (CSVWriter writer = new CSVWriter(new FileWriter(output.toFile(), false))) {
             duplicates.asMap()
                       .entrySet()
                       .forEach(reportEntry(writer));
         }
+
+        return output;
     }
 
     private Consumer<Map.Entry<PathElement, Collection<PathElement>>> reportEntry(final CSVWriter writer) {

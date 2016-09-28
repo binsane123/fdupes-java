@@ -24,138 +24,29 @@
 
 package com.github.cbismuth.fdupes;
 
-import com.codahale.metrics.Slf4jReporter;
-import com.github.cbismuth.fdupes.immutable.PathElement;
-import com.github.cbismuth.fdupes.io.DirectoryWalker;
-import com.github.cbismuth.fdupes.io.PathOrganizer;
-import com.github.cbismuth.fdupes.md5.Md5Computer;
-import com.github.cbismuth.fdupes.report.DuplicatesCsvReporter;
-import com.github.cbismuth.fdupes.report.DuplicatesLogReporter;
-import com.google.common.collect.Multimap;
-import org.apache.spark.network.util.JavaUtils;
-import org.slf4j.Logger;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Collection;
 
-import static com.codahale.metrics.Slf4jReporter.LoggingLevel.DEBUG;
 import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.slf4j.LoggerFactory.getLogger;
 
-public final class Main {
-
-    private static final Logger LOGGER = getLogger(Main.class);
-
-    static {
-        initPoolSize();
-    }
-
-    private static void initPoolSize() {
-        int size = 1;
-
-        final String value = System.getProperty("fdupes.parallelism");
-        if (value != null) {
-            try {
-                size = Integer.valueOf(value);
-            } catch (final NumberFormatException e) {
-                LOGGER.error(e.getMessage());
-            }
-        }
-
-        final String name = "java.util.concurrent.ForkJoinPool.common.parallelism";
-        System.setProperty(name, String.valueOf(size));
-        LOGGER.warn("Thread pool size set to [{}]", System.getProperty(name));
-    }
-
-    public static final int BUFFER_SIZE = extractBufferSize();
-
-    private static int extractBufferSize() {
-        int size = 64 * 1024;
-
-        final String value = System.getProperty("fdupes.buffer.size");
-        if (value != null) {
-            try {
-                size = Math.toIntExact(JavaUtils.byteStringAsBytes(value));
-            } catch (final NumberFormatException | ArithmeticException e) {
-                LOGGER.error(e.getMessage());
-            }
-        }
-
-        LOGGER.warn("Byte buffer size size set to [{}] byte(s)", size);
-
-        return size;
-    }
+@Configuration
+@EnableAutoConfiguration
+@ComponentScan
+public class Main {
 
     public static void main(final String... args) throws IOException {
-        if (args.length == 0) {
-            help();
-        } else if (args.length == 1 && ("-v".equals(args[0]) || "--version".equals(args[0]))) {
-            System.out.println(version());
-        } else {
-            execute(args);
-        }
-    }
+        getMetricRegistry();
 
-    private static void help() {
-        System.out.println(version());
-        System.err.println("Usage: java -jar fdupes-<version>-all.jar <dir1> [<dir2>]...");
-    }
+        final SpringApplication app = new SpringApplication(Main.class);
 
-    private static String version() {
-        return String.format("fdupes-java version %s", Main.class.getPackage().getImplementationVersion());
-    }
-
-    private static void execute(final String[] args) throws IOException {
-        final Md5Computer md5 = new Md5Computer();
-        final DirectoryWalker walker = new DirectoryWalker(md5);
-
-        final Path outputPath = new Main(walker).launchAndReport(args);
-
-        LOGGER.info("Output file written at [{}]", outputPath);
-    }
-
-    private final DirectoryWalker walker;
-
-    public Main(final DirectoryWalker walker) {
-        this.walker = walker;
-    }
-
-    public Path launchAndReport(final String... args) throws IOException {
-        return launchAndReport(newArrayList(args));
-    }
-
-    public Path launchAndReport(final Collection<String> args) throws IOException {
-        try (final Slf4jReporter slf4jReporter = Slf4jReporter.forRegistry(getMetricRegistry())
-                                                              .outputTo(getLogger(getClass()))
-                                                              .withLoggingLevel(DEBUG).build()) {
-            slf4jReporter.start(15L, SECONDS);
-            final Path outputPath = launch(args);
-            slf4jReporter.report();
-
-            return outputPath;
-        }
-    }
-
-    private Path launch(final Collection<String> args) throws IOException {
-        try {
-            final Multimap<PathElement, PathElement> duplicates = walker.extractDuplicates(args);
-
-            new DuplicatesCsvReporter().report(duplicates);
-
-            // TODO add option to organize files by timestamp
-            new PathOrganizer().organize(duplicates.keys());
-
-            return new DuplicatesLogReporter().report(duplicates);
-        } catch (final OutOfMemoryError ignored) {
-            LOGGER.error("Not enough memory, solutions are:");
-            LOGGER.error("\t- increase Java heap size (e.g. -Xmx512m),");
-            LOGGER.error("\t- decrease byte buffer size (e.g. -Dfdupes.buffer.size=8k - default is 64k),");
-            LOGGER.error("\t- reduce the level of parallelism (e.g. -Dfdupes.parallelism=1).");
-
-            return null;
+        try (final ConfigurableApplicationContext applicationContext = app.run(args)) {
+            applicationContext.getBean(Launcher.class).launch(newArrayList(args));
         }
     }
 

@@ -24,67 +24,64 @@
 
 package com.github.cbismuth.fdupes.stream;
 
-import com.github.cbismuth.fdupes.immutable.PathElement;
+import com.codahale.metrics.Gauge;
+import com.github.cbismuth.fdupes.cli.SystemPropertyGetter;
+import com.github.cbismuth.fdupes.collect.PathComparator;
+import com.github.cbismuth.fdupes.container.immutable.PathElement;
 import com.github.cbismuth.fdupes.io.BufferedAnalyzer;
-import com.github.cbismuth.fdupes.md5.Md5Computer;
+import com.github.cbismuth.fdupes.io.Md5Computer;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
 import org.slf4j.Logger;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
-import java.util.stream.Stream;
+import java.util.Set;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
-import static java.util.stream.Collectors.toSet;
 import static org.slf4j.LoggerFactory.getLogger;
 
+@Component
 public class DuplicatesFinder {
 
     private static final Logger LOGGER = getLogger(DuplicatesFinder.class);
 
     private final Md5Computer md5Computer;
-    private final StreamHandler handler = new StreamHandler();
+    private final DuplicateFinderByKey duplicateFinderByKey;
+    private final PathComparator pathComparator;
+    private final SystemPropertyGetter systemPropertyGetter;
 
-    public DuplicatesFinder(final Md5Computer md5Computer) {
-        Preconditions.checkNotNull(md5Computer, "null MD5 computer");
-
+    public DuplicatesFinder(final Md5Computer md5Computer,
+                            final DuplicateFinderByKey duplicateFinderByKey,
+                            final PathComparator pathComparator,
+                            final SystemPropertyGetter systemPropertyGetter) {
+        this.duplicateFinderByKey = duplicateFinderByKey;
         this.md5Computer = md5Computer;
+        this.pathComparator = pathComparator;
+        this.systemPropertyGetter = systemPropertyGetter;
     }
 
-    public Multimap<PathElement, PathElement> extractDuplicates(final Collection<PathElement> elements) throws IOException {
-        Preconditions.checkNotNull(elements, "null file metadata collection");
-
-        Stream<PathElement> stream = elements.parallelStream();
+    public void extractDuplicates(final Collection<PathElement> input,
+                                  final Set<PathElement> uniquesElements,
+                                  final Multimap<PathElement, PathElement> duplicates) {
+        Preconditions.checkNotNull(input, "null file metadata collection");
 
         LOGGER.info("Pass 1/3 - compare file by size ...");
-        final String passName1 = "size";
-        stream = handler.removeUniqueFilesByKey(stream, passName1, PathElement::size);
-        LOGGER.info("Pass 1/3 - compare file by size completed! - {} duplicate(s) found", getCount(passName1));
+        final Collection<PathElement> duplicatesBySize = duplicateFinderByKey.getDuplicates(input, PathElement::size, uniquesElements);
+        getMetricRegistry().register(name("duplicates", "by-size", "count"), (Gauge<Integer>) duplicatesBySize::size);
+        LOGGER.info("Pass 1/3 - compare file by size completed! - {} duplicate(s) found", duplicatesBySize.size());
 
         LOGGER.info("Pass 2/3 - compare file by MD5 ...");
-        final String passName2 = "md5";
-        stream = handler.removeUniqueFilesByKey(stream, passName2, md5Computer::compute);
-        LOGGER.info("Pass 2/3 - compare file by MD5 completed! - {} duplicate(s) found", getCount(passName2));
+        final Collection<PathElement> duplicatesByMd5 = duplicateFinderByKey.getDuplicates(duplicatesBySize, md5Computer::compute, uniquesElements);
+        getMetricRegistry().register(name("duplicates", "by-md5", "count"), (Gauge<Integer>) duplicatesByMd5::size);
+        LOGGER.info("Pass 2/3 - compare file by MD5 completed! - {} duplicate(s) found", duplicatesByMd5.size());
 
         LOGGER.info("Pass 3/3 - compare file byte-by-byte ...");
-        final BufferedAnalyzer analyzer = new BufferedAnalyzer();
-        final Multimap<PathElement, PathElement> duplicates = analyzer.analyze(stream);
-        LOGGER.info("Pass 3/3 - compare file byte-by-byte completed! - {} duplicate(s) found", duplicates.asMap()
-                                                                                                         .entrySet()
-                                                                                                         .parallelStream()
-                                                                                                         .map(Map.Entry::getValue)
-                                                                                                         .flatMap(Collection::stream)
-                                                                                                         .collect(toSet())
-                                                                                                         .size());
-
-        return duplicates;
-    }
-
-    private long getCount(final String name) {
-        return getMetricRegistry().counter(name("collector", name, "counter", "duplicates")).getCount();
+        final BufferedAnalyzer analyzer = new BufferedAnalyzer(pathComparator, systemPropertyGetter);
+        analyzer.analyze(duplicatesByMd5, uniquesElements, duplicates);
+        getMetricRegistry().register(name("duplicates", "by-bytes", "count"), (Gauge<Integer>) duplicates::size);
+        LOGGER.info("Pass 3/3 - compare file byte-by-byte completed! - {} duplicate(s) found", duplicates.size());
     }
 
 }

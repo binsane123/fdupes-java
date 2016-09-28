@@ -25,18 +25,14 @@
 package com.github.cbismuth.fdupes.io;
 
 import com.google.common.base.Preconditions;
+import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
 
 import static java.lang.String.format;
 
+@Component
 public final class PathEscapeFunction implements Function<String, String> {
-
-    public static final PathEscapeFunction INSTANCE = new PathEscapeFunction();
-
-    private PathEscapeFunction() {
-        // PRIVATE
-    }
 
     @Override
     public String apply(final String s) {

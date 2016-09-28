@@ -26,11 +26,13 @@ package com.github.cbismuth.fdupes.io;
 
 import org.junit.Test;
 
+import java.util.function.Function;
+
 import static org.junit.Assert.assertEquals;
 
 public class PathEscapeFunctionTest {
 
-    private final PathEscapeFunction systemUnderTest = PathEscapeFunction.INSTANCE;
+    private final Function<String, String> systemUnderTest = new PathEscapeFunction();
 
     @Test
     public void testApply() {

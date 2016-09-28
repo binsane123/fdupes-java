@@ -24,17 +24,15 @@
 
 package com.github.cbismuth.fdupes.stream;
 
+import com.github.cbismuth.fdupes.Launcher;
 import com.github.cbismuth.fdupes.Main;
-import com.github.cbismuth.fdupes.immutable.PathElement;
-import com.github.cbismuth.fdupes.io.DirectoryWalker;
 import com.github.cbismuth.fdupes.io.PathHelper;
-import com.github.cbismuth.fdupes.md5.Md5Computer;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.Matchers;
-import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,46 +41,13 @@ import java.util.Collection;
 
 import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Arrays.asList;
-import static java.util.UUID.randomUUID;
+import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@RunWith(Parameterized.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = Main.class, webEnvironment = RANDOM_PORT)
 public class DirectoryWalkerTest {
-
-    @Parameterized.Parameters(name = "{0}")
-    public static Collection<Object[]> data() {
-        return asList(
-            new Object[][] {
-                { new Md5Computer() },
-                { new Md5Computer(null) },
-                { newForceByteComparisonMock() },
-                { newNativeMd5WithExceptionMock() },
-                { newJvmMd5WithExceptionMock() }
-            }
-        );
-    }
-
-    private static Md5Computer newForceByteComparisonMock() {
-        final Md5Computer mock = Mockito.mock(Md5Computer.class);
-        Mockito.when(mock.compute(Matchers.any(PathElement.class))).thenReturn(randomUUID().toString());
-        Mockito.when(mock.toString()).thenReturn("byte-by-byte");
-        return mock;
-    }
-
-    private static Md5Computer newNativeMd5WithExceptionMock() {
-        final Md5Computer mock = Mockito.mock(Md5Computer.class);
-        Mockito.when(mock.nativeMd5(Matchers.any(PathElement.class))).thenThrow(new RuntimeException());
-        Mockito.when(mock.toString()).thenReturn("mock-exception-md5-native");
-        return mock;
-    }
-
-    private static Md5Computer newJvmMd5WithExceptionMock() {
-        final Md5Computer mock = Mockito.mock(Md5Computer.class);
-        Mockito.when(mock.jvmMd5(Matchers.any(PathElement.class))).thenThrow(new RuntimeException());
-        Mockito.when(mock.toString()).thenReturn("mock-exception-md5-jvm");
-        return mock;
-    }
 
     @Before
     public void setUp() {
@@ -95,24 +60,19 @@ public class DirectoryWalkerTest {
     private static final long DIRECTORY_DUPLICATION_FACTOR = 10L;
     private static final long FILE_DUPLICATION_FACTOR = 20L;
 
-    private final PathHelper helper = new PathHelper();
-
-    private final Main systemUnderTest;
-
-    public DirectoryWalkerTest(final Md5Computer md5) {
-        final DirectoryWalker walker = new DirectoryWalker(md5);
-
-        systemUnderTest = new Main(walker);
-    }
+    @Autowired
+    private PathHelper pathHelper;
+    @Autowired
+    private Launcher systemUnderTest;
 
     @Test
     public void testExtractDuplicates_fakePath() throws Exception {
         // GIVEN
-        final Path inputPath = Paths.get(helper.uniqueString());
+        final Path inputPath = Paths.get(pathHelper.uniqueString());
 
         // WHEN
         final Collection<String> duplicates = Files.readAllLines(
-            systemUnderTest.launchAndReport(inputPath.toString())
+            systemUnderTest.launch(singleton(inputPath.toString()))
         );
 
         // THEN
@@ -123,18 +83,18 @@ public class DirectoryWalkerTest {
 
     @Test
     public void testExtractDuplicates_emptyPaths() throws Exception {
-        final Path parentDirectory = Files.createTempDirectory(helper.uniqueString());
+        final Path parentDirectory = Files.createTempDirectory(pathHelper.uniqueString());
         parentDirectory.toFile().deleteOnExit();
 
         // GIVEN
         final Collection<Path> sources = newArrayList();
-        sources.add(helper.createEmptyTempDirectory(parentDirectory));
-        sources.add(helper.createEmptyTempDirectory(parentDirectory));
-        sources.add(helper.createEmptyTempDirectory(parentDirectory));
+        sources.add(pathHelper.createEmptyTempDirectory(parentDirectory));
+        sources.add(pathHelper.createEmptyTempDirectory(parentDirectory));
+        sources.add(pathHelper.createEmptyTempDirectory(parentDirectory));
 
         // WHEN
         final Collection<String> duplicates = Files.readAllLines(
-            systemUnderTest.launchAndReport(parentDirectory.toString())
+            systemUnderTest.launch(singleton(parentDirectory.toString()))
         );
 
         // THEN
@@ -145,16 +105,16 @@ public class DirectoryWalkerTest {
 
     @Test
     public void testExtractDuplicates_singleEmptyFile() throws Exception {
-        final Path parentDirectory = Files.createTempDirectory(helper.uniqueString());
+        final Path parentDirectory = Files.createTempDirectory(pathHelper.uniqueString());
         parentDirectory.toFile().deleteOnExit();
 
         // GIVEN
         final Collection<Path> sources = newArrayList();
-        sources.add(helper.createSingleEmptyFile(parentDirectory));
+        sources.add(pathHelper.createSingleEmptyFile(parentDirectory));
 
         // WHEN
         final Collection<String> duplicates = Files.readAllLines(
-            systemUnderTest.launchAndReport(parentDirectory.toString())
+            systemUnderTest.launch(singleton(parentDirectory.toString()))
         );
 
         // THEN
@@ -165,16 +125,16 @@ public class DirectoryWalkerTest {
 
     @Test
     public void testExtractDuplicates_duplicatesBySizeOnly() throws Exception {
-        final Path parentDirectory = Files.createTempDirectory(helper.uniqueString());
+        final Path parentDirectory = Files.createTempDirectory(pathHelper.uniqueString());
         parentDirectory.toFile().deleteOnExit();
 
         // GIVEN
         final Collection<Path> sources = newArrayList();
-        sources.addAll(helper.createNewSetWithDuplicatesBySize(parentDirectory, DIRECTORY_DUPLICATION_FACTOR, UNIQUE_FILES_COUNT));
+        sources.addAll(pathHelper.createNewSetWithDuplicatesBySize(parentDirectory, DIRECTORY_DUPLICATION_FACTOR, UNIQUE_FILES_COUNT));
 
         // WHEN
         final Collection<String> duplicates = Files.readAllLines(
-            systemUnderTest.launchAndReport(parentDirectory.toString())
+            systemUnderTest.launch(singleton(parentDirectory.toString()))
         );
 
         // THEN
@@ -185,16 +145,16 @@ public class DirectoryWalkerTest {
 
     @Test
     public void testExtractDuplicates_duplicatesByMd5Only() throws Exception {
-        final Path parentDirectory = Files.createTempDirectory(helper.uniqueString());
+        final Path parentDirectory = Files.createTempDirectory(pathHelper.uniqueString());
         parentDirectory.toFile().deleteOnExit();
 
         // GIVEN
         final Collection<Path> sources = newArrayList();
-        sources.addAll(helper.createNewSetWithDuplicatesByMd5(parentDirectory, UNIQUE_FILES_COUNT, DIRECTORY_DUPLICATION_FACTOR, FILE_DUPLICATION_FACTOR));
+        sources.addAll(pathHelper.createNewSetWithDuplicatesByMd5(parentDirectory, UNIQUE_FILES_COUNT, DIRECTORY_DUPLICATION_FACTOR, FILE_DUPLICATION_FACTOR));
 
         // WHEN
         final Collection<String> duplicates = Files.readAllLines(
-            systemUnderTest.launchAndReport(parentDirectory.toString())
+            systemUnderTest.launch(singleton(parentDirectory.toString()))
         );
 
         // THEN
@@ -205,19 +165,19 @@ public class DirectoryWalkerTest {
 
     @Test
     public void testExtractDuplicates_all() throws Exception {
-        final Path parentDirectory = Files.createTempDirectory(helper.uniqueString());
+        final Path parentDirectory = Files.createTempDirectory(pathHelper.uniqueString());
         parentDirectory.toFile().deleteOnExit();
 
         // GIVEN
         final Collection<Path> sources = newArrayList();
-        sources.add(helper.createEmptyTempDirectory(parentDirectory));
-        sources.add(helper.createSingleEmptyFile(parentDirectory));
-        sources.addAll(helper.createNewSetWithDuplicatesBySize(parentDirectory, DIRECTORY_DUPLICATION_FACTOR, UNIQUE_FILES_COUNT));
-        sources.addAll(helper.createNewSetWithDuplicatesByMd5(parentDirectory, UNIQUE_FILES_COUNT, DIRECTORY_DUPLICATION_FACTOR, FILE_DUPLICATION_FACTOR));
+        sources.add(pathHelper.createEmptyTempDirectory(parentDirectory));
+        sources.add(pathHelper.createSingleEmptyFile(parentDirectory));
+        sources.addAll(pathHelper.createNewSetWithDuplicatesBySize(parentDirectory, DIRECTORY_DUPLICATION_FACTOR, UNIQUE_FILES_COUNT));
+        sources.addAll(pathHelper.createNewSetWithDuplicatesByMd5(parentDirectory, UNIQUE_FILES_COUNT, DIRECTORY_DUPLICATION_FACTOR, FILE_DUPLICATION_FACTOR));
 
         // WHEN
         final Collection<String> duplicates = Files.readAllLines(
-            systemUnderTest.launchAndReport(parentDirectory.toString())
+            systemUnderTest.launch(singleton(parentDirectory.toString()))
         );
 
         // THEN

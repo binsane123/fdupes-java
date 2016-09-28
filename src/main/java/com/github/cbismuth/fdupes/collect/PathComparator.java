@@ -24,16 +24,19 @@
 
 package com.github.cbismuth.fdupes.collect;
 
-import com.github.cbismuth.fdupes.immutable.PathElement;
+import com.github.cbismuth.fdupes.container.immutable.PathElement;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ComparisonChain;
+import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class PathComparator implements Comparator<PathElement> {
+@Component
+public class PathComparator implements Comparator<PathElement>, Serializable {
 
-    public static final Comparator<PathElement> INSTANCE = new PathComparator();
+    private static final long serialVersionUID = -1463353231447344113L;
 
     @Override
     public int compare(final PathElement o1, final PathElement o2) {
@@ -45,7 +48,7 @@ public class PathComparator implements Comparator<PathElement> {
                                   .compare(o1.creationTime(), o2.creationTime())
                                   .compare(o1.lastAccessTime(), o2.lastAccessTime())
                                   .compare(o1.lastModifiedTime(), o2.lastModifiedTime())
-                                  .compare(o1.toString(), o2.toString())
+                                  .compare(o1.getPath().toString(), o2.getPath().toString())
                                   .result();
         } catch (final Exception e) {
             throw Throwables.propagate(e);

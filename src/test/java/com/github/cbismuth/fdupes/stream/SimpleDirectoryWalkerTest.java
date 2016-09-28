@@ -24,12 +24,16 @@
 
 package com.github.cbismuth.fdupes.stream;
 
+import com.github.cbismuth.fdupes.Launcher;
 import com.github.cbismuth.fdupes.Main;
-import com.github.cbismuth.fdupes.io.DirectoryWalker;
+import com.github.cbismuth.fdupes.io.PathEscapeFunction;
 import com.github.cbismuth.fdupes.io.PathHelper;
-import com.github.cbismuth.fdupes.md5.Md5Computer;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,22 +41,20 @@ import java.util.Collection;
 import java.util.List;
 
 import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetricRegistry;
-import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = Main.class, webEnvironment = RANDOM_PORT)
 public class SimpleDirectoryWalkerTest {
 
-    private final PathHelper helper = new PathHelper();
-
-    private final Main systemUnderTest;
-
-    public SimpleDirectoryWalkerTest() {
-        final Md5Computer md5 = new Md5Computer();
-        final DirectoryWalker walker = new DirectoryWalker(md5);
-
-        systemUnderTest = new Main(walker);
-    }
+    @Autowired
+    private PathHelper pathHelper;
+    @Autowired
+    private PathEscapeFunction pathEscapeFunction;
+    @Autowired
+    private Launcher systemUnderTest;
 
     @Before
     public void setUp() {
@@ -71,7 +73,7 @@ public class SimpleDirectoryWalkerTest {
         final int directoryDuplicationFactor = 8;
         final int fileDuplicationFactor = 100;
 
-        final Collection<Path> filesWithDuplicates = helper.createNewSetWithDuplicatesByMd5(
+        final Collection<Path> filesWithDuplicates = pathHelper.createNewSetWithDuplicatesByMd5(
             parentDirectory,
             distinctFilesCount,
             directoryDuplicationFactor,
@@ -79,18 +81,18 @@ public class SimpleDirectoryWalkerTest {
         );
 
         // WHEN
-        final Collection<String> actual = Files.readAllLines(
-            systemUnderTest.launchAndReport(filesWithDuplicates.parallelStream()
-                                                               .map(Path::toString)
-                                                               .collect(toList()))
-        );
+        final List<String> inputAbsolutePaths = filesWithDuplicates.parallelStream()
+                                                                   .map(Path::toString)
+                                                                   .collect(toList());
+        final Path outputDuplicatesReportPath = systemUnderTest.launch(inputAbsolutePaths);
+        final Collection<String> actual = Files.readAllLines(outputDuplicatesReportPath);
 
         // THEN
         assertEquals(directoryDuplicationFactor * fileDuplicationFactor - distinctFilesCount, actual.size());
 
         final List<String> escapedAbsolutePathWithDuplicates = filesWithDuplicates.parallelStream()
                                                                                   .map(Path::toString)
-                                                                                  .map(s -> format("\"%s\"", s))
+                                                                                  .map(s -> pathEscapeFunction.apply(s))
                                                                                   .collect(toList());
 
         actual.forEach(escapedAbsolutePathWithDuplicates::contains);

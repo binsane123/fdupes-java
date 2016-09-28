@@ -25,33 +25,96 @@
 package com.github.cbismuth.fdupes.io;
 
 import com.github.cbismuth.fdupes.collect.PathAnalyser;
-import com.github.cbismuth.fdupes.immutable.PathElement;
+import com.github.cbismuth.fdupes.container.immutable.PathElement;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.System.currentTimeMillis;
+import static org.slf4j.LoggerFactory.getLogger;
 
+@Component
 public class PathOrganizer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PathOrganizer.class);
+    private static final Logger LOGGER = getLogger(PathOrganizer.class);
 
-    public void organize(final Iterable<PathElement> pathElements) throws IOException {
-        final Path destination = Files.createDirectory(Paths.get(String.valueOf(currentTimeMillis())));
-        final PathAnalyser pathAnalyser = new PathAnalyser();
+    private final PathAnalyser pathAnalyser;
 
-        pathElements.forEach(pathElement -> pathAnalyser.getTimestampPath(destination, pathElement.getPath())
-                                                        .ifPresent(path -> {
-                                                            try {
-                                                                Files.move(pathElement.getPath(), path);
-                                                            } catch (final IOException e) {
-                                                                LOGGER.error(e.getMessage(), e);
-                                                            }
-                                                        }));
+    public PathOrganizer(final PathAnalyser pathAnalyser) {
+        this.pathAnalyser = pathAnalyser;
+    }
+
+    public void organize(final Iterable<PathElement> uniquesElements) throws IOException {
+        final String workingDirectory = System.getProperty("user.dir");
+        final String millisAsString = String.valueOf(currentTimeMillis());
+        final Path directoryToCreate = Paths.get(workingDirectory, millisAsString);
+        final Path destination = Files.createDirectory(directoryToCreate);
+
+        moveUniqueFiles(destination, uniquesElements);
+    }
+
+    private void moveUniqueFiles(final Path destination,
+                                 final Iterable<PathElement> uniquesElements) {
+
+        final AtomicInteger counter = new AtomicInteger(1);
+
+        uniquesElements.forEach(pathElement -> {
+            final Optional<Path> timestampPath = pathAnalyser.getTimestampPath(destination, pathElement.getPath());
+
+            if (timestampPath.isPresent()) {
+                onTimestampPath(pathElement, timestampPath.get());
+            } else {
+                onNoTimestampPath(destination, pathElement, counter);
+            }
+        });
+    }
+
+    private void onTimestampPath(final PathElement pathElement, final Path timestampPath) {
+        try {
+            FileUtils.moveFile(
+                pathElement.getPath().toFile(),
+                timestampPath.toFile()
+            );
+        } catch (final IOException e) {
+            LOGGER.error(e.getMessage());
+        }
+    }
+
+    private void onNoTimestampPath(final Path destination,
+                                   final PathElement pathElement,
+                                   final AtomicInteger counter) {
+        final Path path = pathElement.getPath();
+
+        final String baseName = FilenameUtils.getBaseName(path.toString());
+        final int count = counter.getAndIncrement();
+        final String extension = FilenameUtils.getExtension(path.toString());
+
+        final String newName = String.format("%s-%d.%s", baseName, count, extension);
+
+        final Path sibling = path.resolveSibling(newName);
+
+        try {
+            FileUtils.moveFile(
+                path.toFile(),
+                sibling.toFile()
+            );
+
+            FileUtils.moveFileToDirectory(
+                sibling.toFile(),
+                Paths.get(destination.toString(), "misc").toFile(),
+                true
+            );
+        } catch (final IOException e) {
+            LOGGER.error(e.getMessage());
+        }
     }
 
 }

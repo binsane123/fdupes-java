@@ -55,7 +55,7 @@ public class FilenamePredicateTest {
     private static final Logger LOGGER = getLogger(FilenamePredicateTest.class);
 
     private final String forbiddenSubstring;
-    private final FilenamePredicate systemUnderTest = FilenamePredicate.INSTANCE;
+    private final FilenamePredicate systemUnderTest = new FilenamePredicate();
 
     public FilenamePredicateTest(final String forbiddenSubstring) {
         this.forbiddenSubstring = forbiddenSubstring;

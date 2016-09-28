@@ -26,13 +26,13 @@ package com.github.cbismuth.fdupes.io;
 
 import com.codahale.metrics.Timer;
 import com.github.cbismuth.fdupes.collect.FilenamePredicate;
-import com.github.cbismuth.fdupes.immutable.PathElement;
-import com.github.cbismuth.fdupes.md5.Md5Computer;
+import com.github.cbismuth.fdupes.container.immutable.PathElement;
 import com.github.cbismuth.fdupes.report.ErrorReporter;
 import com.github.cbismuth.fdupes.stream.DuplicatesFinder;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
 import org.slf4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -40,6 +40,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collection;
 import java.util.Set;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -47,54 +48,63 @@ import static com.github.cbismuth.fdupes.metrics.MetricRegistrySingleton.getMetr
 import static com.google.common.collect.Sets.newConcurrentHashSet;
 import static org.slf4j.LoggerFactory.getLogger;
 
+@Component
 public class DirectoryWalker {
 
     private static final Logger LOGGER = getLogger(DirectoryWalker.class);
 
     private final DuplicatesFinder duplicatesFinder;
+    private final FilenamePredicate filenamePredicate;
+    private final PathEscapeFunction pathEscapeFunction;
 
-    private final Set<PathElement> paths = newConcurrentHashSet();
-    private final Set<Path> pathsInError = newConcurrentHashSet();
-
-    public DirectoryWalker(final Md5Computer md5Computer) {
-        Preconditions.checkNotNull(md5Computer, "null MD5 computer");
-
-        duplicatesFinder = new DuplicatesFinder(md5Computer);
+    public DirectoryWalker(final DuplicatesFinder duplicatesFinder,
+                           final FilenamePredicate filenamePredicate,
+                           final PathEscapeFunction pathEscapeFunction) {
+        this.duplicatesFinder = duplicatesFinder;
+        this.filenamePredicate = filenamePredicate;
+        this.pathEscapeFunction = pathEscapeFunction;
     }
 
-    public Multimap<PathElement, PathElement> extractDuplicates(final Iterable<String> inputPaths) throws IOException {
+    public void extractDuplicates(final Iterable<String> inputPaths,
+                                  final Set<PathElement> uniquesElements,
+                                  final Multimap<PathElement, PathElement> duplicates) throws IOException {
         Preconditions.checkNotNull(inputPaths, "null input path collection");
 
-        paths.clear();
+        final Collection<PathElement> readablePaths = newConcurrentHashSet();
+        final Collection<Path> unreadablePaths = newConcurrentHashSet();
+
+        readablePaths.clear();
 
         inputPaths.forEach(rootPath -> {
             final Path path = Paths.get(rootPath);
 
-            if (FilenamePredicate.INSTANCE.accept(path)) {
+            if (filenamePredicate.accept(path)) {
                 if (Files.isDirectory(path)) {
-                    handleDirectory(path);
+                    handleDirectory(path, readablePaths, unreadablePaths);
                 } else if (Files.isRegularFile(path)) {
-                    handleRegularFile(path);
+                    handleRegularFile(path, readablePaths, unreadablePaths);
                 } else {
                     LOGGER.warn("[{}] is not a directory or a regular file", rootPath);
                 }
             }
         });
 
-        new ErrorReporter().report(pathsInError);
+        new ErrorReporter(pathEscapeFunction).report(unreadablePaths);
 
-        return duplicatesFinder.extractDuplicates(paths);
+        duplicatesFinder.extractDuplicates(readablePaths, uniquesElements, duplicates);
     }
 
-    private void handleDirectory(final Path path) {
-        try (final DirectoryStream<Path> stream = Files.newDirectoryStream(path, FilenamePredicate.INSTANCE)) {
+    private void handleDirectory(final Path path,
+                                 final Collection<PathElement> paths,
+                                 final Collection<Path> pathsInError) {
+        try (final DirectoryStream<Path> stream = Files.newDirectoryStream(path, filenamePredicate)) {
             stream.forEach(p -> {
                 if (Files.isDirectory(p)) {
                     getMetricRegistry().counter(name("fs", "counter", "directories")).inc();
 
-                    handleDirectory(p);
+                    handleDirectory(p, paths, pathsInError);
                 } else {
-                    handleRegularFile(p);
+                    handleRegularFile(p, paths, pathsInError);
                 }
             });
         } catch (final IOException e) {
@@ -102,7 +112,9 @@ public class DirectoryWalker {
         }
     }
 
-    private void handleRegularFile(final Path path) {
+    private void handleRegularFile(final Path path,
+                                   final Collection<PathElement> paths,
+                                   final Collection<Path> pathsInError) {
         try {
             try (final Timer.Context ignored = getMetricRegistry().timer(name("fs", "timer", "files", "attributes", "read")).time()) {
                 paths.add(new PathElement(path, Files.readAttributes(path, BasicFileAttributes.class)));

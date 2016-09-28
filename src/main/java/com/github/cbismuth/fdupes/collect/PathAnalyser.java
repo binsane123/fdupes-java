@@ -26,6 +26,7 @@ package com.github.cbismuth.fdupes.collect;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,13 +35,15 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Locale.getDefault;
 import static org.slf4j.LoggerFactory.getLogger;
 
+@Component
 public class PathAnalyser {
 
     private static final Logger LOGGER = getLogger(PathAnalyser.class);
 
-    private static final Pattern PATTERN = Pattern.compile("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2}).*\\.(.*)$");
+    private static final Pattern PATTERN = Pattern.compile("^.*([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2}).*\\.(.*)$");
 
     public Optional<Path> getTimestampPath(final Path destination, final Path path) {
         final Optional<Path> result;
@@ -58,8 +61,6 @@ public class PathAnalyser {
     }
 
     private Path onMatch(final Path destination, final Path path, final Matcher matcher) {
-        LOGGER.debug("Pattern matched with [{}]", path);
-
         final String year = matcher.group(1);
         final String month = matcher.group(2);
         final String day = matcher.group(3);
@@ -78,7 +79,8 @@ public class PathAnalyser {
                                                     .append(second)
                                                     .append('.')
                                                     .append(extension)
-                                                    .toString());
+                                                    .toString()
+                                                    .toUpperCase(getDefault()));
 
         int i = 1;
         while (Files.exists(newPath)) {
@@ -94,7 +96,8 @@ public class PathAnalyser {
                                                    .append(i++)
                                                    .append('.')
                                                    .append(extension)
-                                                   .toString());
+                                                   .toString()
+                                                   .toUpperCase(getDefault()));
         }
 
         return newPath;
