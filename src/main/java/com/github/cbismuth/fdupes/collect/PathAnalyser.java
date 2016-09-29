@@ -50,7 +50,7 @@ public class PathAnalyser {
 
         final Matcher matcher = PATTERN.matcher(FilenameUtils.getName(path.toString()));
         if (matcher.matches()) {
-            result = Optional.of(onMatch(destination, path, matcher));
+            result = Optional.of(onMatch(destination, matcher));
         } else {
             LOGGER.warn("File [{}] doesn't match pattern", path);
 
@@ -60,7 +60,7 @@ public class PathAnalyser {
         return result;
     }
 
-    private Path onMatch(final Path destination, final Path path, final Matcher matcher) {
+    private Path onMatch(final Path destination, final Matcher matcher) {
         final String year = matcher.group(1);
         final String month = matcher.group(2);
         final String day = matcher.group(3);
