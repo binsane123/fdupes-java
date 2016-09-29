@@ -62,16 +62,16 @@ java -Xmx1g                       \
 
 ### Benchmark
 
-**Hardware**
-
+| Hardware  |                                         |
+| --------- | ----------------------------------------|
 | Processor | Intel® Core™ i7-5500U CPU @ 2.40GHz × 4 |
 | Memory    | 15.4 Go                                 |
 | Disk      | SSD Samsung MZ7LN256 rev. 3L6Q          |
 
-**Software**
-
-| OS   | Ubuntu 16.04 LTS 64-bit |
-| Java | JRE 1.8.0_92-b14 64-bit |
+| Software  |                         |
+| --------- | ------------------------|
+| OS        | Ubuntu 16.04 LTS 64-bit |
+| Java      | JRE 1.8.0_92-b14 64-bit |
 
 **Command line**
 
@@ -85,8 +85,8 @@ java -Xmx8g                       \
      ~/Pictures/tmp
 ```
 
-**Results**
-
+| Results                |                     |
+| ---------------------- | ------------------- |
 | Total files count      | 69406               |
 | Total files size       | 148 Go              |
 | Total duplicates count | 8196                |
