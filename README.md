@@ -96,7 +96,7 @@ java -Xmx8g                       \
 | Total files size       | 148 Go              |
 | Total duplicates count | 8196                |
 | Total duplicates size  | 49,597.715 Mo       |
-| Execution time         | less than 7 minutes |
+| Execution time         | 3m1.164s            |
 
 ## Requirements
 
