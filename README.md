@@ -42,7 +42,7 @@ Find duplicated files in a single directory and its subdirectories with default 
 java -jar fdupes-1.2.0-all.jar ~/pictures
 ```
 
-Find duplicated files in a two directories with custom options:
+Find duplicated files in a two directories plus one single file with custom options:
 
 ```
 java -Xmx1g                       \
