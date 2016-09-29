@@ -53,17 +53,21 @@ public class PathOrganizer {
     }
 
     public void organize(final Iterable<PathElement> uniquesElements) throws IOException {
-        final String workingDirectory = System.getProperty("user.dir");
-        final String millisAsString = String.valueOf(currentTimeMillis());
-        final Path directoryToCreate = Paths.get(workingDirectory, millisAsString);
+        organize(System.getProperty("user.dir"), String.valueOf(currentTimeMillis()), uniquesElements);
+
+    }
+
+    public void organize(final String workingDirectory,
+                         final String subDirectoryName,
+                         final Iterable<PathElement> uniqueElements) throws IOException {
+        final Path directoryToCreate = Paths.get(workingDirectory, subDirectoryName);
         final Path destination = Files.createDirectory(directoryToCreate);
 
-        moveUniqueFiles(destination, uniquesElements);
+        moveUniqueFiles(destination, uniqueElements);
     }
 
     private void moveUniqueFiles(final Path destination,
                                  final Iterable<PathElement> uniquesElements) {
-
         final AtomicInteger counter = new AtomicInteger(1);
 
         uniquesElements.forEach(pathElement -> {
