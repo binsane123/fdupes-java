@@ -17,7 +17,7 @@ Executable files are available on the [release page](https://github.com/cbismuth
 latest one and run the command line below. 
 
 ```
-java -jar fdupes-<version>-all.jar <PATH1> [<PATH2>]...
+java -jar fdupes-1.3.0.jar <PATH1> [<PATH2>]...
 ```
 
 ### Options
@@ -39,7 +39,7 @@ Here are optional command line switches:
 Find duplicated files in a single directory and its subdirectories with default options:
 
 ```
-java -jar fdupes-1.2.0-all.jar ~/pictures
+java -jar fdupes-1.3.0.jar ~/pictures
 ```
 
 Find duplicated files in a two directories plus one single file with custom options:
@@ -50,13 +50,46 @@ java -Xmx1g                       \
      -Dfdupes.buffer.size=3m      \
      -Dlogging.level.fdupes=DEBUG \
      -Dlogging.level.root=DEBUG   \
-     -jar fdupes-1.2.0-all.jar    \
+     -jar fdupes-1.3.0.jar        \
      ~/pictures                   \
      ~/downloads                  \
      ~/desktop/DSC00042.JPG
 ```
 
 **Note**: `<PATH1> [<PATH2>]...` can be either regular files, directories or both.
+
+### Benchmark
+
+**Hardware**
+
+* Processor: Intel® Core™ i7-5500U CPU @ 2.40GHz × 4
+* Memory: 15.4 Go
+* Disk: SSD Samsung MZ7LN256 rev. 3L6Q
+
+**Software**
+
+* OS: Ubuntu 16.04 LTS 64-bit
+* Java: JRE 1.8.0_92-b14 64-bit
+
+**Command line**
+
+```
+java -Xmx8g                       \
+     -Dfdupes.parallelism=8       \
+     -Dfdupes.buffer.size=512k    \
+     -Dlogging.level.fdupes=INFO  \
+     -Dlogging.level.root=ERROR   \
+     -jar fdupes-1.3.0.jar        \
+     ~/Pictures/tmp
+```
+
+**Results**
+
+* Total files count: 69406
+* Total files size: 148 Go
+* Total duplicates count: 8196
+* Total duplicates size: 49,597.715 Mo
+* Execution time: less than 7 minutes
 
 ## Output
 
@@ -86,8 +119,8 @@ Duplicated input directories and files are filtered in [fdupes-java](https://git
 
 ## Algorithms
 
-* Files are compared by **file sizes**, then by **MD5 signatures**, finally a buffered **byte-by-byte** comparison is done.
-* Original file is detected by comparing creation, last access and last modification time.
+ * Files are compared by **file sizes**, then by **MD5 signatures**, finally a buffered **byte-by-byte** comparison is done.
+ * Original file is detected by comparing creation, last access and last modification time.
 
 ## Issues
 
