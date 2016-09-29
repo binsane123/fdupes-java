@@ -20,6 +20,12 @@ latest one and run the command line below.
 java -jar fdupes-1.3.0.jar <PATH1> [<PATH2>]...
 ```
 
+## Output
+
+Paths of duplicated files are reported in a `duplicates.log` file dumped in the current working directory.
+
+**Note**: reported paths are **double-quoted** and **whitespace-escaped** to be *nix-compliant.
+
 ### Options
 
 Here are optional command line switches:
@@ -92,12 +98,6 @@ java -Xmx8g                       \
 | Total duplicates count | 8196                |
 | Total duplicates size  | 49,597.715 Mo       |
 | Execution time         | less than 7 minutes |
-
-## Output
-
-Paths of duplicated files are reported in a `duplicates.log` file dumped in the current working directory.
-
-**Note**: reported paths are **double-quoted** and **whitespace-escaped** to be *nix-compliant.
 
 ## Requirements
 
