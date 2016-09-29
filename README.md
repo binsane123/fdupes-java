@@ -25,14 +25,16 @@ java -jar fdupes-1.3.0.jar <PATH1> [<PATH2>]...
 Here are optional command line switches:
 
 ```
--Dlogging.level.fdupes=<LEVEL>    the logging level of fdupes-java, may be one of [ALL,TRACE,DEBUG,INFO,WARN,ERROR,OFF] (default is INFO)
--Dlogging.level.root=<LEVEL>      the logging level of embedded libraries, may be one of [ALL,TRACE,DEBUG,INFO,WARN,ERROR,OFF] (default is WARN)
+-Dlogging.level.fdupes=<LEVEL>    the logging level of fdupes-java, may be one of (default is INFO)
+-Dlogging.level.root=<LEVEL>      the logging level of embedded libraries, may be one of (default is WARN)
 
 -Xmx<SIZE><UNIT>                  the max amount of memory to allocate to the Java Runtime Environment (e.g. 512m)
 
 -Dfdupes.parallelism=<NUMBER>     the numbers of threads to parallelize execution  (default is 1)
 -Dfdupes.buffer.size=<SIZE><UNIT> the buffer size used for byte-by-byte comparison (default is 64k)
 ```
+
+Logging levels must be one of: `ALL`, `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `OFF`.
 
 ### Examples
 
