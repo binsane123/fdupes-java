@@ -39,6 +39,19 @@ public class PathAnalyserTest {
     private final PathAnalyser systemUnderTest = new PathAnalyser();
 
     @Test
+    public void testGetTimestampPath_bug() throws IOException {
+        final Path destination = Files.createTempDirectory(getClass().getSimpleName());
+        final Path path = Paths.get("somewhere", "on", "disk", "20110724123316-16226-4486.JPG");
+
+        final Optional<Path> actual = systemUnderTest.getTimestampPath(destination, path);
+        final Path expected = Paths.get(destination.toString(),
+                                        "2011", "07", "24",
+                                        "20110724123316.JPG");
+
+        assertEquals(expected.toString(), actual.get().toString());
+    }
+
+    @Test
     public void testGetTimestampPath_onMatch_notExisting_withoutPrefix() throws IOException {
         final Path destination = Files.createTempDirectory(getClass().getSimpleName());
         final Path path = Paths.get("somewhere", "on", "disk", "2016010212131401-1.MOV");

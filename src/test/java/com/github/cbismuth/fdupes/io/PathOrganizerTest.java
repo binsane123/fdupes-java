@@ -43,7 +43,27 @@ public class PathOrganizerTest {
     private final PathOrganizer systemUnderTest = new PathOrganizer(new PathAnalyser());
 
     @Test
-    public void testOrganize_onTimestampPath() throws IOException {
+    public void testOrganize_onTimestampPath_withoutPrefix() throws IOException {
+        // GIVEN
+        final Path destination = Files.createTempDirectory(getClass().getSimpleName());
+
+        final Path actual = Paths.get(destination.toString(), "2016010212131401-1.MOV");
+        Files.createFile(actual);
+
+        final String workingDirectory = destination.toString();
+        final PathElement uniqueElement = new PathElement(actual, Files.readAttributes(actual, BasicFileAttributes.class));
+        final List<PathElement> uniqueElements = singletonList(uniqueElement);
+
+        // WHEN
+        systemUnderTest.organize(workingDirectory, "sub", uniqueElements);
+
+        // THEN
+        final Path expected = Paths.get(destination.toString(), "sub", "2016", "01", "02", "20160102121314.MOV");
+        assertTrue(Files.exists(expected));
+    }
+
+    @Test
+    public void testOrganize_onTimestampPath_withPrefix() throws IOException {
         // GIVEN
         final Path destination = Files.createTempDirectory(getClass().getSimpleName());
 

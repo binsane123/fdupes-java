@@ -43,17 +43,19 @@ public class PathAnalyser {
 
     private static final Logger LOGGER = getLogger(PathAnalyser.class);
 
-    private static final Pattern PATTERN_1 = Pattern.compile("^([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2}).*\\.(.*)$");
-    private static final Pattern PATTERN_2 = Pattern.compile("^.*\\D([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2}).*\\.(.*)$");
+    private static final Pattern PATTERN_1 = Pattern.compile("^([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2}).*\\.([^\\.]+)$");
+    private static final Pattern PATTERN_2 = Pattern.compile("^.*\\D([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2}).*\\.([^\\.]+)$");
 
     public Optional<Path> getTimestampPath(final Path destination, final Path path) {
         final Optional<Path> result;
 
-        final Matcher matcher_1 = PATTERN_1.matcher(FilenameUtils.getName(path.toString()));
+        final String name = FilenameUtils.getName(path.toString());
+
+        final Matcher matcher_1 = PATTERN_1.matcher(name);
         if (matcher_1.matches()) {
             result = Optional.of(onMatch(destination, matcher_1));
         } else {
-            final Matcher matcher_2 = PATTERN_2.matcher(FilenameUtils.getName(path.toString()));
+            final Matcher matcher_2 = PATTERN_2.matcher(name);
             if (matcher_2.matches()) {
                 result = Optional.of(onMatch(destination, matcher_2));
             } else {

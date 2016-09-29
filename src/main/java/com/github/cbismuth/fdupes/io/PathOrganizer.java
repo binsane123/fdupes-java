@@ -54,7 +54,6 @@ public class PathOrganizer {
 
     public void organize(final Iterable<PathElement> uniqueElements) throws IOException {
         organize(System.getProperty("user.dir"), String.valueOf(currentTimeMillis()), uniqueElements);
-
     }
 
     public void organize(final String workingDirectory,
