@@ -13,8 +13,7 @@ A command line duplicated files finder written in Java 8 which finds all duplica
 
 ## Usage
 
-Executable files are available on the [release page](https://github.com/cbismuth/fdupes-java/releases), download the
-latest one and run the command line below. 
+Executable files are available on the [release page](https://github.com/cbismuth/fdupes-java/releases), download the latest one and run the command line below. 
 
 ```
 java -jar fdupes-1.3.0.jar <PATH1> [<PATH2>]...
@@ -31,8 +30,8 @@ Paths of duplicated files are reported in a `duplicates.log` file dumped in the 
 Here are optional command line switches:
 
 ```
--Dlogging.level.fdupes=<LEVEL>    the logging level of fdupes-java, may be one of (default is INFO)
--Dlogging.level.root=<LEVEL>      the logging level of embedded libraries, may be one of (default is WARN)
+-Dlogging.level.fdupes=<LEVEL>    the logging level of fdupes-java        (default is INFO)
+-Dlogging.level.root=<LEVEL>      the logging level of embedded libraries (default is WARN)
 
 -Xmx<SIZE><UNIT>                  the max amount of memory to allocate (e.g. 512m)
 
@@ -121,7 +120,7 @@ Duplicated input directories and files are filtered in [fdupes-java](https://git
 
 ## Algorithms
 
- * Files are compared by **file sizes**, then by **MD5 signatures**, finally a buffered **byte-by-byte** comparison is done.
+ * Files are compared by **file sizes**, then by **MD5 signatures**, finally a **buffered byte-by-byte** comparison is done.
  * Original file is detected by comparing creation, last access and last modification time.
 
 ## Issues
