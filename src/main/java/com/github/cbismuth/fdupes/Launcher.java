@@ -67,13 +67,13 @@ public class Launcher {
 
     public Path launch(final Collection<String> args) throws IOException {
         try {
-            final Set<PathElement> uniquesElements = newConcurrentHashSet();
+            final Set<PathElement> uniqueElements = newConcurrentHashSet();
             final Multimap<PathElement, PathElement> duplicates = synchronizedListMultimap(ArrayListMultimap.create());
 
-            directoryWalker.extractDuplicates(args, uniquesElements, duplicates);
+            directoryWalker.extractDuplicates(args, uniqueElements, duplicates);
 
             if (systemPropertyGetter.doOrganize()) {
-                pathOrganizer.organize(uniquesElements);
+                pathOrganizer.organize(uniqueElements);
             }
 
             final Path csvReport = new DuplicatesCsvReporter().report(duplicates);

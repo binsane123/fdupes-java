@@ -41,14 +41,14 @@ public class DuplicateFinderByKey {
 
     public <K> Collection<PathElement> getDuplicates(final Collection<PathElement> input,
                                                      final Function<PathElement, K> keyMapper,
-                                                     final Collection<PathElement> uniquesElements) {
+                                                     final Collection<PathElement> uniqueElements) {
         Preconditions.checkNotNull(input, "null pass stream");
         Preconditions.checkNotNull(keyMapper, "null pass key mapper");
 
         final Multimap<K, PathElement> multimap = input.parallelStream()
                                                        .collect(toMultimap(keyMapper));
 
-        uniquesElements.addAll(
+        uniqueElements.addAll(
             multimap.asMap()
                     .entrySet()
                     .parallelStream()

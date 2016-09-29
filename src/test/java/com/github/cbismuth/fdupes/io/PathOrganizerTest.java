@@ -52,10 +52,10 @@ public class PathOrganizerTest {
 
         final String workingDirectory = destination.toString();
         final PathElement uniqueElement = new PathElement(actual, Files.readAttributes(actual, BasicFileAttributes.class));
-        final List<PathElement> uniquesElements = singletonList(uniqueElement);
+        final List<PathElement> uniqueElements = singletonList(uniqueElement);
 
         // WHEN
-        systemUnderTest.organize(workingDirectory, "sub", uniquesElements);
+        systemUnderTest.organize(workingDirectory, "sub", uniqueElements);
 
         // THEN
         final Path expected = Paths.get(destination.toString(), "sub", "2016", "01", "02", "20160102121314.MOV");
@@ -72,10 +72,10 @@ public class PathOrganizerTest {
 
         final String workingDirectory = destination.toString();
         final PathElement uniqueElement = new PathElement(actual, Files.readAttributes(actual, BasicFileAttributes.class));
-        final List<PathElement> uniquesElements = singletonList(uniqueElement);
+        final List<PathElement> uniqueElements = singletonList(uniqueElement);
 
         // WHEN
-        systemUnderTest.organize(workingDirectory, "sub", uniquesElements);
+        systemUnderTest.organize(workingDirectory, "sub", uniqueElements);
 
         // THEN
         final Path expected = Paths.get(destination.toString(), "sub", "misc", "42-MOV01020304-1-1.MOV");

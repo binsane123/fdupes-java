@@ -52,8 +52,8 @@ public class PathOrganizer {
         this.pathAnalyser = pathAnalyser;
     }
 
-    public void organize(final Iterable<PathElement> uniquesElements) throws IOException {
-        organize(System.getProperty("user.dir"), String.valueOf(currentTimeMillis()), uniquesElements);
+    public void organize(final Iterable<PathElement> uniqueElements) throws IOException {
+        organize(System.getProperty("user.dir"), String.valueOf(currentTimeMillis()), uniqueElements);
 
     }
 
@@ -67,10 +67,10 @@ public class PathOrganizer {
     }
 
     private void moveUniqueFiles(final Path destination,
-                                 final Iterable<PathElement> uniquesElements) {
+                                 final Iterable<PathElement> uniqueElements) {
         final AtomicInteger counter = new AtomicInteger(1);
 
-        uniquesElements.forEach(pathElement -> {
+        uniqueElements.forEach(pathElement -> {
             final Optional<Path> timestampPath = pathAnalyser.getTimestampPath(destination, pathElement.getPath());
 
             if (timestampPath.isPresent()) {

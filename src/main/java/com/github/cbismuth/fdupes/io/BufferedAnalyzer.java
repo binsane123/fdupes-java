@@ -57,7 +57,7 @@ public class BufferedAnalyzer {
     }
 
     public void analyze(final Collection<PathElement> input,
-                        final Set<PathElement> uniquesElements,
+                        final Set<PathElement> uniqueElements,
                         final Multimap<PathElement, PathElement> duplicates) {
         input.parallelStream()
              .collect(toMultimap(PathElement::size))
@@ -69,7 +69,7 @@ public class BufferedAnalyzer {
                  values.parallelStream()
                        .map(pathElement -> new ByteBuffer(pathElement, systemPropertyGetter.getBufferSize()))
                        .collect(toList()),
-                 uniquesElements,
+                 uniqueElements,
                  duplicates
              ));
 
@@ -77,7 +77,7 @@ public class BufferedAnalyzer {
     }
 
     private void removeUniqueFiles(final Collection<ByteBuffer> buffers,
-                                   final Set<PathElement> uniquesElements,
+                                   final Set<PathElement> uniqueElements,
                                    final Multimap<PathElement, PathElement> duplicates) {
         if (!buffers.isEmpty() && buffers.size() != 1) {
             buffers.forEach(ByteBuffer::read);
@@ -91,7 +91,7 @@ public class BufferedAnalyzer {
 
                 final PathElement original = collect.remove(0);
 
-                uniquesElements.add(original);
+                uniqueElements.add(original);
                 duplicates.putAll(original, collect);
             } else {
                 final Collection<Collection<ByteBuffer>> values = buffers.parallelStream()
@@ -103,11 +103,11 @@ public class BufferedAnalyzer {
                       .filter(collection -> collection.size() == 1)
                       .flatMap(Collection::stream)
                       .map(ByteBuffer::getPathElement)
-                      .forEach(uniquesElements::add);
+                      .forEach(uniqueElements::add);
 
                 values.parallelStream()
                       .filter(collection -> collection.size() > 1)
-                      .forEach(collection -> removeUniqueFiles(collection, uniquesElements, duplicates));
+                      .forEach(collection -> removeUniqueFiles(collection, uniqueElements, duplicates));
             }
         }
     }

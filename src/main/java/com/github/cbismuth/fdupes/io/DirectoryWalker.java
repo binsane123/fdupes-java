@@ -66,7 +66,7 @@ public class DirectoryWalker {
     }
 
     public void extractDuplicates(final Iterable<String> inputPaths,
-                                  final Set<PathElement> uniquesElements,
+                                  final Set<PathElement> uniqueElements,
                                   final Multimap<PathElement, PathElement> duplicates) throws IOException {
         Preconditions.checkNotNull(inputPaths, "null input path collection");
 
@@ -91,7 +91,7 @@ public class DirectoryWalker {
 
         new ErrorReporter(pathEscapeFunction).report(unreadablePaths);
 
-        duplicatesFinder.extractDuplicates(readablePaths, uniquesElements, duplicates);
+        duplicatesFinder.extractDuplicates(readablePaths, uniqueElements, duplicates);
     }
 
     private void handleDirectory(final Path path,

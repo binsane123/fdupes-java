@@ -63,23 +63,23 @@ public class DuplicatesFinder {
     }
 
     public void extractDuplicates(final Collection<PathElement> input,
-                                  final Set<PathElement> uniquesElements,
+                                  final Set<PathElement> uniqueElements,
                                   final Multimap<PathElement, PathElement> duplicates) {
         Preconditions.checkNotNull(input, "null file metadata collection");
 
         LOGGER.info("Pass 1/3 - compare file by size ...");
-        final Collection<PathElement> duplicatesBySize = duplicateFinderByKey.getDuplicates(input, PathElement::size, uniquesElements);
+        final Collection<PathElement> duplicatesBySize = duplicateFinderByKey.getDuplicates(input, PathElement::size, uniqueElements);
         getMetricRegistry().register(name("duplicates", "by-size", "count"), (Gauge<Integer>) duplicatesBySize::size);
         LOGGER.info("Pass 1/3 - compare file by size completed! - {} duplicate(s) found", duplicatesBySize.size());
 
         LOGGER.info("Pass 2/3 - compare file by MD5 ...");
-        final Collection<PathElement> duplicatesByMd5 = duplicateFinderByKey.getDuplicates(duplicatesBySize, md5Computer::compute, uniquesElements);
+        final Collection<PathElement> duplicatesByMd5 = duplicateFinderByKey.getDuplicates(duplicatesBySize, md5Computer::compute, uniqueElements);
         getMetricRegistry().register(name("duplicates", "by-md5", "count"), (Gauge<Integer>) duplicatesByMd5::size);
         LOGGER.info("Pass 2/3 - compare file by MD5 completed! - {} duplicate(s) found", duplicatesByMd5.size());
 
         LOGGER.info("Pass 3/3 - compare file byte-by-byte ...");
         final BufferedAnalyzer analyzer = new BufferedAnalyzer(pathComparator, systemPropertyGetter);
-        analyzer.analyze(duplicatesByMd5, uniquesElements, duplicates);
+        analyzer.analyze(duplicatesByMd5, uniqueElements, duplicates);
         getMetricRegistry().register(name("duplicates", "by-bytes", "count"), (Gauge<Integer>) duplicates::size);
         LOGGER.info("Pass 3/3 - compare file byte-by-byte completed! - {} duplicate(s) found", duplicates.size());
     }
