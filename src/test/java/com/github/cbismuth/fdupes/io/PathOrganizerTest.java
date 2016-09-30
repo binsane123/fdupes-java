@@ -58,7 +58,7 @@ public class PathOrganizerTest {
         systemUnderTest.organize(workingDirectory, "sub", uniqueElements);
 
         // THEN
-        final Path expected = Paths.get(destination.toString(), "sub", "2016", "01", "02", "20160102121314.MOV");
+        final Path expected = Paths.get(destination.toString(), "sub", "2016", "01", "20160102121314.MOV");
         assertTrue(Files.exists(expected));
     }
 
@@ -78,7 +78,7 @@ public class PathOrganizerTest {
         systemUnderTest.organize(workingDirectory, "sub", uniqueElements);
 
         // THEN
-        final Path expected = Paths.get(destination.toString(), "sub", "2016", "01", "02", "20160102121314.MOV");
+        final Path expected = Paths.get(destination.toString(), "sub", "2016", "01", "20160102121314.MOV");
         assertTrue(Files.exists(expected));
     }
 

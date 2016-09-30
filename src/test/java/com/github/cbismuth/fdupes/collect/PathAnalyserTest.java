@@ -45,7 +45,7 @@ public class PathAnalyserTest {
 
         final Optional<Path> actual = systemUnderTest.getTimestampPath(destination, path);
         final Path expected = Paths.get(destination.toString(),
-                                        "2011", "07", "24",
+                                        "2011", "07",
                                         "20110724123316.JPG");
 
         assertEquals(expected.toString(), actual.get().toString());
@@ -58,7 +58,7 @@ public class PathAnalyserTest {
 
         final Optional<Path> actual = systemUnderTest.getTimestampPath(destination, path);
         final Path expected = Paths.get(destination.toString(),
-                                        "2016", "01", "02",
+                                        "2016", "01",
                                         "20160102121314.MOV");
 
         assertEquals(expected.toString(), actual.get().toString());
@@ -71,7 +71,7 @@ public class PathAnalyserTest {
 
         final Optional<Path> actual = systemUnderTest.getTimestampPath(destination, path);
         final Path expected = Paths.get(destination.toString(),
-                                        "2016", "01", "02",
+                                        "2016", "01",
                                         "20160102121314.MOV");
 
         assertEquals(expected.toString(), actual.get().toString());
@@ -81,20 +81,20 @@ public class PathAnalyserTest {
     public void testGetTimestampPath_onMatch_existing() throws IOException {
         final Path destination = Files.createTempDirectory(getClass().getSimpleName());
         final Path path = Paths.get(destination.toString(),
-                                    "2016", "01", "02",
+                                    "2016", "01",
                                     "MOV20160102121314.MOV");
 
-        Files.createDirectories(Paths.get(destination.toString(), "2016", "01", "02"));
+        Files.createDirectories(Paths.get(destination.toString(), "2016", "01"));
         final Path created1 = Files.createFile(Paths.get(destination.toString(),
-                                                         "2016", "01", "02",
+                                                         "2016", "01",
                                                          "20160102121314.MOV"));
         final Path created2 = Files.createFile(Paths.get(destination.toString(),
-                                                         "2016", "01", "02",
+                                                         "2016", "01",
                                                          "20160102121314-1.MOV"));
 
         final Optional<Path> actual = systemUnderTest.getTimestampPath(destination, path);
         final Path expected = Paths.get(destination.toString(),
-                                        "2016", "01", "02",
+                                        "2016", "01",
                                         "20160102121314-2.MOV");
 
         assertEquals(expected.toString(), actual.get().toString());

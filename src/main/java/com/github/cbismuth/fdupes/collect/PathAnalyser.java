@@ -78,7 +78,7 @@ public class PathAnalyser {
         final String extension = matcher.group(7);
 
         Path newPath = Paths.get(destination.toString(),
-                                 year, month, day,
+                                 year, month,
                                  new StringBuilder().append(year)
                                                     .append(month)
                                                     .append(day)
@@ -93,7 +93,7 @@ public class PathAnalyser {
         int i = 1;
         while (Files.exists(newPath)) {
             newPath = Paths.get(destination.toString(),
-                                year, month, day,
+                                year, month,
                                 new StringBuilder().append(year)
                                                    .append(month)
                                                    .append(day)
