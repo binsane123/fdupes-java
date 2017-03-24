@@ -7,11 +7,11 @@
 [![issues](https://img.shields.io/github/issues/cbismuth/fdupes-java.svg)](https://github.com/cbismuth/fdupes-java/issues)
 [![licence](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/cbismuth/fdupes-java/master/LICENSE.md)
 
-## Description
+## Description
 
 A command line duplicated files finder written in Java 8 which finds all duplicated files from input paths and their subdirectories.
 
-## Usage
+## Usage
 
 Executable files are available on the [release page](https://github.com/cbismuth/fdupes-java/releases), download the latest one and run the command line below. 
 
@@ -65,7 +65,7 @@ java -Xmx1g                       \
 
 **Note**: `<PATH1> [<PATH2>]...` can be either regular files, directories or both.
 
-### Benchmark
+### Benchmark
 
 | Hardware  |                                         |
 | --------- | ----------------------------------------|
@@ -132,7 +132,7 @@ Here is how issues are triaged:
 * **Enhancement**: improves the way the application behaves but produces the same result.
 * **Spike**: improves implementation design but does not change application behaviour and produces the same result.
 
-## Credits
+## Credits
 
 Written by Christophe Bismuth, licensed under the [The MIT License (MIT)](LICENSE.md).
 
