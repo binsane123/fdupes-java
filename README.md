@@ -135,3 +135,6 @@ Here is how issues are triaged:
 ## Credits
 
 Written by Christophe Bismuth, licensed under the [The MIT License (MIT)](LICENSE.md).
+
+This project is finely profiled with the awesome **JProfiler** from ej-technologies!
+https://www.ej-technologies.com/products/jprofiler/overview.html
